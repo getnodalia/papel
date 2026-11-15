@@ -8,7 +8,7 @@ use super::{
 };
 
 /// `DocInfo::outline` holds the first this many bookmarks in outline order. Opening a document
-/// reads only this window; the rest are listed by page through `pdfcraft_organize`.
+/// reads only this window; the rest are listed by page through `papel_organize`.
 pub(super) const OUTLINE_WINDOW: usize = 10_000;
 
 /// Deepest level `DocInfo::outline` nests (the top level is 0); deeper bookmarks are left out.
@@ -414,9 +414,9 @@ impl<'a> Inspector<'a> {
 }
 
 /// A text string's value, decoded by the same rules as the engine's object model
-/// ([`pdfcraft_cos::PdfString::to_text`]) so the panels and outline editing agree.
+/// ([`papel_cos::PdfString::to_text`]) so the panels and outline editing agree.
 pub(super) fn text_string(bytes: &[u8]) -> String {
-    pdfcraft_cos::PdfString::literal(bytes).to_text()
+    papel_cos::PdfString::literal(bytes).to_text()
 }
 
 /// What [`Inspector::name_tree_find`] has visited: node dictionaries, and the key and `/Names`
@@ -480,7 +480,7 @@ fn label_work(left: &mut usize, count: usize) -> Result<(), &'static str> {
 /// Read like [`inspect`]: the lazy reader first, lopdf's tolerant one when the lazy reader fails.
 pub fn named_destination(bytes: Arc<Vec<u8>>, password: Option<&str>, name: &str) -> Option<(usize, DestView)> {
     // PDFDocEncoding bytes that are also UTF-8 read as UTF-8, so only this finds "Ã©" written C3 A9.
-    let pdfdoc: Option<Vec<u8>> = name.chars().map(pdfcraft_cos::pdfdoc_byte).collect();
+    let pdfdoc: Option<Vec<u8>> = name.chars().map(papel_cos::pdfdoc_byte).collect();
     let find = |doc: &dyn Structure| {
         let insp = Inspector::new(doc);
         let dest = insp

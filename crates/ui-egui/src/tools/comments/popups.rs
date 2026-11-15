@@ -343,7 +343,7 @@ pub(crate) fn popups(ctx: &egui::Context, view: &mut DocView, info: &DocInfo, pr
     let mut rects = Vec::new();
     let mut hovered = None;
     // The comment each reply files under, as the Comments panel threads them (by reference).
-    let tops = pdfcraft_render::thread_tops(&info.annotations);
+    let tops = papel_render::thread_tops(&info.annotations);
     let xforms: Vec<(usize, PageXform)> = view.page_xforms();
     for (page, xf) in xforms {
         let shown: Vec<Annotation> =

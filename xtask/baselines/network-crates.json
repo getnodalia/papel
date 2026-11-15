@@ -1,74 +1,74 @@
 [
   {
-    "crate": "pdfcraft-cli",
+    "crate": "papel-cli",
     "name": "hyper",
     "reachable": true,
-    "path": "pdfcraft-cli -> pdfcraft-engine -> pdfcraft-print -> craft-print -> winprint -> reqwest -> hyper"
+    "path": "papel-cli -> papel-engine -> papel-print -> craft-print -> winprint -> reqwest -> hyper"
   },
   {
-    "crate": "pdfcraft-cli",
+    "crate": "papel-cli",
     "name": "reqwest",
     "reachable": true,
-    "path": "pdfcraft-cli -> pdfcraft-engine -> pdfcraft-print -> craft-print -> winprint -> reqwest"
+    "path": "papel-cli -> papel-engine -> papel-print -> craft-print -> winprint -> reqwest"
   },
   {
-    "crate": "pdfcraft-cli",
+    "crate": "papel-cli",
     "name": "socket2",
     "reachable": true,
-    "path": "pdfcraft-cli -> pdfcraft-engine -> pdfcraft-print -> craft-print -> winprint -> reqwest -> hyper-util -> socket2"
+    "path": "papel-cli -> papel-engine -> papel-print -> craft-print -> winprint -> reqwest -> hyper-util -> socket2"
   },
   {
-    "crate": "pdfcraft-cli",
+    "crate": "papel-cli",
     "name": "tokio",
     "reachable": true,
-    "path": "pdfcraft-cli -> pdfcraft-engine -> pdfcraft-print -> craft-print -> winprint -> reqwest -> tokio"
+    "path": "papel-cli -> papel-engine -> papel-print -> craft-print -> winprint -> reqwest -> tokio"
   },
   {
-    "crate": "pdfcraft-automation",
+    "crate": "papel-automation",
     "name": "hyper",
     "reachable": true,
-    "path": "pdfcraft-automation -> pdfcraft-engine -> pdfcraft-print -> craft-print -> winprint -> reqwest -> hyper"
+    "path": "papel-automation -> papel-engine -> papel-print -> craft-print -> winprint -> reqwest -> hyper"
   },
   {
-    "crate": "pdfcraft-automation",
+    "crate": "papel-automation",
     "name": "reqwest",
     "reachable": true,
-    "path": "pdfcraft-automation -> pdfcraft-engine -> pdfcraft-print -> craft-print -> winprint -> reqwest"
+    "path": "papel-automation -> papel-engine -> papel-print -> craft-print -> winprint -> reqwest"
   },
   {
-    "crate": "pdfcraft-automation",
+    "crate": "papel-automation",
     "name": "socket2",
     "reachable": true,
-    "path": "pdfcraft-automation -> pdfcraft-engine -> pdfcraft-print -> craft-print -> winprint -> reqwest -> hyper-util -> socket2"
+    "path": "papel-automation -> papel-engine -> papel-print -> craft-print -> winprint -> reqwest -> hyper-util -> socket2"
   },
   {
-    "crate": "pdfcraft-automation",
+    "crate": "papel-automation",
     "name": "tokio",
     "reachable": true,
-    "path": "pdfcraft-automation -> pdfcraft-engine -> pdfcraft-print -> craft-print -> winprint -> reqwest -> tokio"
+    "path": "papel-automation -> papel-engine -> papel-print -> craft-print -> winprint -> reqwest -> tokio"
   },
   {
-    "crate": "pdfcraft-engine",
+    "crate": "papel-engine",
     "name": "hyper",
     "reachable": true,
-    "path": "pdfcraft-engine -> pdfcraft-print -> craft-print -> winprint -> reqwest -> hyper"
+    "path": "papel-engine -> papel-print -> craft-print -> winprint -> reqwest -> hyper"
   },
   {
-    "crate": "pdfcraft-engine",
+    "crate": "papel-engine",
     "name": "reqwest",
     "reachable": true,
-    "path": "pdfcraft-engine -> pdfcraft-print -> craft-print -> winprint -> reqwest"
+    "path": "papel-engine -> papel-print -> craft-print -> winprint -> reqwest"
   },
   {
-    "crate": "pdfcraft-engine",
+    "crate": "papel-engine",
     "name": "socket2",
     "reachable": true,
-    "path": "pdfcraft-engine -> pdfcraft-print -> craft-print -> winprint -> reqwest -> hyper-util -> socket2"
+    "path": "papel-engine -> papel-print -> craft-print -> winprint -> reqwest -> hyper-util -> socket2"
   },
   {
-    "crate": "pdfcraft-engine",
+    "crate": "papel-engine",
     "name": "tokio",
     "reachable": true,
-    "path": "pdfcraft-engine -> pdfcraft-print -> craft-print -> winprint -> reqwest -> tokio"
+    "path": "papel-engine -> papel-print -> craft-print -> winprint -> reqwest -> tokio"
   }
 ]

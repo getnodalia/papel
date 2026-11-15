@@ -10,14 +10,14 @@ pub(crate) mod flate {
 
     pub(crate) use fallback::FlateState;
 
-    /// PdfCraft patch: whether a Flate stream with `params` has no predictor, so that
+    /// Papel patch: whether a Flate stream with `params` has no predictor, so that
     /// [`FlateState`] can produce it a piece at a time.
     pub(crate) fn is_plain(params: &Dict<'_>) -> bool {
         PredictorParams::from_params(params).predictor == 1
     }
     use crate::object::Dict;
 
-    /// PdfCraft patch: `limit` is the most bytes inflated (see `filter::decode_limit`), and `rows`
+    /// Papel patch: `limit` is the most bytes inflated (see `filter::decode_limit`), and `rows`
     /// the `/Height` of the image the data is the samples of, if it is (see [`untagged_png_rows`]).
     #[cfg(feature = "unsafe")]
     pub(crate) fn decode(
@@ -53,7 +53,7 @@ pub(crate) mod flate {
 
                 fallback::decode(data, limit)
             })?;
-        // PdfCraft patch: output cut at the limit is reported, never dropped silently.
+        // Papel patch: output cut at the limit is reported, never dropped silently.
         if decoded.len() >= limit {
             warn!("flate stream stopped at its decode limit of {limit} bytes");
         }
@@ -68,14 +68,14 @@ pub(crate) mod flate {
         rows: Option<usize>,
     ) -> Option<Vec<u8>> {
         let decoded = fallback::decode(data, limit)?;
-        // PdfCraft patch: output cut at the limit is reported, never dropped silently.
+        // Papel patch: output cut at the limit is reported, never dropped silently.
         if decoded.len() >= limit {
             warn!("flate stream stopped at its decode limit of {limit} bytes");
         }
         undo_predictor(decoded, &PredictorParams::from_params(params), rows)
     }
 
-    /// PdfCraft patch: the predictor undone, unless the image's rows carry none
+    /// Papel patch: the predictor undone, unless the image's rows carry none
     /// ([`untagged_png_rows`]): the data is then its samples as they are, which is reported.
     fn undo_predictor(
         decoded: Vec<u8>,
@@ -110,7 +110,7 @@ pub(crate) mod flate {
             Some(output)
         }
 
-        /// PdfCraft patch: where a Flate stream is between two calls of [`FlateState::decode_into`].
+        /// Papel patch: where a Flate stream is between two calls of [`FlateState::decode_into`].
         /// Decoding pauses at any output size and resumes where it stopped, so a stream can be
         /// produced a piece at a time without holding all of it.
         #[derive(Default)]
@@ -189,7 +189,7 @@ pub(crate) mod flate {
             }
         }
 
-        /// PdfCraft patch: the working state of one [`FlateState::decode_into`] call.
+        /// Papel patch: the working state of one [`FlateState::decode_into`] call.
         struct FlateStream<'a> {
             data: &'a [u8],
             pos: usize,
@@ -202,12 +202,12 @@ pub(crate) mod flate {
             /// How many bytes were decoded before this call.
             total: usize,
             eof: bool,
-            /// PdfCraft patch: the most bytes in `output` (see `filter::decode_limit`).
+            /// Papel patch: the most bytes in `output` (see `filter::decode_limit`).
             limit: usize,
             block: Block,
         }
 
-        /// PdfCraft patch: the block a Flate stream is in.
+        /// Papel patch: the block a Flate stream is in.
         #[derive(Default)]
         enum Block {
             /// Between blocks, at a block header (or at the end of the data).
@@ -318,7 +318,7 @@ pub(crate) mod flate {
                     }
                 };
 
-                // PdfCraft patch: the final block ends the stream once it is decoded, not when its
+                // Papel patch: the final block ends the stream once it is decoded, not when its
                 // header is read: a stored block still has its bytes to copy.
                 let last = (hdr & 1) != 0;
 
@@ -478,7 +478,7 @@ pub(crate) mod flate {
                         copy = None;
                     }
 
-                    // PdfCraft patch: one code adds at most 258 bytes; stop at the limit.
+                    // Papel patch: one code adds at most 258 bytes; stop at the limit.
                     if self.output.len() >= self.limit {
                         self.block = Block::Coded {
                             lit: lit_code_table,
@@ -566,7 +566,7 @@ pub(crate) mod flate {
                 let Some(mut start) = len.checked_sub(distance).filter(|_| valid && distance > 0) else {
                     return if len < self.limit { 0 } else { left };
                 };
-                // PdfCraft patch: copy in runs of up to `distance` bytes. Each run reads only bytes
+                // Papel patch: copy in runs of up to `distance` bytes. Each run reads only bytes
                 // already in the output, so the bytes are the ones a byte-at-a-time copy writes.
                 let copy = left.min(self.limit.saturating_sub(len));
                 let mut done = 0;
@@ -809,14 +809,14 @@ pub(crate) mod lzw {
     use alloc::vec;
     use alloc::vec::Vec;
 
-    /// Decode a LZW-encoded stream. PdfCraft patch: `limit` is the most bytes produced (see
+    /// Decode a LZW-encoded stream. Papel patch: `limit` is the most bytes produced (see
     /// `filter::decode_limit`); with a full table every 12-bit code can repeat an entry of
     /// thousands of bytes.
     pub(crate) fn decode(data: &[u8], params: &Dict<'_>, limit: usize) -> Option<Vec<u8>> {
         let params = PredictorParams::from_params(params);
 
         let decoded = decode_impl(data, params.early_change, limit)?;
-        // PdfCraft patch: output cut at the limit is reported, never dropped silently.
+        // Papel patch: output cut at the limit is reported, never dropped silently.
         if decoded.len() >= limit {
             warn!("LZW stream stopped at its decode limit of {limit} bytes");
         }
@@ -861,7 +861,7 @@ pub(crate) mod lzw {
                         return None;
                     }
 
-                    // PdfCraft patch: never past `limit`.
+                    // Papel patch: never past `limit`.
                     let left = limit.saturating_sub(decoded.len());
                     if new < table.size() {
                         let entry = table.get(new)?;
@@ -969,7 +969,7 @@ struct PredictorParams {
 
 impl PredictorParams {
     fn row_length_in_bytes(&self) -> usize {
-        // PdfCraft patch: saturating, and in usize (colors × bits overflowed u8): a fuzzed
+        // Papel patch: saturating, and in usize (colors × bits overflowed u8): a fuzzed
         // `/Columns 9223372036854775807` wrapped to a 2^61-byte row.
         self.columns
             .saturating_mul(usize::from(self.bits_per_component) * usize::from(self.colors))
@@ -1001,7 +1001,7 @@ impl PredictorParams {
     }
 }
 
-/// PdfCraft patch: whether `len` bytes of an image `rows` high (`None` for data that isn't an
+/// Papel patch: whether `len` bytes of an image `rows` high (`None` for data that isn't an
 /// image's samples) are its rows without the filter-type byte each row starts with under a PNG
 /// predictor (ISO 32000-2 §7.4.4.4): exactly `rows` × the row's bytes, where the predicted data
 /// would be `rows` × (the row's bytes + 1). Some writers declare `/Predictor 15` without applying
@@ -1031,7 +1031,7 @@ fn apply_predictor(data: Vec<u8>, params: &PredictorParams) -> Option<Vec<u8>> {
                 row_len
             };
 
-            // PdfCraft patch: a zero-width row divided by zero below, and a row longer than the
+            // Papel patch: a zero-width row divided by zero below, and a row longer than the
             // data was allocated before finding there is nothing to read (no rows: empty output,
             // as before).
             if row_len == 0 {
@@ -1050,7 +1050,7 @@ fn apply_predictor(data: Vec<u8>, params: &PredictorParams) -> Option<Vec<u8>> {
             }
 
             if is_png_predictor {
-                // PdfCraft patch: PNG predictors work on bytes whatever the bit depth, so they are
+                // Papel patch: PNG predictors work on bytes whatever the bit depth, so they are
                 // undone a row at a time on byte slices instead of through the bit-level readers.
                 // In usize (the u8 product overflowed).
                 let bpp = (usize::from(params.colors) * usize::from(params.bits_per_component))
@@ -1059,7 +1059,7 @@ fn apply_predictor(data: Vec<u8>, params: &PredictorParams) -> Option<Vec<u8>> {
             }
 
             if i == 2 && matches!(params.bits_per_component, 8 | 16) && !bit_level_only() {
-                // PdfCraft patch: whole-byte samples are undone a row at a time on byte slices
+                // Papel patch: whole-byte samples are undone a row at a time on byte slices
                 // instead of through the bit-level readers, which packed samples need.
                 let sample_len = usize::from(params.bits_per_component / 8);
                 let pixel_len = usize::from(params.colors).saturating_mul(sample_len);
@@ -1093,7 +1093,7 @@ fn apply_predictor(data: Vec<u8>, params: &PredictorParams) -> Option<Vec<u8>> {
                     return None;
                 }
 
-                // PdfCraft patch: packed TIFF samples can leave padding bits at the end
+                // Papel patch: packed TIFF samples can leave padding bits at the end
                 // of a row. split_off requires byte alignment or the next row overwrites it.
                 writer.align();
                 let (data, new_writer) = writer.split_off();
@@ -1106,7 +1106,7 @@ fn apply_predictor(data: Vec<u8>, params: &PredictorParams) -> Option<Vec<u8>> {
     }
 }
 
-/// PdfCraft patch: undoes TIFF predictor 2 (ISO 32000-2 §7.4.4.4, Table 10; TIFF 6.0 §14)
+/// Papel patch: undoes TIFF predictor 2 (ISO 32000-2 §7.4.4.4, Table 10; TIFF 6.0 §14)
 /// for 8- and 16-bit samples, in rows of `row_len` bytes holding pixels of `pixel_len` bytes,
 /// each sample `sample_len` bytes (1 or 2, big-endian): every sample is added to the same
 /// component of the pixel to its left, wrapping at the sample's width. Bytes after the last
@@ -1151,13 +1151,13 @@ fn undo_tiff_bytes(
 
 #[cfg(all(test, feature = "std"))]
 std::thread_local! {
-    /// PdfCraft patch tests: rows the bit-level TIFF predictor path has undone on this thread.
+    /// Papel patch tests: rows the bit-level TIFF predictor path has undone on this thread.
     static BIT_LEVEL_TIFF_ROWS: core::cell::Cell<usize> = const { core::cell::Cell::new(0) };
-    /// PdfCraft patch tests: send whole-byte TIFF samples through the bit-level path too.
+    /// Papel patch tests: send whole-byte TIFF samples through the bit-level path too.
     static BIT_LEVEL_ONLY: core::cell::Cell<bool> = const { core::cell::Cell::new(false) };
 }
 
-/// PdfCraft patch: whether whole-byte TIFF samples must take the bit-level path (only when a
+/// Papel patch: whether whole-byte TIFF samples must take the bit-level path (only when a
 /// test compares the two paths).
 #[cfg(all(test, feature = "std"))]
 fn bit_level_only() -> bool {
@@ -1169,7 +1169,7 @@ fn bit_level_only() -> bool {
     false
 }
 
-/// PdfCraft patch: undoes PNG row filters (ISO 32000-2 §7.4.4.4, PNG specification §9) in
+/// Papel patch: undoes PNG row filters (ISO 32000-2 §7.4.4.4, PNG specification §9) in
 /// rows of `row_len` bytes, each after its filter-type byte, with `bpp` bytes per complete pixel
 /// (at least 1). An unknown filter type copies the row as it is. Bytes after the last complete
 /// row are dropped.
@@ -1413,7 +1413,7 @@ mod tests {
         );
     }
 
-    /// PdfCraft patch: 300 zero bytes, zlib-compressed: one literal, then copies of distance 1 that
+    /// Papel patch: 300 zero bytes, zlib-compressed: one literal, then copies of distance 1 that
     /// are longer than their distance.
     const ZEROS_300: [u8; 13] = [0x78, 0xda, 0x63, 0x60, 0x18, 0x05, 0xc4, 0x02, 0x00, 0x01, 0x2c, 0x00, 0x01];
 
@@ -1475,9 +1475,9 @@ mod tests {
     }
 }
 
-/// PdfCraft patch tests: PNG predictors are undone byte by byte (`unfilter_png`).
+/// Papel patch tests: PNG predictors are undone byte by byte (`unfilter_png`).
 #[cfg(test)]
-mod pdfcraft_png_predictor_tests {
+mod papel_png_predictor_tests {
     use crate::filter::lzw_flate::{PredictorParams, apply_predictor, flate, untagged_png_rows};
     use crate::object::{Dict, FromBytes};
 
@@ -1734,10 +1734,10 @@ mod pdfcraft_png_predictor_tests {
     }
 }
 
-/// PdfCraft patch tests: TIFF predictor 2 on 8- and 16-bit samples is undone on byte rows
+/// Papel patch tests: TIFF predictor 2 on 8- and 16-bit samples is undone on byte rows
 /// (`undo_tiff_bytes`), with the same output as the bit-level path.
 #[cfg(all(test, feature = "std"))]
-mod pdfcraft_tiff_predictor_tests {
+mod papel_tiff_predictor_tests {
     use super::{BIT_LEVEL_ONLY, BIT_LEVEL_TIFF_ROWS};
     use crate::filter::lzw_flate::{PredictorParams, apply_predictor};
 

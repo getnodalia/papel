@@ -3,8 +3,8 @@
 
 use std::sync::Arc;
 
-use pdfcraft_cos::{Dict, Document, ObjRef, Object, SaveOptions, Stream, write_full};
-use pdfcraft_optimize::{DOWNSAMPLED_ABOVE, TileReport, tile_large_images};
+use papel_cos::{Dict, Document, ObjRef, Object, SaveOptions, Stream, write_full};
+use papel_optimize::{DOWNSAMPLED_ABOVE, TileReport, tile_large_images};
 
 /// 4200 × 1000: just over [`DOWNSAMPLED_ABOVE`], three tiles wide.
 const W: u32 = 4200;
@@ -56,8 +56,8 @@ fn page_drawing(w: u32, h: u32, before: &str, add: impl FnOnce(&mut Document) ->
 
 fn render(doc: &Document) -> Vec<u8> {
     let bytes = write_full(doc, &SaveOptions::default()).unwrap();
-    let mut r = pdfcraft_render::PageRenderer::new(Arc::new(bytes), pdfcraft_render::RenderConfig::default());
-    let out = r.render(pdfcraft_render::RenderRequest { page: 0, scale: 1.0, ..Default::default() });
+    let mut r = papel_render::PageRenderer::new(Arc::new(bytes), papel_render::RenderConfig::default());
+    let out = r.render(papel_render::RenderRequest { page: 0, scale: 1.0, ..Default::default() });
     assert!(out.error.is_none(), "{:?}", out.error);
     out.rgba.to_vec()
 }
@@ -108,7 +108,7 @@ fn one_bit_grey_and_four_bit_indexed_samples_are_cut_on_byte_boundaries() {
             Object::name("Indexed"),
             Object::name("DeviceRGB"),
             Object::Int(15),
-            Object::String(pdfcraft_cos::PdfString::literal(palette.clone())),
+            Object::String(papel_cos::PdfString::literal(palette.clone())),
         ]);
         let d = image_dict(W, H, &[("ColorSpace", indexed), ("BitsPerComponent", Object::Int(4))]);
         doc.add(Object::Stream(Stream::flate(d, &nibbles)))

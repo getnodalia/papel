@@ -2,14 +2,14 @@
 //! the printer it names is the one the dialog already has.
 
 use egui_kittest::Harness;
-use pdfcraft_engine::print::spool::Printer;
-use pdfcraft_engine::print::{PAPERS, SizeMode};
-use pdfcraft_ui_egui::{PdfCraftApp, PrinterSetup};
+use papel_engine::print::spool::Printer;
+use papel_engine::print::{PAPERS, SizeMode};
+use papel_ui_egui::{PapelApp, PrinterSetup};
 use std::sync::{Arc, Mutex};
 
-fn harness() -> Harness<'static, PdfCraftApp> {
+fn harness() -> Harness<'static, PapelApp> {
     let mut h = Harness::builder().with_size(egui::vec2(1400.0, 900.0)).build_eframe(|_cc| {
-        let mut app = PdfCraftApp::new();
+        let mut app = PapelApp::new();
         app.set_option("language", "en").unwrap();
         app.open_bytes("form.pdf", None, include_bytes!("../data/form.pdf").to_vec()).unwrap();
         app
@@ -18,7 +18,7 @@ fn harness() -> Harness<'static, PdfCraftApp> {
     h
 }
 
-fn wait_for_list(h: &mut Harness<'static, PdfCraftApp>) {
+fn wait_for_list(h: &mut Harness<'static, PapelApp>) {
     let deadline = std::time::Instant::now() + std::time::Duration::from_secs(10);
     while h.state().print_draft.printers_loading && std::time::Instant::now() < deadline {
         h.run_steps(1);

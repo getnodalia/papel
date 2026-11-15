@@ -16,9 +16,9 @@ pub(super) fn full_save_holds(doc: &Document, secret: &[u8]) -> bool {
 #[test]
 fn a_redacted_field_listed_in_the_calculation_order_leaves_the_saved_file() {
     let mut doc = one_page(b"", "", vec![]);
-    pdfcraft_forms::add_field(&mut doc, 0, [10.0, 50.0, 100.0, 70.0], &pdfcraft_forms::NewField::Text { multiline: false }, Some("ssn")).unwrap();
-    pdfcraft_forms::set_value(&mut doc, "ssn", &pdfcraft_forms::FieldValue::Text("SSN-078-05-1120".into())).unwrap();
-    let field = pdfcraft_forms::fields(&doc).swap_remove(0).obj;
+    papel_forms::add_field(&mut doc, 0, [10.0, 50.0, 100.0, 70.0], &papel_forms::NewField::Text { multiline: false }, Some("ssn")).unwrap();
+    papel_forms::set_value(&mut doc, "ssn", &papel_forms::FieldValue::Text("SSN-078-05-1120".into())).unwrap();
+    let field = papel_forms::fields(&doc).swap_remove(0).obj;
     let root = doc.root().unwrap();
     let af = doc.get(root).as_dict().unwrap().reference(b"AcroForm").unwrap();
     doc.update_dict(af, |d| d.set(b"CO".to_vec(), Object::Array(vec![Object::Ref(field)]))).unwrap();
@@ -147,7 +147,7 @@ fn redacted_type3_glyph_and_exclusive_resources_do_not_survive_full_save() {
     // Reopen and inspect the Type 3 font dictionary
     let bytes = write_full(&doc, &SaveOptions::default()).unwrap();
     let saved = Document::open(Arc::new(bytes)).unwrap();
-    let page = pdfcraft_model::pages(&saved).swap_remove(0);
+    let page = papel_model::pages(&saved).swap_remove(0);
     let res = saved.resolve(page.dict.get(b"Resources").unwrap()).as_dict().unwrap().clone();
     let fonts = saved.resolve(res.get(b"Font").unwrap()).as_dict().unwrap().clone();
     let t3 = saved.resolve(fonts.get(b"T3").unwrap()).as_dict().unwrap().clone();
@@ -225,8 +225,8 @@ fn an_image_a_type3_glyphs_form_with_parameters_by_reference_draws_is_kept() {
 /// the redaction rather than being decoded in full. Two small ones are the control.
 #[test]
 fn the_form_a_kept_type3_glyph_draws_is_walked_within_the_allowance_of_a_page() {
-    for (size, refused) in [(pdfcraft_cos::MAX_PAGE_DECODED / 2 + 1, true), (1, false)] {
-        let packed = pdfcraft_filters::encode_flate(&vec![b' '; size]);
+    for (size, refused) in [(papel_cos::MAX_PAGE_DECODED / 2 + 1, true), (1, false)] {
+        let packed = papel_filters::encode_flate(&vec![b' '; size]);
         let blank = || stream("/Type /XObject /Subtype /Form /BBox [0 0 1000 1000] /Filter /FlateDecode", packed.as_slice());
         let mut doc = pdf(vec![
             b"<< /Type /Catalog /Pages 2 0 R >>".to_vec(),
@@ -245,7 +245,7 @@ fn the_form_a_kept_type3_glyph_draws_is_walked_within_the_allowance_of_a_page() 
         mark(&mut doc, 0, &[[9.0, 95.0, 14.9, 110.0]], "");
         let out = apply(&mut doc, None);
         if refused {
-            assert!(matches!(out, Err(RedactError::Cos(pdfcraft_cos::CosError::Filter(_)))), "forms of {size} bytes each: {out:?}");
+            assert!(matches!(out, Err(RedactError::Cos(papel_cos::CosError::Filter(_)))), "forms of {size} bytes each: {out:?}");
         } else {
             assert_eq!(out.unwrap().glyphs, 1, "forms of {size} bytes each");
         }
@@ -276,7 +276,7 @@ fn all_redacted_type3_glyphs_cause_font_removal_from_resources() {
 
     let bytes = write_full(&doc, &SaveOptions::default()).unwrap();
     let saved = Document::open(Arc::new(bytes)).unwrap();
-    let page = pdfcraft_model::pages(&saved).swap_remove(0);
+    let page = papel_model::pages(&saved).swap_remove(0);
     if let Some(res_val) = page.dict.get(b"Resources")
         && let Some(res) = saved.resolve(res_val).as_dict()
         && let Some(fonts_val) = res.get(b"Font")
@@ -320,7 +320,7 @@ fn shared_type3_font_preserves_glyphs_used_by_another_page() {
 
     let bytes = write_full(&doc, &SaveOptions::default()).unwrap();
     let saved = Document::open(Arc::new(bytes)).unwrap();
-    let pages = pdfcraft_model::pages(&saved);
+    let pages = papel_model::pages(&saved);
     let p2_res = saved.resolve(pages[1].dict.get(b"Resources").unwrap()).as_dict().unwrap().clone();
     let fonts = saved.resolve(p2_res.get(b"Font").unwrap()).as_dict().unwrap().clone();
     let t3 = saved.resolve(fonts.get(b"T3").unwrap()).as_dict().unwrap().clone();
@@ -476,7 +476,7 @@ fn an_image_a_type3_glyph_with_parameters_by_reference_draws_is_kept() {
 
 /// Whether `out` is the redaction refused with a syntax error whose detail holds `detail`.
 fn refused_for(out: &Result<Report, RedactError>, detail: &str) -> bool {
-    matches!(out, Err(RedactError::Cos(pdfcraft_cos::CosError::Syntax { detail: d, .. })) if d.contains(detail))
+    matches!(out, Err(RedactError::Cos(papel_cos::CosError::Syntax { detail: d, .. })) if d.contains(detail))
 }
 
 /// The font's cleanup scans every page and form for the glyphs they show. A string left open in a
@@ -691,7 +691,7 @@ fn a_page_s_appearances_share_one_operator_total() {
 /// than being decoded and held in full.
 #[test]
 fn a_page_s_appearances_share_one_decoded_byte_allowance() {
-    let packed = pdfcraft_filters::encode_flate(&vec![b' '; pdfcraft_cos::MAX_PAGE_DECODED / 2 + 1]);
+    let packed = papel_filters::encode_flate(&vec![b' '; papel_cos::MAX_PAGE_DECODED / 2 + 1]);
     let big = || stream("/Type /XObject /Subtype /Form /BBox [0 0 100 20] /Filter /FlateDecode", packed.as_slice());
     let mut doc = pdf(vec![
         b"<< /Type /Catalog /Pages 2 0 R >>".to_vec(),
@@ -720,9 +720,9 @@ fn a_page_s_appearances_share_one_decoded_byte_allowance() {
 fn a_page_s_appearances_spend_what_its_content_left_of_the_allowance() {
     let mut content = b"BT /T3 10 Tf 10 100 Td (AC) Tj ET".to_vec();
     content.resize(1 << 20, b' ');
-    let content = pdfcraft_filters::encode_flate(&content);
-    for (size, refused) in [(pdfcraft_cos::MAX_PAGE_DECODED - (1 << 19), true), (1, false)] {
-        let appearance = pdfcraft_filters::encode_flate(&vec![b' '; size]);
+    let content = papel_filters::encode_flate(&content);
+    for (size, refused) in [(papel_cos::MAX_PAGE_DECODED - (1 << 19), true), (1, false)] {
+        let appearance = papel_filters::encode_flate(&vec![b' '; size]);
         let mut doc = pdf(vec![
             b"<< /Type /Catalog /Pages 2 0 R >>".to_vec(),
             b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>".to_vec(),
@@ -746,7 +746,7 @@ fn a_page_s_appearances_spend_what_its_content_left_of_the_allowance() {
 fn saved_first_page_lists_font(doc: &Document, name: &[u8]) -> bool {
     let bytes = write_full(doc, &SaveOptions::default()).unwrap();
     let saved = Document::open(Arc::new(bytes)).unwrap();
-    let page = pdfcraft_model::pages(&saved).swap_remove(0);
+    let page = papel_model::pages(&saved).swap_remove(0);
     let res = saved.resolve(page.dict.get(b"Resources").unwrap()).as_dict().unwrap().clone();
     res.get(b"Font").and_then(|f| saved.resolve(f).as_dict().map(|fonts| fonts.contains(name))).unwrap_or(false)
 }

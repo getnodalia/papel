@@ -1,7 +1,7 @@
 //! Bounded path extraction and snapping in PDF user space, including nested Form XObjects.
 use crate::{Point, Result, check_points, distance, invalid};
-use pdfcraft_content::{Matrix, ops};
-use pdfcraft_cos::{DecodeBudget, Dict, Document, ObjRef, Object};
+use papel_content::{Matrix, ops};
+use papel_cos::{DecodeBudget, Dict, Document, ObjRef, Object};
 use serde::Serialize;
 use std::collections::HashSet;
 

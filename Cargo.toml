@@ -2,81 +2,81 @@
 resolver = "3"
 members = ["crates/*", "apps/*", "xtask"]
 exclude = ["vendor"]
-default-members = ["crates/*", "apps/pdfcraft", "apps/pdfcraft-cli", "xtask"]
+default-members = ["crates/*", "apps/papel", "apps/papel-cli", "xtask"]
 
 [workspace.package]
-version = "0.18.1"
+version = "0.1.0-dev"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
-repository = "https://github.com/storytold/pdfcraft"
+repository = "https://github.com/getnodalia/papel"
 
 [workspace.dependencies]
 # Shared frontend components; engines remain independent of egui.
-craft-ui = { git = "https://github.com/storytold/craft-libs", version = "0.1.0", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff", features = ["serde"] }
+craft-ui = { git = "https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main", version = "0.1.0", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff", features = ["serde"] }
 # Quit the macOS way (#1136): ⌘Q asks about unsaved changes, and closing quits through `terminate:`.
-craft-quit = { git = "https://github.com/storytold/craft-libs", version = "0.1.0", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff" }
+craft-quit = { git = "https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main", version = "0.1.0", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff" }
 # One menu definition for the native macOS menu bar and the in-window bar elsewhere.
-craft-menu = { git = "https://github.com/storytold/craft-libs", version = "0.1.0", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff" }
-craft-keymap = { git = "https://github.com/storytold/craft-libs", version = "0.1.0", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff", default-features = false }
+craft-menu = { git = "https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main", version = "0.1.0", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff" }
+craft-keymap = { git = "https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main", version = "0.1.0", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff", default-features = false }
 # Interface translations: lookup, fallback, CLDR plurals and language names over the craft-i18n
-# catalogs that `crates/ui-egui/build.rs` embeds from `CRAFT_I18N_DIR` (storytold/craft-i18n, at
+# catalogs that `crates/ui-egui/build.rs` embeds from `CRAFT_I18N_DIR` (getnodalia/foundation (vendor/craft-i18n), at
 # the commit in `craft-i18n.rev`). Already in the tree through craft-ui.
-craft-i18n = { git = "https://github.com/storytold/craft-libs", version = "0.1.0", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff" }
-# Shared system spooler; document composition remains in pdfcraft-print.
-craft-print = { git = "https://github.com/storytold/craft-libs", version = "0.1.0", rev = "1146cdc4f92e6c5c4fc3d67efbf0e1cec436a10c" }
+craft-i18n = { git = "https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main", version = "0.1.0", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff" }
+# Shared system spooler; document composition remains in papel-print.
+craft-print = { git = "https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main", version = "0.1.0", rev = "1146cdc4f92e6c5c4fc3d67efbf0e1cec436a10c" }
 # Whether a path stored in a document may be opened (GoToR link targets).
-craft-docpath = { version = "0.1.0", git = "https://github.com/storytold/craft-libs", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff" }
+craft-docpath = { version = "0.1.0", git = "https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff" }
 # craft-update: app-specific pretend versions apply to startup and manual checks.
-craft-update = { git = "https://github.com/storytold/craft-libs", version = "=0.1.0", rev = "1b34eba41e62138fc2438d2734523b302840b45d", features = ["egui"] }
+craft-update = { git = "https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main", version = "=0.1.0", rev = "1b34eba41e62138fc2438d2734523b302840b45d", features = ["egui"] }
 # internal
-pdfcraft-geom = { path = "crates/geom", version = "0.18.1" }
-pdfcraft-filters = { path = "crates/filters", version = "0.18.1" }
-pdfcraft-cos = { path = "crates/cos", version = "0.18.1" }
-pdfcraft-crypt = { path = "crates/crypt", version = "0.18.1" }
-pdfcraft-organize = { path = "crates/organize", version = "0.18.1" }
-pdfcraft-measure = { path = "crates/measure", version = "0.18.1" }
-pdfcraft-annot = { path = "crates/annot", version = "0.18.1" }
-pdfcraft-audit = { path = "crates/audit", version = "0.18.1" }
-pdfcraft-fonts = { path = "crates/fonts", version = "0.18.1" }
-pdfcraft-model = { path = "crates/model", version = "0.18.1" }
-pdfcraft-content = { path = "crates/content", version = "0.18.1" }
-pdfcraft-redact = { path = "crates/redact", version = "0.18.1" }
-pdfcraft-print = { path = "crates/print", version = "0.18.1" }
-pdfcraft-xfdf = { path = "crates/xfdf", version = "0.18.1" }
-pdfcraft-sign = { path = "crates/sign", version = "0.18.1" }
-pdfcraft-optimize = { path = "crates/optimize", version = "0.18.1" }
-pdfcraft-a11y = { path = "crates/a11y", version = "0.18.1" }
-pdfcraft-oracle = { path = "crates/oracle", version = "0.18.1" }
-pdfcraft-testkit = { path = "crates/testkit", version = "0.18.1" }
-pdfcraft-ocr = { path = "crates/ocr", version = "0.18.1" }
-pdfcraft-js = { path = "crates/js", version = "0.18.1" }
-pdfcraft-compare = { path = "crates/compare", version = "0.18.1" }
-pdfcraft-preflight = { path = "crates/preflight", version = "0.18.1" }
-pdfcraft-export = { path = "crates/export", version = "0.18.1" }
-pdfcraft-edit = { path = "crates/edit", version = "0.18.1" }
-pdfcraft-create = { path = "crates/create", version = "0.18.1" }
-pdfcraft-forms = { path = "crates/forms", version = "0.18.1" }
-pdfcraft-xfa = { path = "crates/xfa", version = "0.18.1" }
-pdfcraft-render = { path = "crates/render", version = "0.18.1" }
-pdfcraft-engine = { path = "crates/engine", version = "0.18.1" }
-pdfcraft-platform = { path = "crates/platform", version = "0.18.1" }
-pdfcraft-ui-egui = { path = "crates/ui-egui", version = "0.18.1" }
-pdfcraft-automation = { path = "crates/automation", version = "0.18.1", default-features = false }
-pdfcraft-prc = { path = "crates/prc", version = "0.18.1" }
-pdfcraft-prc-render = { path = "crates/prc-render", version = "0.18.1" }
+papel-geom = { path = "crates/geom", version = "0.1.0-dev" }
+papel-filters = { path = "crates/filters", version = "0.1.0-dev" }
+papel-cos = { path = "crates/cos", version = "0.1.0-dev" }
+papel-crypt = { path = "crates/crypt", version = "0.1.0-dev" }
+papel-organize = { path = "crates/organize", version = "0.1.0-dev" }
+papel-measure = { path = "crates/measure", version = "0.1.0-dev" }
+papel-annot = { path = "crates/annot", version = "0.1.0-dev" }
+papel-audit = { path = "crates/audit", version = "0.1.0-dev" }
+papel-fonts = { path = "crates/fonts", version = "0.1.0-dev" }
+papel-model = { path = "crates/model", version = "0.1.0-dev" }
+papel-content = { path = "crates/content", version = "0.1.0-dev" }
+papel-redact = { path = "crates/redact", version = "0.1.0-dev" }
+papel-print = { path = "crates/print", version = "0.1.0-dev" }
+papel-xfdf = { path = "crates/xfdf", version = "0.1.0-dev" }
+papel-sign = { path = "crates/sign", version = "0.1.0-dev" }
+papel-optimize = { path = "crates/optimize", version = "0.1.0-dev" }
+papel-a11y = { path = "crates/a11y", version = "0.1.0-dev" }
+papel-oracle = { path = "crates/oracle", version = "0.1.0-dev" }
+papel-testkit = { path = "crates/testkit", version = "0.1.0-dev" }
+papel-ocr = { path = "crates/ocr", version = "0.1.0-dev" }
+papel-js = { path = "crates/js", version = "0.1.0-dev" }
+papel-compare = { path = "crates/compare", version = "0.1.0-dev" }
+papel-preflight = { path = "crates/preflight", version = "0.1.0-dev" }
+papel-export = { path = "crates/export", version = "0.1.0-dev" }
+papel-edit = { path = "crates/edit", version = "0.1.0-dev" }
+papel-create = { path = "crates/create", version = "0.1.0-dev" }
+papel-forms = { path = "crates/forms", version = "0.1.0-dev" }
+papel-xfa = { path = "crates/xfa", version = "0.1.0-dev" }
+papel-render = { path = "crates/render", version = "0.1.0-dev" }
+papel-engine = { path = "crates/engine", version = "0.1.0-dev" }
+papel-platform = { path = "crates/platform", version = "0.1.0-dev" }
+papel-ui-egui = { path = "crates/ui-egui", version = "0.1.0-dev" }
+papel-automation = { path = "crates/automation", version = "0.1.0-dev", default-features = false }
+papel-prc = { path = "crates/prc", version = "0.1.0-dev" }
+papel-prc-render = { path = "crates/prc-render", version = "0.1.0-dev" }
 
 # pdf
 hayro = "0.7.1"
 hayro-syntax = "0.7.2"
 lopdf = "0.45"
 # zlib-rs: miniz_oxide took about 1.7 µs for every fixed-Huffman block, empty or not
-# (`pdfcraft_filters::FLATE_READ_WORK`). Other dependencies still build flate2's default
+# (`papel_filters::FLATE_READ_WORK`). Other dependencies still build flate2's default
 # miniz_oxide backend; flate2 prefers zlib-rs when both are built, as the Windows build already did
 # through craft-update. `flate::tests::a_copy_from_before_the_start_is_damage` shows which runs.
 flate2 = { version = "1.1", default-features = false, features = ["zlib-rs"] }
 weezl = "0.2"
-# CCITT Group 4 encoding (pdfcraft-filters); already in the tree through tiff.
+# CCITT Group 4 encoding (papel-filters); already in the tree through tiff.
 fax = "0.2.7"
 # Independent CCITT and JBIG2 codecs, already in the tree through hayro.
 hayro-ccitt = "0.3"
@@ -154,18 +154,18 @@ vello_cpu = { path = "vendor/vello_cpu" }
 # Only the retained `vendor/winit` and `vendor/egui-wgpu` copies are provenance for the app's
 # earlier patches and their source guards, not path patches; the other `vendor/` entries above
 # remain real path patches. See vendor/README.md and the migration plan.
-ecolor = { git = "https://github.com/storytold/egui.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
-emath = { git = "https://github.com/storytold/egui.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
-epaint = { git = "https://github.com/storytold/egui.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
-epaint_default_fonts = { git = "https://github.com/storytold/egui.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
-egui = { git = "https://github.com/storytold/egui.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
-egui-winit = { git = "https://github.com/storytold/egui.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
-egui-wgpu = { git = "https://github.com/storytold/egui.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
-egui_glow = { git = "https://github.com/storytold/egui.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
-egui_extras = { git = "https://github.com/storytold/egui.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
-egui_kittest = { git = "https://github.com/storytold/egui.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
-egui_system_font_provider = { git = "https://github.com/storytold/egui.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
-eframe = { git = "https://github.com/storytold/egui.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
-egui_demo_lib = { git = "https://github.com/storytold/egui.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
-egui_inspection = { git = "https://github.com/storytold/egui.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
-winit = { git = "https://github.com/storytold/winit.git", rev = "a517b3846ee8457d84ee4975110bfda6797c44dc" }
+ecolor = { git = "https://github.com/getnodalia/foundation/tree/vendor/egui/main.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
+emath = { git = "https://github.com/getnodalia/foundation/tree/vendor/egui/main.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
+epaint = { git = "https://github.com/getnodalia/foundation/tree/vendor/egui/main.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
+epaint_default_fonts = { git = "https://github.com/getnodalia/foundation/tree/vendor/egui/main.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
+egui = { git = "https://github.com/getnodalia/foundation/tree/vendor/egui/main.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
+egui-winit = { git = "https://github.com/getnodalia/foundation/tree/vendor/egui/main.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
+egui-wgpu = { git = "https://github.com/getnodalia/foundation/tree/vendor/egui/main.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
+egui_glow = { git = "https://github.com/getnodalia/foundation/tree/vendor/egui/main.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
+egui_extras = { git = "https://github.com/getnodalia/foundation/tree/vendor/egui/main.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
+egui_kittest = { git = "https://github.com/getnodalia/foundation/tree/vendor/egui/main.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
+egui_system_font_provider = { git = "https://github.com/getnodalia/foundation/tree/vendor/egui/main.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
+eframe = { git = "https://github.com/getnodalia/foundation/tree/vendor/egui/main.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
+egui_demo_lib = { git = "https://github.com/getnodalia/foundation/tree/vendor/egui/main.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
+egui_inspection = { git = "https://github.com/getnodalia/foundation/tree/vendor/egui/main.git", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
+winit = { git = "https://github.com/getnodalia/foundation/tree/vendor/winit/master.git", rev = "a517b3846ee8457d84ee4975110bfda6797c44dc" }

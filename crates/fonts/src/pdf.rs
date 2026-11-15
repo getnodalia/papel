@@ -14,7 +14,7 @@
 use std::borrow::Cow;
 use std::collections::{BinaryHeap, HashMap, HashSet};
 
-use pdfcraft_cos::{DecodeBudget, Dict, Document, Object, Stream};
+use papel_cos::{DecodeBudget, Dict, Document, Object, Stream};
 
 /// How the bytes of a string map to codes.
 #[derive(Clone, Debug, PartialEq)]
@@ -518,7 +518,7 @@ fn type3_glyph_box(doc: &Document, font: &Dict, reads: &mut Reads<'_>) -> Option
 /// The glyph box `llx lly urx ury` of a glyph description that begins with `wx wy llx lly urx ury
 /// d1`; `None` for `d0` or anything else first.
 fn d1_box(data: &[u8]) -> Option<[f64; 4]> {
-    let mut lexer = pdfcraft_cos::Lexer::new(data, 0);
+    let mut lexer = papel_cos::Lexer::new(data, 0);
     let mut operands = [0.0; 6];
     for slot in &mut operands {
         lexer.skip_ws();
@@ -1831,7 +1831,7 @@ mod tests;
 
 #[cfg(test)]
 mod encoding_tests {
-    use pdfcraft_cos::{Dict, Document, Object};
+    use papel_cos::{Dict, Document, Object};
 
     use super::*;
 
@@ -2008,7 +2008,7 @@ mod encoding_tests {
         // 128 resources naming one 1 MiB program that isn't a font: each decode is charged,
         // so an enumeration stops decoding once the shared budget is spent.
         let mut doc = Document::new_empty();
-        let program = doc.add(pdfcraft_cos::Stream::flate(Dict::new(), &vec![0; 1 << 20]));
+        let program = doc.add(papel_cos::Stream::flate(Dict::new(), &vec![0; 1 << 20]));
         let descriptor: Dict = [(b"FontFile2".to_vec(), Object::Ref(program))].into_iter().collect();
         let descriptor = doc.add(descriptor);
         let font: Dict = [(b"FontDescriptor".to_vec(), Object::Ref(descriptor))].into_iter().collect();

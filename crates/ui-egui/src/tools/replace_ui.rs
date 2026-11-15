@@ -1,14 +1,14 @@
 //! Find and replace from the find bar (Edit text mode): the engine plans the change
-//! ([`pdfcraft_engine::Document::plan_replace`]) and it is applied as one edit, so Replace all
+//! ([`papel_engine::Document::plan_replace`]) and it is applied as one edit, so Replace all
 //! is one undo step; what was left alone is said, never skipped silently.
 
 use std::collections::BTreeMap;
 
-use pdfcraft_engine::find_replace::{Replace, Replacement, Which};
+use papel_engine::find_replace::{Replace, Replacement, Which};
 
-use crate::PdfCraftApp;
+use crate::PapelApp;
 
-impl PdfCraftApp {
+impl PapelApp {
     /// Replace the find bar's highlighted match (`all` false) or every match in the document, in
     /// view `i`, with its Replace field's text.
     pub(crate) fn replace_found(&mut self, i: usize, all: bool) {

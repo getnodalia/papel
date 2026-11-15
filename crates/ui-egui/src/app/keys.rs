@@ -1,7 +1,7 @@
 use super::*;
 use crate::page_keys::PageKeys;
 
-impl PdfCraftApp {
+impl PapelApp {
     pub(super) fn shortcuts(&mut self, ctx: &egui::Context) {
         use egui::Key;
         // "Save changes?" is modal: its keys are its own (⌘D is Don't save there, not Document
@@ -74,7 +74,7 @@ impl PdfCraftApp {
     }
 }
 
-impl PdfCraftApp {
+impl PapelApp {
     /// ⌘A selects all of the document or the page grid, unless a text field or overlay owns the
     /// keyboard.
     fn select_all_keys(&mut self, i: usize, ctx: &egui::Context) {

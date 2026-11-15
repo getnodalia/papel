@@ -16,7 +16,7 @@ pub enum Content {
 /// moves to `(a·x + c·y + e, b·x + d·y + f)`) → the same motion in PDF user space, which is
 /// what `ImageEdit::Transform` applies after the image's placement. Both spaces are related by
 /// an affine map, so three corners of the crop box pin the result down.
-fn view_transform_to_user(info: &pdfcraft_render::PageInfo, m: [f64; 6]) -> Result<[f64; 6]> {
+fn view_transform_to_user(info: &papel_render::PageInfo, m: [f64; 6]) -> Result<[f64; 6]> {
     let [a, b, c, d, e, f] = m;
     let det = a * d - b * c;
     if !m.iter().all(|v| v.is_finite()) || !det.is_finite() || det.abs() < 1e-9 {
@@ -86,18 +86,18 @@ impl Automation {
                     None => (0..doc.info.pages.len()).collect(),
                 };
                 let parity = match a.opt_str("subset")?.unwrap_or("all") {
-                    "all" => pdfcraft_engine::PageParity::Both,
-                    "even" => pdfcraft_engine::PageParity::Even,
-                    "odd" => pdfcraft_engine::PageParity::Odd,
+                    "all" => papel_engine::PageParity::Both,
+                    "even" => papel_engine::PageParity::Even,
+                    "odd" => papel_engine::PageParity::Odd,
                     s => return Err(ToolError::InvalidArgs(format!("unknown subset {s:?} (all, even, odd)"))),
                 };
                 let orientation = match a.opt_str("orientation")?.unwrap_or("all") {
-                    "all" => pdfcraft_engine::PageOrientation::Both,
-                    "landscape" => pdfcraft_engine::PageOrientation::Landscape,
-                    "portrait" => pdfcraft_engine::PageOrientation::Portrait,
+                    "all" => papel_engine::PageOrientation::Both,
+                    "landscape" => papel_engine::PageOrientation::Landscape,
+                    "portrait" => papel_engine::PageOrientation::Portrait,
                     o => return Err(ToolError::InvalidArgs(format!("unknown orientation {o:?} (all, landscape, portrait)"))),
                 };
-                let pages = pdfcraft_engine::filter_pages(&self.doc(&a)?.info, &base, parity, orientation);
+                let pages = papel_engine::filter_pages(&self.doc(&a)?.info, &base, parity, orientation);
                 if pages.is_empty() {
                     return Err(failed("no pages match the filters"));
                 }
@@ -126,8 +126,8 @@ impl Automation {
                     Some(l) => return Err(ToolError::InvalidArgs(format!("level must be between 0 and 100, not {l}"))),
                 };
                 let look = match a.opt_str("mode")? {
-                    None => pdfcraft_engine::camera_clean::Look::Colour,
-                    Some(m) => pdfcraft_engine::camera_clean::Look::from_name(m)
+                    None => papel_engine::camera_clean::Look::Colour,
+                    Some(m) => papel_engine::camera_clean::Look::from_name(m)
                         .ok_or_else(|| ToolError::InvalidArgs(format!("unknown mode {m:?} (original, colour, greyscale, bw)")))?,
                 };
                 self.session.enhance_camera_page_at(id, page, corners, look, level).map_err(failed)?;
@@ -177,7 +177,7 @@ impl Automation {
             "doc_inspect" => self.doc_inspect(&a)?,
             "render_preview" => return self.render_preview(&a),
             "page_number" => {
-                use pdfcraft_organize::LabelStyle as L;
+                use papel_organize::LabelStyle as L;
                 let n = self.doc(&a)?.info.pages.len();
                 let (from, to) = (a.int("from")?, a.int("to")?);
                 if from < 1 || to < from || to as usize > n {
@@ -420,7 +420,7 @@ impl Automation {
                     write_atomic(&path, &bytes)?;
                     json!({ "path": path.to_string_lossy(), "format": ext, "bytes": bytes.len() })
                 } else {
-                    use pdfcraft_engine::ImageEdit;
+                    use papel_engine::ImageEdit;
                     let change = match a.str("action")? {
                         "move" => {
                             let r: Vec<f64> =
@@ -463,10 +463,10 @@ impl Automation {
                             ImageEdit::Flip { horizontal: horizontal ^ (info.rotation % 180 == 90) }
                         }
                         "delete" => ImageEdit::Delete,
-                        "bring_to_front" => ImageEdit::Arrange(pdfcraft_engine::ArrangeOrder::BringToFront),
-                        "send_to_back" => ImageEdit::Arrange(pdfcraft_engine::ArrangeOrder::SendToBack),
-                        "bring_forward" => ImageEdit::Arrange(pdfcraft_engine::ArrangeOrder::BringForward),
-                        "send_backward" => ImageEdit::Arrange(pdfcraft_engine::ArrangeOrder::SendBackward),
+                        "bring_to_front" => ImageEdit::Arrange(papel_engine::ArrangeOrder::BringToFront),
+                        "send_to_back" => ImageEdit::Arrange(papel_engine::ArrangeOrder::SendToBack),
+                        "bring_forward" => ImageEdit::Arrange(papel_engine::ArrangeOrder::BringForward),
+                        "send_backward" => ImageEdit::Arrange(papel_engine::ArrangeOrder::SendBackward),
                         "remove_crop" => ImageEdit::RemoveCrop,
                         "ungroup" => ImageEdit::Ungroup,
                         "replace" => {
@@ -532,9 +532,9 @@ impl Automation {
                 } else if let Some(root) = &self.root {
                     vec![root.clone()]
                 } else {
-                    pdfcraft_engine::text_fonts::installed_directories()
+                    papel_engine::text_fonts::installed_directories()
                 };
-                json!({"fonts": pdfcraft_engine::text_fonts::discover(&roots).into_iter().map(|f| json!({"path":f.path,"family":f.family,"font":f.face})).collect::<Vec<_>>()})
+                json!({"fonts": papel_engine::text_fonts::discover(&roots).into_iter().map(|f| json!({"path":f.path,"family":f.family,"font":f.face})).collect::<Vec<_>>()})
             }
             "text_font_import" => {
                 let page = self.page(&a)?;
@@ -571,7 +571,7 @@ impl Automation {
                 let index = self.paragraph_index(doc.id, page, k, &blocks)?;
                 let source = blocks.get(index).ok_or_else(|| ToolError::InvalidArgs("paragraph is out of range".into()))?;
                 let text = a.opt_str("text")?.unwrap_or(&source.editor_text);
-                let style = pdfcraft_engine::BlockStyle {
+                let style = papel_engine::BlockStyle {
                     size: a.opt_num("size")?,
                     width: a.opt_num("width")?,
                     resource: a.opt_str("font_resource")?.map(str::to_owned),
@@ -607,7 +607,7 @@ impl Automation {
                     None if width.is_some() => block.reflow_text.clone(),
                     None => block.text,
                 };
-                let mut style = pdfcraft_engine::BlockStyle {
+                let mut style = papel_engine::BlockStyle {
                     ranges: parse_style_ranges(a.get("ranges"))?,
                     resource: a.opt_str("font_resource")?.map(str::to_owned),
                     bold: a.opt_bool("bold")?,
@@ -625,9 +625,9 @@ impl Automation {
                 }
                 if let Some(f) = a.opt_str("font")? {
                     let family = match f {
-                        "helvetica" => pdfcraft_engine::FontFamily::Helvetica,
-                        "times" => pdfcraft_engine::FontFamily::Times,
-                        "courier" => pdfcraft_engine::FontFamily::Courier,
+                        "helvetica" => papel_engine::FontFamily::Helvetica,
+                        "times" => papel_engine::FontFamily::Times,
+                        "courier" => papel_engine::FontFamily::Courier,
                         other => return Err(ToolError::InvalidArgs(format!("unknown font {other:?} (helvetica, times, courier)"))),
                     };
                     style.family = Some((family, a.opt_bool("bold")?.unwrap_or(false), a.opt_bool("italic")?.unwrap_or(false)));
@@ -757,7 +757,7 @@ impl Automation {
                     Some(n) => n.to_string(),
                     None => path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default(),
                 };
-                let mime = pdfcraft_engine::mime_for_name(&name).map(str::to_string);
+                let mime = papel_engine::mime_for_name(&name).map(str::to_string);
                 let description = a.opt_str("description")?.map(str::to_string);
                 // Only the document-level keys: an annotation attachment of the same name is not the new one.
                 let before = document_attachment_keys(self.doc(&a)?);
@@ -782,13 +782,13 @@ impl Automation {
                     .attachments
                     .iter()
                     .filter_map(|attachment| match &attachment.source {
-                        pdfcraft_render::AttachmentSource::Document { key: attachment_key }
+                        papel_render::AttachmentSource::Document { key: attachment_key }
                             if key.is_some_and(|key| key == attachment_key) || name.is_some_and(|name| name == attachment.name) =>
                         {
                             Some(attachment_key.clone())
                         }
-                        pdfcraft_render::AttachmentSource::Document { .. } => None,
-                        pdfcraft_render::AttachmentSource::Annotation { .. } => None,
+                        papel_render::AttachmentSource::Document { .. } => None,
+                        papel_render::AttachmentSource::Annotation { .. } => None,
                     })
                     .collect();
                 let key = match keys.as_slice() {
@@ -816,9 +816,9 @@ impl Automation {
             "doc_audit_redactions" => self.doc_audit_redactions(&a)?,
             "fill_sign_add" => self.fill_sign_add(&a)?,
             "fill_sign_date_format" => self.fill_sign_date_format(&a)?,
-            "measure_distance" => self.measurement_add(&a, pdfcraft_engine::measure::Kind::Distance)?,
-            "measure_perimeter" => self.measurement_add(&a, pdfcraft_engine::measure::Kind::Perimeter)?,
-            "measure_area" => self.measurement_add(&a, pdfcraft_engine::measure::Kind::Area)?,
+            "measure_distance" => self.measurement_add(&a, papel_engine::measure::Kind::Distance)?,
+            "measure_perimeter" => self.measurement_add(&a, papel_engine::measure::Kind::Perimeter)?,
+            "measure_area" => self.measurement_add(&a, papel_engine::measure::Kind::Area)?,
             "measure_info" => self.measurement_info(&a)?,
             "measure_list" => self.measurement_list(&a)?,
             "measure_scale" => self.measurement_scale(&a)?,
@@ -853,8 +853,8 @@ impl Automation {
             "pdfa_convert" => self.pdfa_convert(&a)?,
             "standards_remove_id" => {
                 let standard = match a.str("standard")? {
-                    "pdfa" => pdfcraft_engine::Standard::PdfA,
-                    "pdfx" => pdfcraft_engine::Standard::PdfX,
+                    "pdfa" => papel_engine::Standard::PdfA,
+                    "pdfx" => papel_engine::Standard::PdfX,
                     other => return Err(ToolError::InvalidArgs(format!("standard must be pdfa or pdfx, not {other}"))),
                 };
                 self.apply(&a, Edit::RemoveStandardId { standard })?
@@ -886,10 +886,10 @@ impl Automation {
             "sign_document" => self.sign_document(&a)?,
             "sign_keychain_ids" => {
                 #[cfg(target_os = "macos")]
-                let ids: Vec<Value> = pdfcraft_engine::sign::keychain::identities(None)
+                let ids: Vec<Value> = papel_engine::sign::keychain::identities(None)
                     .map_err(failed)?
                     .iter()
-                    .map(|id| json!({ "id": pdfcraft_engine::sign::keychain::reference(&id.certificate), "certificate": super::signing::cert_json(&id.certificate) }))
+                    .map(|id| json!({ "id": papel_engine::sign::keychain::reference(&id.certificate), "certificate": super::signing::cert_json(&id.certificate) }))
                     .collect();
                 #[cfg(not(target_os = "macos"))]
                 let ids: Vec<Value> = Vec::new();
@@ -898,11 +898,11 @@ impl Automation {
             "sign_windows_ids" => {
                 #[cfg(target_os = "windows")]
                 let (ids, unusable): (Vec<Value>, Vec<Value>) = {
-                    let listing = pdfcraft_engine::sign::windows::list().map_err(failed)?;
+                    let listing = papel_engine::sign::windows::list().map_err(failed)?;
                     let ids = listing
                         .ids
                         .iter()
-                        .map(|id| json!({ "id": pdfcraft_engine::sign::windows::reference(&id.certificate), "certificate": super::signing::cert_json(&id.certificate) }))
+                        .map(|id| json!({ "id": papel_engine::sign::windows::reference(&id.certificate), "certificate": super::signing::cert_json(&id.certificate) }))
                         .collect();
                     let unusable = listing
                         .unusable
@@ -935,7 +935,7 @@ impl Automation {
     /// `text_script`: Format text ▸ Superscript or Subscript on a paragraph, or on a byte range
     /// of its editor text, written as `text_edit` writes the paragraph.
     fn text_script(&mut self, a: &Args) -> Result<Value> {
-        use pdfcraft_engine::text_script::{Script, toggle};
+        use papel_engine::text_script::{Script, toggle};
         let name = a.str("script")?;
         let script = match name {
             "superscript" => Script::Super,
@@ -989,11 +989,11 @@ impl Automation {
             None => Vec::new(),
         };
         let level = match a.opt_int("level")? {
-            None => pdfcraft_engine::scan_clean::ScanCleanSettings::default().level,
+            None => papel_engine::scan_clean::ScanCleanSettings::default().level,
             Some(l @ 0..=100) => l as u8,
             Some(l) => return Err(ToolError::InvalidArgs(format!("level must be between 0 and 100, not {l}"))),
         };
-        let mut settings = pdfcraft_engine::scan_clean::ScanCleanSettings::at(level);
+        let mut settings = papel_engine::scan_clean::ScanCleanSettings::at(level);
         if let Some(on) = a.opt_bool("edge_shadows")? {
             settings.edge_shadows = on;
         }

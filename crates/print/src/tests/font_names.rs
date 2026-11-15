@@ -3,8 +3,8 @@
 use super::*;
 use crate::font_names::{distinct, distinct_within, renamed_sfnt};
 use crate::spool::spooled_pdf;
-use pdfcraft_cos::DecodeBudget;
-use pdfcraft_render::{PageRenderer, RenderConfig, RenderRequest, RequestKind};
+use papel_cos::DecodeBudget;
+use papel_render::{PageRenderer, RenderConfig, RenderRequest, RequestKind};
 use skrifa::raw::TableProvider as _;
 use skrifa::string::StringId;
 use skrifa::{FontRef, MetadataProvider as _};
@@ -57,7 +57,7 @@ fn print_ready() -> Vec<u8> {
     let mut resources = Dict::new();
     resources.set(b"Font".to_vec(), Object::Dict(fonts));
     let contents = doc.add(Object::Stream(Stream::flate(Dict::new(), b"BT /F1 40 Tf 10 200 Td (Hola) Tj ET BT /F2 40 Tf 10 100 Td (Hola) Tj ET")));
-    let page = pdfcraft_model::pages(&doc)[0].obj;
+    let page = papel_model::pages(&doc)[0].obj;
     doc.update_dict(page, |d| {
         d.remove(b"Annots");
         d.set(b"Resources".to_vec(), Object::Dict(resources));
@@ -112,9 +112,9 @@ fn windows_gets_embedded_subsets_under_names_no_installed_font_has() {
 
     // Each program has a name of its own, in the PDF and in its `name` table; the subset tag stays.
     let names: Vec<_> = after.iter().map(|f| (f.0.as_str(), f.1.as_str())).collect();
-    assert_eq!(names, [("AAAAAA+PdfCraftPrint1", "AAAAAA+PdfCraftPrint1"), ("AAAAAA+PdfCraftPrint2", "AAAAAA+PdfCraftPrint2")]);
+    assert_eq!(names, [("AAAAAA+PapelPrint1", "AAAAAA+PapelPrint1"), ("AAAAAA+PapelPrint2", "AAAAAA+PapelPrint2")]);
     for (n, (_, _, program, length1)) in after.iter().enumerate() {
-        let name = format!("PdfCraftPrint{}", n + 1);
+        let name = format!("PapelPrint{}", n + 1);
         for id in [StringId::FAMILY_NAME, StringId::FULL_NAME, StringId::POSTSCRIPT_NAME, StringId::UNIQUE_ID] {
             assert_eq!(name_of(program, id).as_deref(), Some(name.as_str()), "{id:?}");
         }
@@ -173,7 +173,7 @@ fn a_program_that_cannot_be_rewritten_keeps_its_name_in_the_pdf_too() {
     fonts.set(b"F2".to_vec(), Object::Ref(broken));
     let mut resources = Dict::new();
     resources.set(b"Font".to_vec(), Object::Dict(fonts));
-    let page = pdfcraft_model::pages(&doc)[0].obj;
+    let page = papel_model::pages(&doc)[0].obj;
     doc.update_dict(page, |d| d.set(b"Resources".to_vec(), Object::Dict(resources))).unwrap();
     let pdf = write_full(&doc, &SaveOptions::default()).unwrap();
 
@@ -181,7 +181,7 @@ fn a_program_that_cannot_be_rewritten_keeps_its_name_in_the_pdf_too() {
     assert_eq!(
         names,
         [
-            ("AAAAAA+PdfCraftPrint1".to_owned(), "AAAAAA+PdfCraftPrint1".to_owned(), false),
+            ("AAAAAA+PapelPrint1".to_owned(), "AAAAAA+PapelPrint1".to_owned(), false),
             ("BAAAAA+Arial-BoldMT".to_owned(), "BAAAAA+Arial-BoldMT".to_owned(), true),
         ]
     );
@@ -201,12 +201,12 @@ fn programs_past_the_shared_decode_budget_keep_their_names() {
     let mut budget = DecodeBudget::new(INTER.len() * 3 / 2, 0);
     let renamed = distinct_within(&pdf, &mut budget).unwrap().unwrap();
     let names: Vec<_> = true_type_fonts(&renamed).into_iter().map(|f| (f.0, name_of(&f.2, StringId::FAMILY_NAME).unwrap())).collect();
-    let (new, old): (Vec<_>, Vec<_>) = names.iter().partition(|(base_font, _)| base_font.contains("PdfCraftPrint"));
+    let (new, old): (Vec<_>, Vec<_>) = names.iter().partition(|(base_font, _)| base_font.contains("PapelPrint"));
     assert_eq!((new.len(), old.len()), (1, 1), "{names:?}");
-    assert!(new[0].0.starts_with("AAAAAA+PdfCraftPrint") && new[0].1.starts_with("PdfCraftPrint"), "{names:?}");
+    assert!(new[0].0.starts_with("AAAAAA+PapelPrint") && new[0].1.starts_with("PapelPrint"), "{names:?}");
     assert!(old[0].0.starts_with("AAAAAA+Arial") && old[0].1 == "Inter", "{names:?}");
     // With the default allowance both are renamed.
-    assert_eq!(true_type_fonts(&distinct(&pdf).unwrap().unwrap()).iter().filter(|f| f.0.contains("PdfCraftPrint")).count(), 2);
+    assert_eq!(true_type_fonts(&distinct(&pdf).unwrap().unwrap()).iter().filter(|f| f.0.contains("PapelPrint")).count(), 2);
 }
 
 /// A CIDFontType2 named `base_font` over `program`, written as a dictionary with its descriptor
@@ -250,12 +250,12 @@ fn a_cidfont_written_inside_its_type0_font_is_renamed_with_it() {
     }
     let mut resources = Dict::new();
     resources.set(b"Font".to_vec(), Object::Dict(fonts));
-    let page = pdfcraft_model::pages(&doc)[0].obj;
+    let page = papel_model::pages(&doc)[0].obj;
     doc.update_dict(page, |d| d.set(b"Resources".to_vec(), Object::Dict(resources))).unwrap();
     let pdf = write_full(&doc, &SaveOptions::default()).unwrap();
 
     let renamed = Document::open(Arc::new(distinct(&pdf).unwrap().unwrap())).unwrap();
-    let page = renamed.dict(&Object::Ref(pdfcraft_model::pages(&renamed)[0].obj)).unwrap();
+    let page = renamed.dict(&Object::Ref(papel_model::pages(&renamed)[0].obj)).unwrap();
     let fonts = renamed.dict(renamed.dict(page.get(b"Resources").unwrap()).unwrap().get(b"Font").unwrap()).unwrap();
     let name = |d: &Dict, key: &[u8]| String::from_utf8(d.name(key).unwrap().to_vec()).unwrap();
     let simple = renamed.dict(fonts.get(b"F1").unwrap()).unwrap();
@@ -269,7 +269,7 @@ fn a_cidfont_written_inside_its_type0_font_is_renamed_with_it() {
         let family = name_of(&program.decoded().unwrap(), StringId::FAMILY_NAME).unwrap();
         // The Type 0 font, its CIDFont and the descriptor all say the program's new name.
         let expected = format!("{tag}{family}");
-        assert!(family.starts_with("PdfCraftPrint"), "{family}");
+        assert!(family.starts_with("PapelPrint"), "{family}");
         assert_eq!(
             (name(&type0, b"BaseFont"), name(cid, b"BaseFont"), name(descriptor, b"FontName")),
             (expected.clone(), expected.clone(), expected)
@@ -310,28 +310,28 @@ fn fonts_sharing_a_program_share_its_name_and_type0_fonts_follow_their_cidfont()
     }
     let mut resources = Dict::new();
     resources.set(b"Font".to_vec(), Object::Dict(fonts));
-    let page = pdfcraft_model::pages(&doc)[0].obj;
+    let page = papel_model::pages(&doc)[0].obj;
     doc.update_dict(page, |d| d.set(b"Resources".to_vec(), Object::Dict(resources))).unwrap();
     let pdf = write_full(&doc, &SaveOptions::default()).unwrap();
 
     // The file is written anew, so the fonts are found again through the page.
     let renamed = Document::open(Arc::new(distinct(&pdf).unwrap().unwrap())).unwrap();
-    let page = renamed.dict(&Object::Ref(pdfcraft_model::pages(&renamed)[0].obj)).unwrap();
+    let page = renamed.dict(&Object::Ref(papel_model::pages(&renamed)[0].obj)).unwrap();
     let fonts = renamed.dict(renamed.dict(page.get(b"Resources").unwrap()).unwrap().get(b"Font").unwrap()).unwrap();
     let font = |key: &[u8]| renamed.dict(fonts.get(key).unwrap()).unwrap();
     let base_font = |d: &Dict| String::from_utf8(d.name(b"BaseFont").unwrap().to_vec()).unwrap();
-    assert_eq!(base_font(&font(b"F1")), "BCDEFG+PdfCraftPrint1");
-    assert_eq!(base_font(&font(b"F2")), "PdfCraftPrint1");
-    assert_eq!(base_font(&font(b"F3")), "HIJKLM+PdfCraftPrint1");
+    assert_eq!(base_font(&font(b"F1")), "BCDEFG+PapelPrint1");
+    assert_eq!(base_font(&font(b"F2")), "PapelPrint1");
+    assert_eq!(base_font(&font(b"F3")), "HIJKLM+PapelPrint1");
     let Some(Object::Array(descendants)) = font(b"F3").get(b"DescendantFonts").cloned() else { panic!("descendants") };
     let cid = renamed.dict(&descendants[0]).unwrap();
-    assert_eq!(base_font(&cid), "HIJKLM+PdfCraftPrint1");
+    assert_eq!(base_font(&cid), "HIJKLM+PapelPrint1");
     let Some(Object::Dict(inline)) = cid.get(b"FontDescriptor") else { panic!("inline descriptor") };
-    assert_eq!(inline.name(b"FontName"), Some(b"HIJKLM+PdfCraftPrint1".as_slice()));
+    assert_eq!(inline.name(b"FontName"), Some(b"HIJKLM+PapelPrint1".as_slice()));
     // Renamed once, not once per font.
     let program = renamed.resolve(inline.get(b"FontFile2").unwrap());
     let Object::Stream(program) = program.as_ref() else { panic!("program") };
-    assert_eq!(name_of(&program.decoded().unwrap(), StringId::FAMILY_NAME).as_deref(), Some("PdfCraftPrint1"));
+    assert_eq!(name_of(&program.decoded().unwrap(), StringId::FAMILY_NAME).as_deref(), Some("PapelPrint1"));
 }
 
 /// A `name` table of `format` with the given records `(platform, encoding, language, id, text)`
@@ -395,14 +395,14 @@ fn records_that_share_one_string_keep_sharing_it() {
     // A thousand records over one 60,000-byte string. Each given its own copy they would take
     // 60 MB and lie past what 16-bit offsets reach; stored once, the table is as small as before.
     let table = shared_string_table(1024, 60_000, None);
-    let renamed = renamed_sfnt(&sfnt_with_table(&table), "PdfCraftPrint1").unwrap();
+    let renamed = renamed_sfnt(&sfnt_with_table(&table), "PapelPrint1").unwrap();
     let font = FontRef::new(&renamed).unwrap();
     let name = font.name().unwrap();
     let copyright: std::collections::BTreeSet<_> =
         name.name_record().iter().filter(|r| r.name_id().to_u16() == 0).map(|r| (r.string_offset().to_u32(), r.length())).collect();
     assert_eq!(copyright.len(), 1, "every copyright record points at the one string");
     assert!(font.table_data(skrifa::raw::types::Tag::new(b"name")).unwrap().len() <= table.len() + 64);
-    assert_eq!(name_of(&renamed, StringId::FAMILY_NAME).as_deref(), Some("PdfCraftPrint1"));
+    assert_eq!(name_of(&renamed, StringId::FAMILY_NAME).as_deref(), Some("PapelPrint1"));
     // 60,000 bytes of UTF-16BE: 30,000 characters.
     assert_eq!(name_of(&renamed, StringId::COPYRIGHT_NOTICE).map(|c| c.chars().count()), Some(60_000 / 2));
 }
@@ -452,18 +452,18 @@ fn identity_records_are_respelled_per_platform_and_the_rest_are_kept() {
         ],
         &[b"\0e\0n"],
     );
-    let renamed = renamed_sfnt(&sfnt, "PdfCraftPrint7").unwrap();
+    let renamed = renamed_sfnt(&sfnt, "PapelPrint7").unwrap();
     let (records, tags) = records_of(&renamed);
     assert_eq!(
         records,
         [
-            (1, 0, 0, 1, b"PdfCraftPrint7".to_vec()),
+            (1, 0, 0, 1, b"PapelPrint7".to_vec()),
             (1, 0, 0, 2, b"Bold".to_vec()),
             (3, 1, 0x409, 0, copyright),
-            (3, 1, 0x409, 1, utf16("PdfCraftPrint7")),
-            (3, 1, 0x409, 6, utf16("PdfCraftPrint7")),
+            (3, 1, 0x409, 1, utf16("PapelPrint7")),
+            (3, 1, 0x409, 6, utf16("PapelPrint7")),
             // The Shift-JIS family can't be respelled in ASCII here, so it goes.
-            (3, 1, 0x8000, 4, utf16("PdfCraftPrint7")),
+            (3, 1, 0x8000, 4, utf16("PapelPrint7")),
         ]
     );
     assert_eq!(tags, [b"\0e\0n".to_vec()]);

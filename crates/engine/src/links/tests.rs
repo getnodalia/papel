@@ -1,7 +1,7 @@
 #[test]
 fn remote_documents_must_be_regular_pdf_files() {
     use super::{RemoteDocumentPathError as E, read_remote_document as read};
-    let dir = std::env::temp_dir().join(format!("pdfcraft-gotor-read-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("papel-gotor-read-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(dir.join("folder.pdf")).unwrap();
     std::fs::write(dir.join("doc.PDF"), b"%PDF-1.7\n").unwrap();

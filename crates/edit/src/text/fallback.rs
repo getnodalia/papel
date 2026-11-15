@@ -29,7 +29,7 @@ pub(super) fn is_variation_selector(ch: char) -> bool {
 const SELECTOR_GLYPH_PROC: &[u8] = b"0 0 0 0 0 0 d1\n";
 
 fn is_win_ansi_char(c: char) -> bool {
-    c == '\t' || pdfcraft_fonts::win_ansi_byte(c).is_some()
+    c == '\t' || papel_fonts::win_ansi_byte(c).is_some()
 }
 
 pub(crate) fn needs_type3(text: &str) -> bool {
@@ -271,7 +271,7 @@ const SIDE_BEARING: f64 = 0.05;
 /// (one em each, as in JIS X 0208) and have no proportional (`palt`) metrics for them, so a
 /// word set that way reads as letter-spaced. Those letters get their ink width plus a side
 /// bearing instead; everything else keeps the face's own advance.
-fn proportional(ch: char, glyph: &pdfcraft_fonts::GlyphOutline) -> (f64, f64) {
+fn proportional(ch: char, glyph: &papel_fonts::GlyphOutline) -> (f64, f64) {
     let respace = matches!(ch, '\u{0370}'..='\u{03FF}' | '\u{0400}'..='\u{052F}' | '\u{1F00}'..='\u{1FFF}');
     let ink = glyph.bbox[2] - glyph.bbox[0];
     if !respace || glyph.contours.is_empty() || !(ink > 0.0 && ink < glyph.width) {
@@ -305,7 +305,7 @@ pub(crate) fn no_fallback_font(text: &str) -> EditError {
     EditError::Invalid(format!(
         "the paragraph's font has no glyph for {ch} (U+{:04X}) and this build has no fallback font for it; \
          choose a font that has it (Load font… or Installed fonts…), or use an official release, which includes \
-         PdfCraft's fallback fonts (to build them in, set CRAFT_FONTS_DIR to a craft-fonts checkout)",
+         Papel's fallback fonts (to build them in, set CRAFT_FONTS_DIR to a craft-fonts checkout)",
         u32::from(ch)
     ))
 }
@@ -320,13 +320,13 @@ fn needs_japanese(ch: char) -> bool {
 /// what the writer can do about it. A CJK character without a Japanese face in the build is about
 /// that build input, which is the one answer that changes it.
 pub(crate) fn no_glyph_for(face: &CraftFont, ch: char) -> EditError {
-    if needs_japanese(ch) && pdfcraft_fonts::document_japanese_font().is_none() {
+    if needs_japanese(ch) && papel_fonts::document_japanese_font().is_none() {
         return no_japanese_font();
     }
     EditError::Invalid(format!(
         "the {} fallback font has no glyph for {ch} (U+{:04X}), and no fallback face covers the text; \
          choose a font that has it (Load font… or Installed fonts…), or use an official release, which includes \
-         PdfCraft's fallback fonts (to build them in, set CRAFT_FONTS_DIR to a craft-fonts checkout)",
+         Papel's fallback fonts (to build them in, set CRAFT_FONTS_DIR to a craft-fonts checkout)",
         face.family,
         u32::from(ch)
     ))
@@ -335,7 +335,7 @@ pub(crate) fn no_glyph_for(face: &CraftFont, ch: char) -> EditError {
 /// This build has no Japanese face to draw replacement text with.
 pub(super) fn no_japanese_font() -> EditError {
     EditError::Invalid(
-        "this text needs PdfCraft's Japanese fallback font, which this build doesn't include \
+        "this text needs Papel's Japanese fallback font, which this build doesn't include \
          (official releases do; to build it in, set CRAFT_FONTS_DIR to a craft-fonts checkout)"
             .into(),
     )
@@ -349,7 +349,7 @@ pub(crate) fn fallback_face<'a>(faces: &[&'a CraftFont], chars: &[char], has_gly
 /// This build has no Hebrew face to draw replacement text with.
 fn no_hebrew_font() -> EditError {
     EditError::Invalid(
-        "this text needs PdfCraft's Hebrew fallback font (Noto Sans Hebrew), which this build doesn't include \
+        "this text needs Papel's Hebrew fallback font (Noto Sans Hebrew), which this build doesn't include \
          (to build it in, set CRAFT_FONTS_DIR to a craft-fonts checkout that has it)"
             .into(),
     )
@@ -361,8 +361,8 @@ fn no_hebrew_font() -> EditError {
 /// bundled Latin face behind them, which covers the Latin, Greek and Cyrillic letters they lack
 /// (#2593: the Japanese faces have no қ, ғ, ҳ, ә, ө, ү, ұ or һ).
 pub(crate) fn type3_faces(text: &str, family: crate::added::Family, bold: bool) -> Result<(Vec<&'static CraftFont>, bool), EditError> {
-    let japanese = pdfcraft_fonts::document_japanese_fonts_for_style(family == crate::added::Family::Times, bold);
-    let latin = pdfcraft_fonts::document_latin_fonts(bold);
+    let japanese = papel_fonts::document_japanese_fonts_for_style(family == crate::added::Family::Times, bold);
+    let latin = papel_fonts::document_latin_fonts(bold);
     if !text.chars().any(crate::bidi::is_hebrew) {
         return Ok((japanese.into_iter().chain(latin).collect(), false));
     }
@@ -371,7 +371,7 @@ pub(crate) fn type3_faces(text: &str, family: crate::added::Family, bold: bool) 
     if text.chars().any(crate::bidi::is_hebrew_mark) {
         return Err(EditError::Invalid("Hebrew points (niqqud) can't be written into a PDF yet; type the text without them".into()));
     }
-    let hebrew = pdfcraft_fonts::document_hebrew_font(bold).ok_or_else(no_hebrew_font)?;
+    let hebrew = papel_fonts::document_hebrew_font(bold).ok_or_else(no_hebrew_font)?;
     Ok((std::iter::once(hebrew).chain(japanese).chain(latin).collect(), true))
 }
 
@@ -527,7 +527,7 @@ pub(super) fn add_type3_font(doc: &mut Document, fonts_res: &mut Dict, face: &Cr
 }
 
 /// A glyph's CharProc body at 1000 units per em, with a six-operand `d1` and its actual ink box.
-pub(crate) fn glyph_path(glyph: &pdfcraft_fonts::GlyphOutline) -> Vec<u8> {
+pub(crate) fn glyph_path(glyph: &papel_fonts::GlyphOutline) -> Vec<u8> {
     let scale = 1000.0;
     let b = if glyph.contours.is_empty() { [0.0; 4] } else { glyph.bbox };
     let mut out = format!(
@@ -655,8 +655,8 @@ pub(crate) fn source_program(doc: &Document, fonts: &Dict, name: &str) -> Option
     if base.split_once('+').is_some_and(|(tag, _)| tag.len() == 6 && tag.bytes().all(|b| b.is_ascii_uppercase())) {
         return None;
     }
-    let bytes = pdfcraft_fonts::pdf::embedded_sfnt(doc, &font)?;
-    pdfcraft_fonts::embedding::validate(&bytes).is_ok().then_some(bytes)
+    let bytes = papel_fonts::pdf::embedded_sfnt(doc, &font)?;
+    papel_fonts::embedding::validate(&bytes).is_ok().then_some(bytes)
 }
 
 /// Whether `text` has characters `line`'s font can't encode that its own program can draw.
@@ -665,7 +665,7 @@ pub(super) fn source_program_completes(doc: &Document, fonts: &Dict, line: &Text
         return false;
     };
     let missing: String = text.chars().filter(|c| !c.is_whitespace() && !source_encodes(&metrics, &c.to_string())).collect();
-    !missing.is_empty() && source_program(doc, fonts, &line.font).is_some_and(|bytes| pdfcraft_fonts::embedding::covers(&bytes, &missing))
+    !missing.is_empty() && source_program(doc, fonts, &line.font).is_some_and(|bytes| papel_fonts::embedding::covers(&bytes, &missing))
 }
 
 /// A subset may contain all the letters but no space glyph: producers use another subset
@@ -748,7 +748,7 @@ pub(crate) fn source_show(metrics: &Metrics, text: &str, size: f64, space: f64, 
     let mut out = Vec::new();
     for (i, word) in text.split(' ').enumerate() {
         if i > 0 {
-            out.push(Op::new("TJ", vec![Object::Array(vec![pdfcraft_content::num(adjustment)])]));
+            out.push(Op::new("TJ", vec![Object::Array(vec![papel_content::num(adjustment)])]));
         }
         if !word.is_empty() {
             let bytes = metrics.encode(word).ok_or_else(|| EditError::Invalid("the source font cannot show the replacement text".into()))?;

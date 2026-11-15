@@ -83,7 +83,7 @@ fn decode_arithmetic(
     if width > MAX_DIMENSION || height > MAX_DIMENSION {
         bail!(OverflowError::BitmapLimit);
     }
-    // PdfCraft patch: the product is bounded too (see `bitmap::MAX_GRID_CELLS`).
+    // Papel patch: the product is bounded too (see `bitmap::MAX_GRID_CELLS`).
     if u64::from(width) * u64::from(height) > crate::bitmap::MAX_GRID_CELLS {
         bail!(OverflowError::BitmapLimit);
     }
@@ -291,11 +291,11 @@ fn extract_bits<S: Simd>(
 }
 
 #[cfg(test)]
-mod pdfcraft_limit_tests {
+mod papel_limit_tests {
     use super::*;
     use crate::error::DecodeError;
 
-    /// PdfCraft patch: a gray-scale image past the bound on a side or on cells is refused by a
+    /// Papel patch: a gray-scale image past the bound on a side or on cells is refused by a
     /// limit, before anything is decoded. A halftone region refuses such a grid first, so this is
     /// reached only by calling it.
     #[test]

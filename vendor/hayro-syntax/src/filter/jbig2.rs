@@ -9,7 +9,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::iter;
 
-/// PdfCraft patch (31): the steps of decoding a page's JBIG2 images may take between them, as many
+/// Papel patch (31): the steps of decoding a page's JBIG2 images may take between them, as many
 /// as one may. Each has its own limit, which doesn't bound a page of many made to reach it. That
 /// is about 6 s to 17 s, inside a render's watchdog; an image of the largest size costs a quarter of
 /// it to decode and a quarter for its page, and ordinary ones are far below that.
@@ -19,21 +19,21 @@ pub const MAX_PAGE_JBIG2_WORK: u64 = 1 << 30;
 std::thread_local! {
     // Unbounded until a page says otherwise: what isn't drawing a page has no page to run out on.
     static PAGE_WORK_LEFT: core::cell::Cell<u64> = const { core::cell::Cell::new(u64::MAX) };
-    // PdfCraft patch (31): what refused the image decoded last on this thread, if one of the
+    // Papel patch (31): what refused the image decoded last on this thread, if one of the
     // decoder's limits did: `STREAM_LIMIT` or `WORK_LIMIT`, 0 otherwise.
     static LIMITED: core::cell::Cell<u8> = const { core::cell::Cell::new(0) };
 }
 
-/// PdfCraft patch (31): a limit the stream reaches by itself, whatever ran before it (a bitmap's
+/// Papel patch (31): a limit the stream reaches by itself, whatever ran before it (a bitmap's
 /// size, a dictionary's symbols, the bitmaps retained and the like), so decoding it again is
 /// refused again.
 #[cfg(feature = "std")]
 const STREAM_LIMIT: u8 = 1;
-/// PdfCraft patch (31): the decoding work, which may be what the page or run had left.
+/// Papel patch (31): the decoding work, which may be what the page or run had left.
 #[cfg(feature = "std")]
 const WORK_LIMIT: u8 = 2;
 
-/// PdfCraft patch (31): whether the JBIG2 image decoded last on this thread was refused by one of
+/// Papel patch (31): whether the JBIG2 image decoded last on this thread was refused by one of
 /// the decoder's limits rather than failing on its data. A soft mask a limit refused hides what
 /// its image would show without it: hayro-interpret leaves such an image out, where a mask the
 /// file damaged leaves its image whole (#6722). A size or count the file damaged can read as past
@@ -49,7 +49,7 @@ pub fn jbig2_limited() -> bool {
     false
 }
 
-/// PdfCraft patch (31): whether the refusal [`jbig2_limited`] reports came from a limit the stream
+/// Papel patch (31): whether the refusal [`jbig2_limited`] reports came from a limit the stream
 /// reaches by itself, not from the decoding work, so the same stream is refused again whenever it
 /// is decoded.
 #[cfg(feature = "std")]
@@ -62,7 +62,7 @@ pub fn jbig2_limited_by_stream() -> bool {
     false
 }
 
-/// PdfCraft patch (31): forget what refused the image decoded last, before decoding another
+/// Papel patch (31): forget what refused the image decoded last, before decoding another
 /// through filters that may fail before JBIG2 is reached.
 #[cfg(feature = "std")]
 pub fn clear_jbig2_limited() {
@@ -87,7 +87,7 @@ fn note_limited(error: Option<&hayro_jbig2::DecodeError>) {
 #[cfg(not(feature = "std"))]
 fn note_limited(_: Option<&hayro_jbig2::DecodeError>) {}
 
-/// PdfCraft patch (31): what the JBIG2 images decoded next on this thread may take, for a new page.
+/// Papel patch (31): what the JBIG2 images decoded next on this thread may take, for a new page.
 #[cfg(feature = "std")]
 pub fn set_page_jbig2_work(work: u64) {
     PAGE_WORK_LEFT.with(|left| left.set(work));
@@ -126,7 +126,7 @@ fn decode_for_page<D: hayro_jbig2::Decoder>(image: &hayro_jbig2::Image<'_>, deco
     image.decode(decoder).ok()
 }
 
-/// PdfCraft patch (31): whether the page has nothing left for another image, which then isn't read
+/// Papel patch (31): whether the page has nothing left for another image, which then isn't read
 /// at all.
 #[cfg(feature = "std")]
 pub fn page_jbig2_work_spent() -> bool {
@@ -151,7 +151,7 @@ pub(crate) fn decode(
         return None;
     }
 
-    // PdfCraft patch: globals are raw segments, so JBIG2 inside them means nothing, and decoding
+    // Papel patch: globals are raw segments, so JBIG2 inside them means nothing, and decoding
     // it reads its own globals in turn: a chain of 16,000 such streams overflowed the stack, which
     // aborts the process. Such a stream reads as globals that can't be decoded.
     let globals = params

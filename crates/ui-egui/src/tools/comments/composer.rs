@@ -141,7 +141,7 @@ pub(crate) fn composer(ctx: &egui::Context, keys: PageKeys, view: &mut DocView, 
             // A callout's leader and box stay in user-space axes (its appearance isn't turned).
             let font_size = prefs.font_size(CommentTool::Callout).unwrap_or(10.0);
             let rect = text_box_rect(c.at, &text, font_size, 0);
-            let knee = pdfcraft_engine::callout_knee(rect, point);
+            let knee = papel_engine::callout_knee(rect, point);
             Some(new_comment(&cx, CommentTool::Callout, Shape::Callout { rect, knee, point, font_size, ending: LineEnding::OpenArrow }, text))
         }
         ComposerKind::Replace => {

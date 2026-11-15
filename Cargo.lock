@@ -1187,17 +1187,17 @@ dependencies = [
 [[package]]
 name = "craft-docpath"
 version = "0.1.0"
-source = "git+https://github.com/storytold/craft-libs?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
 
 [[package]]
 name = "craft-fonts-build"
 version = "0.1.0"
-source = "git+https://github.com/storytold/craft-libs?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
 
 [[package]]
 name = "craft-i18n"
 version = "0.1.0"
-source = "git+https://github.com/storytold/craft-libs?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
 dependencies = [
  "fixed_decimal",
  "icu_decimal",
@@ -1220,7 +1220,7 @@ dependencies = [
 [[package]]
 name = "craft-keymap"
 version = "0.1.0"
-source = "git+https://github.com/storytold/craft-libs?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
 dependencies = [
  "egui",
  "serde",
@@ -1230,7 +1230,7 @@ dependencies = [
 [[package]]
 name = "craft-menu"
 version = "0.1.0"
-source = "git+https://github.com/storytold/craft-libs?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
 dependencies = [
  "craft-keymap",
  "craft-quit",
@@ -1243,7 +1243,7 @@ dependencies = [
 [[package]]
 name = "craft-print"
 version = "0.1.0"
-source = "git+https://github.com/storytold/craft-libs?rev=1146cdc4f92e6c5c4fc3d67efbf0e1cec436a10c#1146cdc4f92e6c5c4fc3d67efbf0e1cec436a10c"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main?rev=1146cdc4f92e6c5c4fc3d67efbf0e1cec436a10c#1146cdc4f92e6c5c4fc3d67efbf0e1cec436a10c"
 dependencies = [
  "craft-winprint-gdi",
  "log",
@@ -1257,7 +1257,7 @@ dependencies = [
 [[package]]
 name = "craft-quit"
 version = "0.1.0"
-source = "git+https://github.com/storytold/craft-libs?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
 dependencies = [
  "dispatch2",
  "egui",
@@ -1268,7 +1268,7 @@ dependencies = [
 [[package]]
 name = "craft-ui"
 version = "0.1.0"
-source = "git+https://github.com/storytold/craft-libs?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
 dependencies = [
  "craft-fonts-build",
  "craft-i18n",
@@ -1289,7 +1289,7 @@ dependencies = [
 [[package]]
 name = "craft-update"
 version = "0.1.0"
-source = "git+https://github.com/storytold/craft-libs?rev=1b34eba41e62138fc2438d2734523b302840b45d#1b34eba41e62138fc2438d2734523b302840b45d"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main?rev=1b34eba41e62138fc2438d2734523b302840b45d#1b34eba41e62138fc2438d2734523b302840b45d"
 dependencies = [
  "chrono",
  "dunce",
@@ -1315,7 +1315,7 @@ dependencies = [
 [[package]]
 name = "craft-web-api"
 version = "0.1.0"
-source = "git+https://github.com/storytold/craft-libs?rev=fd5e2feff6ea25bed371a99cc732b3968d621505#fd5e2feff6ea25bed371a99cc732b3968d621505"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main?rev=fd5e2feff6ea25bed371a99cc732b3968d621505#fd5e2feff6ea25bed371a99cc732b3968d621505"
 dependencies = [
  "js-sys",
  "serde_json",
@@ -1326,7 +1326,7 @@ dependencies = [
 [[package]]
 name = "craft-web-host"
 version = "0.1.0"
-source = "git+https://github.com/storytold/craft-libs?rev=fd5e2feff6ea25bed371a99cc732b3968d621505#fd5e2feff6ea25bed371a99cc732b3968d621505"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main?rev=fd5e2feff6ea25bed371a99cc732b3968d621505#fd5e2feff6ea25bed371a99cc732b3968d621505"
 dependencies = [
  "wasm-bindgen",
  "web-sys",
@@ -1696,7 +1696,7 @@ dependencies = [
 [[package]]
 name = "ecolor"
 version = "0.37.0"
-source = "git+https://github.com/storytold/egui.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/egui/main.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
 dependencies = [
  "bytemuck",
  "emath",
@@ -1728,7 +1728,7 @@ dependencies = [
 [[package]]
 name = "eframe"
 version = "0.37.0"
-source = "git+https://github.com/storytold/egui.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/egui/main.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
 dependencies = [
  "ahash",
  "bytemuck",
@@ -1766,7 +1766,7 @@ dependencies = [
 [[package]]
 name = "egui"
 version = "0.37.0"
-source = "git+https://github.com/storytold/egui.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/egui/main.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
 dependencies = [
  "accesskit",
  "ahash",
@@ -1787,7 +1787,7 @@ dependencies = [
 [[package]]
 name = "egui-wgpu"
 version = "0.37.0"
-source = "git+https://github.com/storytold/egui.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/egui/main.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
 dependencies = [
  "ahash",
  "bytemuck",
@@ -1806,7 +1806,7 @@ dependencies = [
 [[package]]
 name = "egui-winit"
 version = "0.37.0"
-source = "git+https://github.com/storytold/egui.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/egui/main.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
 dependencies = [
  "accesskit_winit",
  "arboard",
@@ -1833,7 +1833,7 @@ dependencies = [
 [[package]]
 name = "egui_extras"
 version = "0.37.0"
-source = "git+https://github.com/storytold/egui.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/egui/main.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
 dependencies = [
  "ahash",
  "egui",
@@ -1847,7 +1847,7 @@ dependencies = [
 [[package]]
 name = "egui_glow"
 version = "0.37.0"
-source = "git+https://github.com/storytold/egui.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/egui/main.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
 dependencies = [
  "bytemuck",
  "egui",
@@ -1860,7 +1860,7 @@ dependencies = [
 [[package]]
 name = "egui_kittest"
 version = "0.37.0"
-source = "git+https://github.com/storytold/egui.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/egui/main.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
 dependencies = [
  "eframe",
  "egui",
@@ -1903,7 +1903,7 @@ dependencies = [
 [[package]]
 name = "emath"
 version = "0.37.0"
-source = "git+https://github.com/storytold/egui.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/egui/main.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
 dependencies = [
  "bytemuck",
  "serde",
@@ -1984,7 +1984,7 @@ dependencies = [
 [[package]]
 name = "epaint"
 version = "0.37.0"
-source = "git+https://github.com/storytold/egui.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/egui/main.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
 dependencies = [
  "ahash",
  "bytemuck",
@@ -2011,7 +2011,7 @@ dependencies = [
 [[package]]
 name = "epaint_default_fonts"
 version = "0.37.0"
-source = "git+https://github.com/storytold/egui.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/egui/main.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
 
 [[package]]
 name = "equator"
@@ -4258,7 +4258,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft"
+name = "papel"
 version = "0.18.1"
 dependencies = [
  "chrono",
@@ -4267,9 +4267,9 @@ dependencies = [
  "egui",
  "fmv-macos-events",
  "log",
- "pdfcraft-engine",
- "pdfcraft-platform",
- "pdfcraft-ui-egui",
+ "papel-engine",
+ "papel-platform",
+ "papel-ui-egui",
  "pollster 1.0.1",
  "raw-window-handle",
  "serde_json",
@@ -4283,56 +4283,56 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-a11y"
+name = "papel-a11y"
 version = "0.18.1"
 dependencies = [
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-fonts",
- "pdfcraft-model",
+ "papel-content",
+ "papel-cos",
+ "papel-fonts",
+ "papel-model",
  "thiserror 2.0.21",
 ]
 
 [[package]]
-name = "pdfcraft-annot"
+name = "papel-annot"
 version = "0.18.1"
 dependencies = [
  "hayro-syntax",
- "pdfcraft-cos",
- "pdfcraft-fonts",
- "pdfcraft-geom",
- "pdfcraft-model",
+ "papel-cos",
+ "papel-fonts",
+ "papel-geom",
+ "papel-model",
  "thiserror 2.0.21",
 ]
 
 [[package]]
-name = "pdfcraft-audit"
+name = "papel-audit"
 version = "0.18.1"
 dependencies = [
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-edit",
- "pdfcraft-model",
+ "papel-content",
+ "papel-cos",
+ "papel-edit",
+ "papel-model",
  "thiserror 2.0.21",
 ]
 
 [[package]]
-name = "pdfcraft-automation"
+name = "papel-automation"
 version = "0.18.1"
 dependencies = [
  "base64 0.23.1",
  "flate2",
  "image",
- "pdfcraft-cos",
- "pdfcraft-engine",
- "pdfcraft-fonts",
- "pdfcraft-model",
- "pdfcraft-organize",
- "pdfcraft-platform",
- "pdfcraft-prc",
- "pdfcraft-prc-render",
- "pdfcraft-render",
- "pdfcraft-xfa",
+ "papel-cos",
+ "papel-engine",
+ "papel-fonts",
+ "papel-model",
+ "papel-organize",
+ "papel-platform",
+ "papel-prc",
+ "papel-prc-render",
+ "papel-render",
+ "papel-xfa",
  "png 0.18.1",
  "rustix 1.1.5",
  "serde_json",
@@ -4341,17 +4341,17 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-cli"
+name = "papel-cli"
 version = "0.18.1"
 dependencies = [
  "base64 0.23.1",
- "pdfcraft-audit",
- "pdfcraft-automation",
- "pdfcraft-cos",
- "pdfcraft-engine",
- "pdfcraft-platform",
- "pdfcraft-preflight",
- "pdfcraft-render",
+ "papel-audit",
+ "papel-automation",
+ "papel-cos",
+ "papel-engine",
+ "papel-platform",
+ "papel-preflight",
+ "papel-render",
  "png 0.18.1",
  "rustix 1.1.5",
  "serde_json",
@@ -4359,28 +4359,28 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-compare"
+name = "papel-compare"
 version = "0.18.1"
 
 [[package]]
-name = "pdfcraft-content"
+name = "papel-content"
 version = "0.18.1"
 dependencies = [
  "hayro-syntax",
- "pdfcraft-cos",
+ "papel-cos",
 ]
 
 [[package]]
-name = "pdfcraft-cos"
+name = "papel-cos"
 version = "0.18.1"
 dependencies = [
  "chrono",
  "hayro-syntax",
  "js-sys",
- "pdfcraft-crypt",
- "pdfcraft-filters",
- "pdfcraft-oracle",
- "pdfcraft-testkit",
+ "papel-crypt",
+ "papel-filters",
+ "papel-oracle",
+ "papel-testkit",
  "proptest",
  "serde_json",
  "thiserror 2.0.21",
@@ -4388,18 +4388,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-create"
+name = "papel-create"
 version = "0.18.1"
 dependencies = [
  "encoding_rs",
  "hayro-ccitt",
  "hayro-syntax",
  "image",
- "pdfcraft-cos",
- "pdfcraft-filters",
- "pdfcraft-fonts",
- "pdfcraft-model",
- "pdfcraft-xfa",
+ "papel-cos",
+ "papel-filters",
+ "papel-fonts",
+ "papel-model",
+ "papel-xfa",
  "png 0.18.1",
  "thiserror 2.0.21",
  "tiff",
@@ -4407,7 +4407,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-crypt"
+name = "papel-crypt"
 version = "0.18.1"
 dependencies = [
  "aes",
@@ -4420,18 +4420,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-edit"
+name = "papel-edit"
 version = "0.18.1"
 dependencies = [
  "hayro-syntax",
  "icu_segmenter",
  "kurbo 0.13.1",
- "pdfcraft-annot",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-fonts",
- "pdfcraft-model",
- "pdfcraft-render",
+ "papel-annot",
+ "papel-content",
+ "papel-cos",
+ "papel-fonts",
+ "papel-model",
+ "papel-render",
  "proptest",
  "sha2 0.11.1",
  "thiserror 2.0.21",
@@ -4439,7 +4439,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-engine"
+name = "papel-engine"
 version = "0.18.1"
 dependencies = [
  "chrono",
@@ -4448,33 +4448,33 @@ dependencies = [
  "icu_properties",
  "idna",
  "image",
- "pdfcraft-a11y",
- "pdfcraft-annot",
- "pdfcraft-audit",
- "pdfcraft-compare",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-create",
- "pdfcraft-edit",
- "pdfcraft-export",
- "pdfcraft-filters",
- "pdfcraft-fonts",
- "pdfcraft-forms",
- "pdfcraft-geom",
- "pdfcraft-js",
- "pdfcraft-measure",
- "pdfcraft-model",
- "pdfcraft-ocr",
- "pdfcraft-optimize",
- "pdfcraft-organize",
- "pdfcraft-preflight",
- "pdfcraft-print",
- "pdfcraft-redact",
- "pdfcraft-render",
- "pdfcraft-sign",
- "pdfcraft-testkit",
- "pdfcraft-xfa",
- "pdfcraft-xfdf",
+ "papel-a11y",
+ "papel-annot",
+ "papel-audit",
+ "papel-compare",
+ "papel-content",
+ "papel-cos",
+ "papel-create",
+ "papel-edit",
+ "papel-export",
+ "papel-filters",
+ "papel-fonts",
+ "papel-forms",
+ "papel-geom",
+ "papel-js",
+ "papel-measure",
+ "papel-model",
+ "papel-ocr",
+ "papel-optimize",
+ "papel-organize",
+ "papel-preflight",
+ "papel-print",
+ "papel-redact",
+ "papel-render",
+ "papel-sign",
+ "papel-testkit",
+ "papel-xfa",
+ "papel-xfdf",
  "png 0.18.1",
  "thiserror 2.0.21",
  "tiff",
@@ -4483,14 +4483,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-export"
+name = "papel-export"
 version = "0.18.1"
 dependencies = [
  "flate2",
 ]
 
 [[package]]
-name = "pdfcraft-filters"
+name = "papel-filters"
 version = "0.18.1"
 dependencies = [
  "fax",
@@ -4503,34 +4503,34 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-fonts"
+name = "papel-fonts"
 version = "0.18.1"
 dependencies = [
  "harfrust",
- "pdfcraft-cos",
+ "papel-cos",
  "skrifa 0.44.0",
  "unicode-bidi",
 ]
 
 [[package]]
-name = "pdfcraft-forms"
+name = "papel-forms"
 version = "0.18.1"
 dependencies = [
  "hayro-syntax",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-fonts",
- "pdfcraft-model",
+ "papel-content",
+ "papel-cos",
+ "papel-fonts",
+ "papel-model",
  "proptest",
  "thiserror 2.0.21",
 ]
 
 [[package]]
-name = "pdfcraft-geom"
+name = "papel-geom"
 version = "0.18.1"
 
 [[package]]
-name = "pdfcraft-js"
+name = "papel-js"
 version = "0.18.1"
 dependencies = [
  "boa_engine",
@@ -4538,31 +4538,31 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-measure"
+name = "papel-measure"
 version = "0.18.1"
 dependencies = [
- "pdfcraft-annot",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-model",
- "pdfcraft-testkit",
+ "papel-annot",
+ "papel-content",
+ "papel-cos",
+ "papel-model",
+ "papel-testkit",
  "serde",
  "thiserror 2.0.21",
 ]
 
 [[package]]
-name = "pdfcraft-model"
+name = "papel-model"
 version = "0.18.1"
 dependencies = [
- "pdfcraft-cos",
+ "papel-cos",
 ]
 
 [[package]]
-name = "pdfcraft-ocr"
+name = "papel-ocr"
 version = "0.18.1"
 dependencies = [
  "ocrs",
- "pdfcraft-fonts",
+ "papel-fonts",
  "png 0.18.1",
  "rten",
  "rten-imageproc",
@@ -4573,26 +4573,26 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-ocr-worker"
+name = "papel-ocr-worker"
 version = "0.18.1"
 dependencies = [
  "js-sys",
- "pdfcraft-ocr",
+ "papel-ocr",
  "wasm-bindgen",
  "web-sys",
 ]
 
 [[package]]
-name = "pdfcraft-optimize"
+name = "papel-optimize"
 version = "0.18.1"
 dependencies = [
  "image",
- "pdfcraft-annot",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-filters",
- "pdfcraft-model",
- "pdfcraft-render",
+ "papel-annot",
+ "papel-content",
+ "papel-cos",
+ "papel-filters",
+ "papel-model",
+ "papel-render",
  "proptest",
  "thiserror 2.0.21",
  "thread-priority",
@@ -4600,22 +4600,22 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-oracle"
+name = "papel-oracle"
 version = "0.18.1"
 
 [[package]]
-name = "pdfcraft-organize"
+name = "papel-organize"
 version = "0.18.1"
 dependencies = [
  "hayro-syntax",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-oracle",
+ "papel-content",
+ "papel-cos",
+ "papel-oracle",
  "thiserror 2.0.21",
 ]
 
 [[package]]
-name = "pdfcraft-platform"
+name = "papel-platform"
 version = "0.18.1"
 dependencies = [
  "async-channel",
@@ -4625,7 +4625,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-prc"
+name = "papel-prc"
 version = "0.18.1"
 dependencies = [
  "flate2",
@@ -4634,56 +4634,56 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-prc-render"
+name = "papel-prc-render"
 version = "0.18.1"
 dependencies = [
  "flate2",
- "pdfcraft-prc",
+ "papel-prc",
  "thiserror 2.0.21",
 ]
 
 [[package]]
-name = "pdfcraft-preflight"
+name = "papel-preflight"
 version = "0.18.1"
 dependencies = [
  "flate2",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-model",
+ "papel-content",
+ "papel-cos",
+ "papel-model",
  "roxmltree 0.21.2",
 ]
 
 [[package]]
-name = "pdfcraft-print"
+name = "papel-print"
 version = "0.18.1"
 dependencies = [
  "craft-print",
  "log",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-model",
- "pdfcraft-render",
+ "papel-content",
+ "papel-cos",
+ "papel-model",
+ "papel-render",
  "skrifa 0.44.0",
  "thiserror 2.0.21",
 ]
 
 [[package]]
-name = "pdfcraft-redact"
+name = "papel-redact"
 version = "0.18.1"
 dependencies = [
  "aho-corasick",
- "pdfcraft-annot",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-edit",
- "pdfcraft-filters",
- "pdfcraft-fonts",
- "pdfcraft-forms",
- "pdfcraft-geom",
- "pdfcraft-model",
- "pdfcraft-render",
- "pdfcraft-testkit",
- "pdfcraft-xfa",
+ "papel-annot",
+ "papel-content",
+ "papel-cos",
+ "papel-edit",
+ "papel-filters",
+ "papel-fonts",
+ "papel-forms",
+ "papel-geom",
+ "papel-model",
+ "papel-render",
+ "papel-testkit",
+ "papel-xfa",
  "regex",
  "roxmltree 0.21.2",
  "sha2 0.11.1",
@@ -4692,7 +4692,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-render"
+name = "papel-render"
 version = "0.18.1"
 dependencies = [
  "bytemuck",
@@ -4703,11 +4703,11 @@ dependencies = [
  "kurbo 0.13.1",
  "log",
  "lopdf",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-fonts",
- "pdfcraft-geom",
- "pdfcraft-testkit",
+ "papel-content",
+ "papel-cos",
+ "papel-fonts",
+ "papel-geom",
+ "papel-testkit",
  "serde",
  "skrifa 0.44.0",
  "thiserror 2.0.21",
@@ -4716,7 +4716,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-sign"
+name = "papel-sign"
 version = "0.18.1"
 dependencies = [
  "aes",
@@ -4736,12 +4736,12 @@ dependencies = [
  "p384",
  "p521",
  "pbkdf2",
- "pdfcraft-annot",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-fonts",
- "pdfcraft-model",
- "pdfcraft-testkit",
+ "papel-annot",
+ "papel-content",
+ "papel-cos",
+ "papel-fonts",
+ "papel-model",
+ "papel-testkit",
  "rc2",
  "ripemd",
  "rsa",
@@ -4755,11 +4755,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-testkit"
+name = "papel-testkit"
 version = "0.18.1"
 
 [[package]]
-name = "pdfcraft-ui-egui"
+name = "papel-ui-egui"
 version = "0.18.1"
 dependencies = [
  "arboard",
@@ -4786,15 +4786,15 @@ dependencies = [
  "objc2 0.6.5",
  "objc2-app-kit 0.3.2",
  "objc2-foundation 0.3.2",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-engine",
- "pdfcraft-fonts",
- "pdfcraft-model",
- "pdfcraft-ocr",
- "pdfcraft-platform",
- "pdfcraft-render",
- "pdfcraft-xfa",
+ "papel-content",
+ "papel-cos",
+ "papel-engine",
+ "papel-fonts",
+ "papel-model",
+ "papel-ocr",
+ "papel-platform",
+ "papel-render",
+ "papel-xfa",
  "plist",
  "png 0.18.1",
  "pollster 1.0.1",
@@ -4817,7 +4817,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-web"
+name = "papel-web"
 version = "0.18.1"
 dependencies = [
  "craft-web-api",
@@ -4825,20 +4825,20 @@ dependencies = [
  "eframe",
  "egui",
  "js-sys",
- "pdfcraft-ui-egui",
+ "papel-ui-egui",
  "serde_json",
  "wasm-bindgen-futures",
  "web-sys",
 ]
 
 [[package]]
-name = "pdfcraft-xfa"
+name = "papel-xfa"
 version = "0.18.1"
 dependencies = [
  "base64 0.23.1",
  "image",
- "pdfcraft-cos",
- "pdfcraft-fonts",
+ "papel-cos",
+ "papel-fonts",
  "png 0.18.1",
  "roxmltree 0.21.2",
  "sha2 0.11.1",
@@ -4846,14 +4846,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "pdfcraft-xfdf"
+name = "papel-xfdf"
 version = "0.18.1"
 dependencies = [
  "base64 0.23.1",
- "pdfcraft-annot",
- "pdfcraft-cos",
- "pdfcraft-forms",
- "pdfcraft-model",
+ "papel-annot",
+ "papel-cos",
+ "papel-forms",
+ "papel-model",
  "proptest",
  "roxmltree 0.21.2",
  "thiserror 2.0.21",
@@ -8257,7 +8257,7 @@ checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
 [[package]]
 name = "winit"
 version = "0.30.13"
-source = "git+https://github.com/storytold/winit.git?rev=a517b3846ee8457d84ee4975110bfda6797c44dc#a517b3846ee8457d84ee4975110bfda6797c44dc"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/winit/master.git?rev=a517b3846ee8457d84ee4975110bfda6797c44dc#a517b3846ee8457d84ee4975110bfda6797c44dc"
 dependencies = [
  "ahash",
  "android-activity",
@@ -8529,8 +8529,8 @@ dependencies = [
  "anyhow",
  "chrono",
  "lopdf",
- "pdfcraft-cos",
- "pdfcraft-oracle",
+ "papel-cos",
+ "papel-oracle",
  "png 0.18.1",
  "serde",
  "serde_json",
@@ -8852,14 +8852,14 @@ dependencies = [
 [[patch.unused]]
 name = "egui_demo_lib"
 version = "0.37.0"
-source = "git+https://github.com/storytold/egui.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/egui/main.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
 
 [[patch.unused]]
 name = "egui_inspection"
 version = "0.37.0"
-source = "git+https://github.com/storytold/egui.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/egui/main.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
 
 [[patch.unused]]
 name = "egui_system_font_provider"
 version = "0.37.0"
-source = "git+https://github.com/storytold/egui.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
+source = "git+https://github.com/getnodalia/foundation/tree/vendor/egui/main.git?rev=725a39fca940f77149ffbb9c58eef405a16997bc#725a39fca940f77149ffbb9c58eef405a16997bc"
