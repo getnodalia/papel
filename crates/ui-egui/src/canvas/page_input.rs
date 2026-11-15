@@ -2,7 +2,7 @@
 //! router, the text layer, and what is drawn over the page after its text.
 
 use egui::{Color32, CornerRadius, Pos2, Rect, Stroke};
-use pdfcraft_render::{DocInfo, LinkTarget, PageText};
+use papel_render::{DocInfo, LinkTarget, PageText};
 
 use super::area::{SignTab, paint_sign_tab, sign_tab_at, sign_tabs};
 use super::{
@@ -44,7 +44,7 @@ pub(crate) struct PageToolContext<'a> {
     pub xf: &'a PageXform,
     pub ptr: &'a PagePointer,
     pub page: usize,
-    pub doc: &'a pdfcraft_engine::Document,
+    pub doc: &'a papel_engine::Document,
     pub info: &'a DocInfo,
     /// This frame's keys as the pages see them.
     pub keys: PageKeys,
@@ -281,8 +281,8 @@ pub(super) fn page_tool_input(ui: &mut egui::Ui, view: &mut DocView, frame: &mut
 /// signs; none unless `shown`.
 fn page_sign_tabs<'a>(
     ui: &egui::Ui,
-    doc: &'a pdfcraft_engine::Document,
-    form: &[pdfcraft_engine::FormField],
+    doc: &'a papel_engine::Document,
+    form: &[papel_engine::FormField],
     info: &DocInfo,
     slot: &PageSlot,
     can_fill: bool,
@@ -460,11 +460,7 @@ fn right_click(hits: &PageHits<'_>, under: &[crate::page_router::Hit], view: &mu
 }
 
 /// Edit text's paragraphs and pictures on page `i`, kept while the document is unchanged.
-fn edit_inventory(
-    view: &mut DocView,
-    doc: &pdfcraft_engine::Document,
-    i: usize,
-) -> (Vec<pdfcraft_engine::TextBlock>, Vec<pdfcraft_engine::PageImage>) {
+fn edit_inventory(view: &mut DocView, doc: &papel_engine::Document, i: usize) -> (Vec<papel_engine::TextBlock>, Vec<papel_engine::PageImage>) {
     let generation = doc.edit_generation();
     let lines = match view.edit_lines.get(&i) {
         Some((g, l)) if *g == generation => l.clone(),
@@ -485,7 +481,7 @@ struct PageHits<'a> {
     info: &'a DocInfo,
     tool: QuickTool,
     pcx: &'a comments::PageCx<'a>,
-    form: &'a [pdfcraft_engine::FormField],
+    form: &'a [papel_engine::FormField],
     can_fill: bool,
     can_modify: bool,
     /// Edit a PDF is open: added text and pictures can be picked up.
@@ -494,11 +490,11 @@ struct PageHits<'a> {
     field_tool: Option<crate::prepare::FieldTool>,
     /// Prepare may draw and move fields (not while a table is being set up).
     prepare_allowed: bool,
-    added: &'a [pdfcraft_engine::Added],
+    added: &'a [papel_engine::Added],
     /// The document's links, as the engine lists them (the Link tool edits every one).
-    doc_links: &'a [pdfcraft_engine::LinkItem],
-    lines: &'a [pdfcraft_engine::TextBlock],
-    images: &'a [pdfcraft_engine::PageImage],
+    doc_links: &'a [papel_engine::LinkItem],
+    lines: &'a [papel_engine::TextBlock],
+    images: &'a [papel_engine::PageImage],
     /// The pages' visible area (the picture's rotate knob stays inside it).
     clip: Rect,
     /// Addresses written as plain page text open like links (#4207).
@@ -516,7 +512,7 @@ impl PageHits<'_> {
 
     /// The hits at `p`, bottom up ([`Self::hits`]). For a press with Shift or ⌘ in Edit text, the
     /// page's `objects` ([`crate::object_ui::ObjectSelection::inventory`]), which take it whole.
-    fn at(&self, view: &DocView, p: Pos2, objects: Option<&Result<Vec<pdfcraft_engine::EditableObject>, String>>) -> Vec<crate::page_router::Hit> {
+    fn at(&self, view: &DocView, p: Pos2, objects: Option<&Result<Vec<papel_engine::EditableObject>, String>>) -> Vec<crate::page_router::Hit> {
         self.hits(view, p, false, objects)
     }
 
@@ -567,7 +563,7 @@ impl PageHits<'_> {
         view: &DocView,
         p: Pos2,
         context: bool,
-        objects: Option<&Result<Vec<pdfcraft_engine::EditableObject>, String>>,
+        objects: Option<&Result<Vec<papel_engine::EditableObject>, String>>,
     ) -> Vec<crate::page_router::Hit> {
         let PageHits {
             page,
@@ -1061,12 +1057,12 @@ pub(super) fn page_overlays(ui: &mut egui::Ui, view: &mut DocView, frame: &mut P
     }
 }
 
-fn paint_field_highlights(painter: &egui::Painter, xf: &PageXform, info: &DocInfo, form: &[pdfcraft_engine::FormField], page: usize, enabled: bool) {
+fn paint_field_highlights(painter: &egui::Painter, xf: &PageXform, info: &DocInfo, form: &[papel_engine::FormField], page: usize, enabled: bool) {
     if !enabled {
         return;
     }
     for field in form.iter() {
-        let required = field.has(pdfcraft_engine::field_flags::REQUIRED);
+        let required = field.has(papel_engine::field_flags::REQUIRED);
         for widget in field.widgets.iter().filter(|widget| widget.page == Some(page) && !widget.hidden && !widget.read_only) {
             let rect = widget.rect;
             let screen_rect = xf.user_rect(info, page, [rect[0] as f32, rect[1] as f32, rect[2] as f32, rect[3] as f32]);

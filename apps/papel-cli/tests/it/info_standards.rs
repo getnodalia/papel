@@ -4,7 +4,7 @@
 
 use std::process::Command;
 
-const BIN: &str = env!("CARGO_BIN_EXE_pdfcraft-cli");
+const BIN: &str = env!("CARGO_BIN_EXE_papel-cli");
 
 /// A one-page PDF, with `metadata` as the catalog's XMP stream when given.
 fn fixture(metadata: Option<&str>) -> Vec<u8> {
@@ -55,7 +55,7 @@ fn xmp(part: &str, conformance: &str) -> String {
 }
 
 fn info_of(bytes: &[u8], name: &str) -> serde_json::Value {
-    let dir = std::env::temp_dir().join(format!("pdfcraft-info-standards-{}-{name}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("papel-info-standards-{}-{name}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
     let path = dir.join("f.pdf");
     std::fs::write(&path, bytes).unwrap();

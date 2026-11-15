@@ -1,11 +1,11 @@
 //! The system's "no animations" setting, which Preferences ▸ Animation effects follows unless it is
-//! set to On or Off (`pdfcraft_ui_egui::motion`).
+//! set to On or Off (`papel_ui_egui::motion`).
 //!
 //! Windows: Settings ▸ Accessibility ▸ Visual effects ▸ Animation effects (in the Control Panel,
 //! "Show animations in Windows"), read through WinRT's `UISettings.AnimationsEnabled`. Other
 //! systems aren't asked yet: there the window animates as before.
 
-use pdfcraft_ui_egui::motion::MotionSource;
+use papel_ui_egui::motion::MotionSource;
 
 /// Asks the system each time, and logs the answer when it changes.
 pub fn source() -> MotionSource {

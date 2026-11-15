@@ -3,16 +3,16 @@
 //! written as a new image, Flate, or for a one-bit image of one component Group 4, or JBIG2 when it
 //! was JBIG2, whichever is smallest; the original object is untouched (other pages may use it).
 //! CCITT fax and JBIG2 images decode through `ImageBudget::decode`, but for Group 3 on
-//! bytes, which PdfCraft's renderer may draw as other rows, and a JBIG2 page of other rows than the
-//! image's. Images whose codec PdfCraft can't decode (DCT, JPX), and those, return `None`, and the
+//! bytes, which Papel's renderer may draw as other rows, and a JBIG2 page of other rows than the
+//! image's. Images whose codec Papel can't decode (DCT, JPX), and those, return `None`, and the
 //! caller removes the whole image instead; that is fail-closed.
 
-use pdfcraft_content::{Matrix, overlaps};
-use pdfcraft_cos::{Dict, Document, ImageBudget, Object, Stream};
+use papel_content::{Matrix, overlaps};
+use papel_cos::{Dict, Document, ImageBudget, Object, Stream};
 
 /// Most pixels an image may have to be cleared in place (larger ones are removed), or to be stored
 /// again without shared `/JBIG2Globals` (see [`crate::globals::without_dictionary`]).
-pub(crate) const MAX_PIXELS: u64 = pdfcraft_cos::MAX_REDACTED_IMAGE_PIXELS;
+pub(crate) const MAX_PIXELS: u64 = papel_cos::MAX_REDACTED_IMAGE_PIXELS;
 
 /// The components of image `s`'s colour space, through any references (`None` when unknown).
 pub(crate) fn components(doc: &Document, s: &Stream) -> Option<usize> {
@@ -81,7 +81,7 @@ fn decode_and_clear(doc: &Document, s: &Stream, ctm: &Matrix, rects: &[[f64; 4]]
         return None;
     }
     // Group 3 on bytes is removed whole for now. The decoder reads it by its end-of-line codes
-    // when the data starts with one, but PdfCraft's renderer draws such rows (the fill ending
+    // when the data starts with one, but Papel's renderer draws such rows (the fill ending
     // each code on a byte) as other rows, so the pixels a mark covers on screen needn't be the
     // ones cleared.
     if is_fax && doc.fax_params(s).is_none_or(|p| p.k >= 0 && p.encoded_byte_align) {
@@ -198,7 +198,7 @@ pub(crate) fn data_elsewhere(doc: &Document, s: &Stream) -> bool {
 pub(crate) fn smallest(dict: Dict, data: &[u8], w: usize, h: usize, bilevel: bool, jbig2: bool) -> Stream {
     let flate = Stream::flate(dict.clone(), data);
     let Some((columns, rows)) = u32::try_from(w).ok().zip(u32::try_from(h).ok()).filter(|_| bilevel) else { return flate };
-    let g4 = pdfcraft_filters::encode_g4(data, columns, rows).ok().map(|coded| {
+    let g4 = papel_filters::encode_g4(data, columns, rows).ok().map(|coded| {
         let mut dict = dict.clone();
         let mut parms = Dict::new();
         parms.set(b"K".to_vec(), Object::Int(-1));
@@ -208,7 +208,7 @@ pub(crate) fn smallest(dict: Dict, data: &[u8], w: usize, h: usize, bilevel: boo
         dict.set(b"DecodeParms".to_vec(), Object::Dict(parms));
         Stream::from_raw(dict, coded)
     });
-    let jbig = jbig2.then(|| pdfcraft_filters::encode_jbig2(data, columns, rows).ok()).flatten().map(|coded| {
+    let jbig = jbig2.then(|| papel_filters::encode_jbig2(data, columns, rows).ok()).flatten().map(|coded| {
         let mut dict = dict.clone();
         dict.set(b"Filter".to_vec(), Object::name("JBIG2Decode"));
         Stream::from_raw(dict, coded)
@@ -219,6 +219,6 @@ pub(crate) fn smallest(dict: Dict, data: &[u8], w: usize, h: usize, bilevel: boo
 /// The bytes stream `s` takes in a file: its data and its dictionary as written.
 fn stored_len(s: &Stream) -> usize {
     let mut dict = Vec::new();
-    pdfcraft_cos::serialize(&Object::Dict(s.dict.clone()), &mut dict);
+    papel_cos::serialize(&Object::Dict(s.dict.clone()), &mut dict);
     dict.len().saturating_add(s.raw.len())
 }

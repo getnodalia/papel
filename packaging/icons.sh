@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Regenerate the app icons from assets/app-icon/pdfcraft.svg and the Windows PDF file icon
-# from assets/app-icon/pdfcraft-document.svg. Both are master vectors.
+# Regenerate the app icons from assets/app-icon/papel.svg and the Windows PDF file icon
+# from assets/app-icon/papel-document.svg. Both are master vectors.
 #
 # Needs: resvg (brew install resvg / cargo install resvg) and python3 (stdlib only, for the .ico).
 # On macOS, iconutil also writes the .icns. The outputs are committed, so building and packaging
@@ -11,8 +11,8 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIR="$ROOT/assets/app-icon"
-SVG="$DIR/pdfcraft.svg"
-ID="ai.storyteller.pdfcraft"
+SVG="$DIR/papel.svg"
+ID="dev.danielmiguelt.Papel"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
@@ -32,8 +32,8 @@ render() {
   resvg -w "$size" -h "$size" "$src" "$out" </dev/null
 }
 
-# 1024 px PNG on Apple's grid (also the runtime Dock icon on macOS, see apps/pdfcraft/src/main.rs).
-render "$MAC" 1024 "$DIR/pdfcraft-1024.png"
+# 1024 px PNG on Apple's grid (also the runtime Dock icon on macOS, see apps/papel/src/main.rs).
+render "$MAC" 1024 "$DIR/papel-1024.png"
 
 # Linux hicolor theme: the scalable icon sits on the Nodalix/Colloid app grid (224/256 tile,
 # 16 px margin, 51.5 px radius, soft shadow). It is made by tools/nodalia-app-icon.py in
@@ -45,8 +45,8 @@ for s in 16 24 32 48 64 128 256 512; do
 done
 
 # Windows .ico: PNG-compressed entries, 16-256 px. The document icon has its own resource
-# in pdfcraft.exe; the app icon remains the first/default icon.
-for name in pdfcraft pdfcraft-document; do
+# in papel.exe; the app icon remains the first/default icon.
+for name in papel papel-document; do
   ICO_PNGS=()
   for s in 16 20 24 32 40 48 64 128 256; do
     render "$DIR/$name.svg" "$s" "$TMP/$name-$s.png"
@@ -69,14 +69,14 @@ done
 
 # macOS .icns.
 if command -v iconutil >/dev/null; then
-  SET="$TMP/pdfcraft.iconset"
+  SET="$TMP/papel.iconset"
   mkdir -p "$SET"
   for s in 16 32 128 256 512; do
     render "$MAC" "$s" "$SET/icon_${s}x${s}.png"
     render "$MAC" $((s * 2)) "$SET/icon_${s}x${s}@2x.png"
   done
-  iconutil -c icns -o "$DIR/pdfcraft.icns" "$SET"
+  iconutil -c icns -o "$DIR/papel.icns" "$SET"
 else
-  echo "warning: iconutil not found (macOS only); pdfcraft.icns not regenerated" >&2
+  echo "warning: iconutil not found (macOS only); papel.icns not regenerated" >&2
 fi
 echo "icons written to $DIR"

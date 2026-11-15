@@ -3,7 +3,7 @@
 //! printer prints on is remembered with the rest of its setup (`print_ui::setups`, #2001), by name,
 //! so a custom paper is found again however the list changes.
 
-use pdfcraft_engine::print::PAPERS;
+use papel_engine::print::PAPERS;
 use serde::{Deserialize, Serialize};
 
 use crate::print_ui::PrintDraft;

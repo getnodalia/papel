@@ -22,7 +22,7 @@ pub fn system() -> f32 {
 /// `gsettings` output (`1.25`) as a factor; 1.0 when it isn't a usable one.
 #[cfg_attr(not(any(target_os = "linux", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd")), allow(dead_code))]
 fn parse(output: &str) -> f32 {
-    output.trim().parse::<f64>().ok().and_then(pdfcraft_ui_egui::ui_scale::valid).unwrap_or(1.0)
+    output.trim().parse::<f64>().ok().and_then(papel_ui_egui::ui_scale::valid).unwrap_or(1.0)
 }
 
 /// Run `gsettings` and return what it printed, or `None` if it is missing, fails or hangs.
@@ -63,6 +63,6 @@ mod tests {
     #[test]
     fn reading_the_system_scale_never_fails() {
         let f = super::system();
-        assert!(f.is_finite() && (pdfcraft_ui_egui::ui_scale::MIN..=pdfcraft_ui_egui::ui_scale::MAX).contains(&f), "{f}");
+        assert!(f.is_finite() && (papel_ui_egui::ui_scale::MIN..=papel_ui_egui::ui_scale::MAX).contains(&f), "{f}");
     }
 }

@@ -7,14 +7,14 @@ use std::process::{Child, Command, Output, Stdio};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, Instant};
 
-const BIN: &str = env!("CARGO_BIN_EXE_pdfcraft-cli");
+const BIN: &str = env!("CARGO_BIN_EXE_papel-cli");
 
 struct Scratch(PathBuf);
 impl Scratch {
     fn new() -> Self {
         static NEXT: AtomicU64 = AtomicU64::new(0);
         for _ in 0..128 {
-            let path = std::env::temp_dir().join(format!("pdfcraft-stderr-{}-{}", std::process::id(), NEXT.fetch_add(1, Ordering::Relaxed)));
+            let path = std::env::temp_dir().join(format!("papel-stderr-{}-{}", std::process::id(), NEXT.fetch_add(1, Ordering::Relaxed)));
             match std::fs::create_dir(&path) {
                 Ok(()) => return Self(path),
                 Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
@@ -64,7 +64,7 @@ fn render(pdf: &Path, out: &Path, stderr: Stdio) -> Output {
 #[test]
 fn failing_diagnostics_preserve_render_success_and_real_text_or_file_errors() {
     let dir = Scratch::new();
-    let bytes = pdfcraft_engine::Session::new().create_from_text("Diagnostic test", "Ordinary diagnostic text").unwrap();
+    let bytes = papel_engine::Session::new().create_from_text("Diagnostic test", "Ordinary diagnostic text").unwrap();
     let pdf = dir.0.join("input.pdf");
     std::fs::write(&pdf, bytes.as_slice()).unwrap();
     let image_path = dir.0.join("page.pam");

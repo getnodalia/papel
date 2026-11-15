@@ -10,7 +10,7 @@ use std::hash::{Hash, Hasher};
 use std::rc::Rc;
 use std::sync::Arc;
 
-use pdfcraft_cos::{CosError, DECODE_PARMS_KEYS, Dict, Document, ImageBudget, MAX_JBIG2_GLOBALS, Object, Stream, reachable_objects};
+use papel_cos::{CosError, DECODE_PARMS_KEYS, Dict, Document, ImageBudget, MAX_JBIG2_GLOBALS, Object, Stream, reachable_objects};
 
 /// The references followed from `/JBIG2Globals` towards a stream, so that a ring of them ends.
 const MAX_HOPS: usize = 32;
@@ -92,7 +92,7 @@ pub(crate) struct Run {
     /// What a reference leads to, as it is read, under every reference on the way, by number and
     /// generation: one whose generation isn't its object's reads as null (#1143), and must not give
     /// another reference to that number what it read, nor take what that one read.
-    reduced: HashMap<(pdfcraft_cos::ObjRef, How), Rc<Object>>,
+    reduced: HashMap<(papel_cos::ObjRef, How), Rc<Object>>,
     /// What a reference leads to names, under every reference on the way, with the key of the one
     /// that names what it ends at: aliases and chains find it, and are counted as that one.
     names: HashMap<Key, (Rc<[u32]>, Key)>,
@@ -119,7 +119,7 @@ impl Run {
     }
 
     /// Fetches the object `r` names, counted.
-    fn fetch(&mut self, doc: &Document, r: pdfcraft_cos::ObjRef) -> Result<Arc<Object>, crate::RedactError> {
+    fn fetch(&mut self, doc: &Document, r: papel_cos::ObjRef) -> Result<Arc<Object>, crate::RedactError> {
         self.spend(1)?;
         self.fetched += 1;
         Ok(doc.get(r))
@@ -129,8 +129,8 @@ impl Run {
     /// reference whose generation isn't its object's as null (#1143), but a reader that doesn't
     /// compare generations draws with the object: what an image that left names this way may hold
     /// its shapes, so it is named, as what names it this way is a user of it.
-    fn fetch_numbered(&mut self, doc: &Document, r: pdfcraft_cos::ObjRef) -> Result<Arc<Object>, crate::RedactError> {
-        self.fetch(doc, pdfcraft_cos::ObjRef::new(r.num, doc.generation(r.num)))
+    fn fetch_numbered(&mut self, doc: &Document, r: papel_cos::ObjRef) -> Result<Arc<Object>, crate::RedactError> {
+        self.fetch(doc, papel_cos::ObjRef::new(r.num, doc.generation(r.num)))
     }
 
     /// What `v` leads to through references, as `followed` goes, kept as `read` makes it. Each
@@ -145,7 +145,7 @@ impl Run {
         how: How,
         read: impl FnOnce(&mut Self, &Document, &Object) -> Result<Object, crate::RedactError>,
     ) -> Result<Rc<Object>, crate::RedactError> {
-        let mut keys: Vec<(pdfcraft_cos::ObjRef, How)> = Vec::new();
+        let mut keys: Vec<(papel_cos::ObjRef, How)> = Vec::new();
         let mut fetched: Option<Arc<Object>> = None;
         for _ in 0..=MAX_HOPS {
             let Some(r) = fetched.as_deref().unwrap_or(v).as_ref() else { break };
@@ -230,7 +230,7 @@ impl Run {
     /// `start` and each reference after it, up to the limit, remembered under `start` for the run,
     /// so entries naming it, directly or not, fetch it once however many there are; a chain that
     /// reaches the start of one already remembered takes what is known from there.
-    fn chain(&mut self, doc: &Document, start: pdfcraft_cos::ObjRef) -> Result<Rc<[u32]>, crate::RedactError> {
+    fn chain(&mut self, doc: &Document, start: papel_cos::ObjRef) -> Result<Rc<[u32]>, crate::RedactError> {
         if let Some(hit) = self.chains.get(&start.num) {
             return Ok(hit.clone());
         }
@@ -267,14 +267,14 @@ impl Run {
     fn filter(&mut self, doc: &Document, v: &Object) -> Result<Object, crate::RedactError> {
         // A name a decoder knows; any other is no filter, and isn't copied, however long.
         fn name(_: &mut Run, _: &Document, o: &Object) -> Result<Object, crate::RedactError> {
-            let known = |n: &[u8]| n.len() <= 16 && !matches!(pdfcraft_filters::Filter::from_name(n), pdfcraft_filters::Filter::Unknown(_));
+            let known = |n: &[u8]| n.len() <= 16 && !matches!(papel_filters::Filter::from_name(n), papel_filters::Filter::Unknown(_));
             Ok(match o {
                 Object::Name(n) if known(n) => o.clone(),
                 _ => Object::Null,
             })
         }
         let read = |run: &mut Self, doc: &Document, o: &Object| match o {
-            Object::Array(a) if a.len() > pdfcraft_filters::MAX_CHAIN + 1 => Ok(Object::Null),
+            Object::Array(a) if a.len() > papel_filters::MAX_CHAIN + 1 => Ok(Object::Null),
             Object::Array(a) => {
                 let mut names = Vec::with_capacity(a.len());
                 for e in a {

@@ -55,7 +55,7 @@ pub(super) fn run(args: &[String]) -> Result<(), CliError> {
     }
     let mut auto = automation(args)?;
     let content = auto.call("doc_batch", &params).map_err(|e| e.to_string())?;
-    let failed = content.iter().any(|c| matches!(c, pdfcraft_automation::Content::Json(v) if v["failed"].as_u64().is_some_and(|n| n > 0)));
+    let failed = content.iter().any(|c| matches!(c, papel_automation::Content::Json(v) if v["failed"].as_u64().is_some_and(|n| n > 0)));
     print_output(&auto, content, None)?;
     if failed { Err("batch: one or more files failed; see the JSON report".into()) } else { Ok(()) }
 }

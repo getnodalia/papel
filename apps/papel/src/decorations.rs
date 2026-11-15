@@ -2,17 +2,17 @@
 //!
 //! Wayland compositors that draw frames for their clients offer `zxdg_decoration_manager_v1`
 //! (KDE, Sway, Hyprland, COSMIC). GNOME doesn't: it leaves the frame to the app, and winit then
-//! drew an imitation of GNOME's. Without that protocol PdfCraft turns winit's frame off and draws
-//! a header bar like GNOME's own apps (`pdfcraft_ui_egui::window_controls`), with the window
+//! drew an imitation of GNOME's. Without that protocol Papel turns winit's frame off and draws
+//! a header bar like GNOME's own apps (`papel_ui_egui::window_controls`), with the window
 //! buttons GNOME's `button-layout` names. X11 window managers always draw the frame.
 //!
-//! `PDFCRAFT_TITLEBAR=app` or `=system` overrides the choice.
+//! `PAPEL_TITLEBAR=app` or `=system` overrides the choice.
 
-use pdfcraft_ui_egui::window_controls::Layout;
+use papel_ui_egui::window_controls::Layout;
 
 /// The window buttons to draw in the app, or `None` when the desktop draws the frame.
 pub(crate) fn app_drawn() -> Option<Layout> {
-    let drawn = match std::env::var("PDFCRAFT_TITLEBAR").ok().as_deref().map(str::trim) {
+    let drawn = match std::env::var("PAPEL_TITLEBAR").ok().as_deref().map(str::trim) {
         Some("app") => true,
         Some("system") => false,
         _ => compositor_leaves_frame_to_app(),
@@ -43,7 +43,7 @@ fn compositor_leaves_frame_to_app() -> bool {
     let Ok((globals, _queue)) = registry_queue_init::<Registry>(&conn) else { return false };
     let offered = globals.contents().with_list(|list| list.iter().any(|g| g.interface == "zxdg_decoration_manager_v1"));
     if !offered {
-        log::info!("the Wayland compositor draws no window frames; PdfCraft draws its own title bar");
+        log::info!("the Wayland compositor draws no window frames; Papel draws its own title bar");
     }
     !offered
 }

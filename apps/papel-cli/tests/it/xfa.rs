@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use std::process::{Command, Output};
 use std::sync::Arc;
 
-const BIN: &str = env!("CARGO_BIN_EXE_pdfcraft-cli");
+const BIN: &str = env!("CARGO_BIN_EXE_papel-cli");
 
 fn fixture(test: &str) -> PathBuf {
     fixture_with(test, "")
@@ -45,7 +45,7 @@ fn fixture_with(test: &str, event: &str) -> PathBuf {
         bytes.extend_from_slice(format!("{offset:010} 00000 n \n").as_bytes());
     }
     bytes.extend_from_slice(format!("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n").as_bytes());
-    let dir = std::env::temp_dir().join(format!("pdfcraft-cli-xfa-{test}-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("papel-cli-xfa-{test}-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
     let path = dir.join("form.pdf");
     std::fs::write(&path, bytes).unwrap();
@@ -103,10 +103,10 @@ fn text_reads_the_layout_including_a_page_absent_from_the_placeholder() {
 
 #[test]
 fn render_matches_the_engine_layout_on_the_second_page() {
-    use pdfcraft_render::{PageRenderer, RenderConfig, RenderRequest, RequestKind};
+    use papel_render::{PageRenderer, RenderConfig, RenderRequest, RequestKind};
     let path = fixture("render");
     let original = std::fs::read(&path).unwrap();
-    let mut session = pdfcraft_engine::Session::new();
+    let mut session = papel_engine::Session::new();
     let id = session.open("form.pdf", None, Arc::new(original.clone()), None).unwrap();
     let doc = session.get(id).unwrap();
     assert_eq!(doc.info.pages.len(), 2);
@@ -128,9 +128,9 @@ fn render_matches_the_engine_layout_on_the_second_page() {
 #[test]
 fn a_laid_out_form_keeps_the_original_copy_permissions() {
     let path = fixture("permissions");
-    let mut doc = pdfcraft_cos::Document::open(Arc::new(std::fs::read(&path).unwrap())).unwrap();
-    doc.set_encryption(&pdfcraft_cos::NewEncryption {
-        algorithm: pdfcraft_cos::Algorithm::Aes256,
+    let mut doc = papel_cos::Document::open(Arc::new(std::fs::read(&path).unwrap())).unwrap();
+    doc.set_encryption(&papel_cos::NewEncryption {
+        algorithm: papel_cos::Algorithm::Aes256,
         user_password: "openme",
         owner_password: "boss",
         permissions: -17,
@@ -138,7 +138,7 @@ fn a_laid_out_form_keeps_the_original_copy_permissions() {
         seed: [17; 32],
     })
     .unwrap();
-    let original = pdfcraft_cos::write_full(&doc, &Default::default()).unwrap();
+    let original = papel_cos::write_full(&doc, &Default::default()).unwrap();
     std::fs::write(&path, &original).unwrap();
     let output = Command::new(BIN).arg("text").arg(&path).args(["--password", "openme"]).output().unwrap();
     assert!(!output.status.success());

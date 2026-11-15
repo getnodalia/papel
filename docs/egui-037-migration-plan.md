@@ -26,9 +26,9 @@ Status: implemented locally against `a2ec27b4775f53c40cad3456936d9406611e3a8d`; 
 
 ## Historical qualification state — 2026-10-25
 
-The managed run `egui037-pdfcraft-reviewed-ui-ci-20261025-0541` passed the first nine CI stages, including formatting, strict lint, workspace tests, WASM compilation, assets and dependency checks. It recorded 5,025 passing test executions, zero failures and 16 ignored across 198 summaries (including four focused regression executions). The final parity stage found one stale test reference after the Arabic logical-order test was renamed; the reference was corrected without changing executable source. Formatting and parity then passed in `egui037-pdfcraft-parity-final-20261025-0555`. An intervening submission `0553` was refused by the storage guard before execution and is not validation evidence. Final documentation/attribution corrections were checked by formatting, assets generation/validation and parity in `egui037-pdfcraft-final-doc-assets-20261025-0571`.
+The managed run `egui037-papel-reviewed-ui-ci-20261025-0541` passed the first nine CI stages, including formatting, strict lint, workspace tests, WASM compilation, assets and dependency checks. It recorded 5,025 passing test executions, zero failures and 16 ignored across 198 summaries (including four focused regression executions). The final parity stage found one stale test reference after the Arabic logical-order test was renamed; the reference was corrected without changing executable source. Formatting and parity then passed in `egui037-papel-parity-final-20261025-0555`. An intervening submission `0553` was refused by the storage guard before execution and is not validation evidence. Final documentation/attribution corrections were checked by formatting, assets generation/validation and parity in `egui037-papel-final-doc-assets-20261025-0571`.
 
-The page-text editor keeps the prior four-by-two inset under egui 0.37, and print tests locate the Two-sided control by ComboBox role. Both narrow/wide text image regressions and booklet regressions passed before the full suite. Canonical dependency/source guards retain the vendored security and rendering provenance. The repository WASM gate checks the library layers. The separate web application shell also passed `cargo check --locked --target wasm32-unknown-unknown -p pdfcraft-web` in `egui037-pdfcraft-web-shell-check-20261025-0575`. Native GUI and IME/PRIMARY, browser interaction, packaged WASM size, real-world old settings and paired app performance remain open; these checks do not establish cross-platform acceptance.
+The page-text editor keeps the prior four-by-two inset under egui 0.37, and print tests locate the Two-sided control by ComboBox role. Both narrow/wide text image regressions and booklet regressions passed before the full suite. Canonical dependency/source guards retain the vendored security and rendering provenance. The repository WASM gate checks the library layers. The separate web application shell also passed `cargo check --locked --target wasm32-unknown-unknown -p papel-web` in `egui037-papel-web-shell-check-20261025-0575`. Native GUI and IME/PRIMARY, browser interaction, packaged WASM size, real-world old settings and paired app performance remain open; these checks do not establish cross-platform acceptance.
 
 This section supersedes every historical statement below that the egui, winit or
 craft-libs revisions resolve through `local-integration-config.toml`, that the
@@ -40,7 +40,7 @@ tree does not use an external Cargo config.
 |---|---|
 | egui family | `6d518fc799681571963842f95b55a6b68431b15a` (storytold/egui) |
 | winit | `a517b3846ee8457d84ee4975110bfda6797c44dc` (storytold/winit) |
-| craft-ui / craft-quit / craft-print | `25da1314d443171b4adeaad2cd9454b273f35c6f` (storytold/craft-libs) |
+| craft-ui / craft-quit / craft-print | `25da1314d443171b4adeaad2cd9454b273f35c6f` (getnodalia/foundation (vendor/craft-libs)) |
 | `Cargo.lock` SHA-256 | `f5cee0acb795240d2071116230316fd4e4b6bfe4e4314c82b0a4ca5459739f80` |
 | Target-main observation | `a7801dc84e74dd12757aecbb6be324dce7a33939` |
 
@@ -78,16 +78,16 @@ This plan covers only Papel. It does not adopt, reset or migrate any other check
 
 Entry points:
 
-- Native: `apps/pdfcraft/src/main.rs::main` calls `eframe::run_native`; `app_creator` (`main.rs:365`) builds `PdfCraftApp` and wires storage, control, recovery and GPU state.
-- Web: `apps/pdfcraft-web/src/main.rs::main` uses `eframe::WebRunner::start` with `WebOptions { renderer: Glow }`, `?file=`, `?host=parent` and the before-unload warning.
-- Headless: `crates/ui-egui/examples/shot.rs` uses `egui_kittest::Harness::build_eframe` plus `Harness::render`; `apps/pdfcraft-cli` has no egui/eframe dependency.
-- Tests: `crates/ui-egui/tests/it/main.rs` links the integrated UI tests; `apps/pdfcraft/tests/it/main.rs` links twelve winit source guards; `crates/ui-egui/src/control.rs` has the in-crate control/pointer probes; `crates/ui-egui/tests/perf.rs` is the existing timing harness.
+- Native: `apps/papel/src/main.rs::main` calls `eframe::run_native`; `app_creator` (`main.rs:365`) builds `PapelApp` and wires storage, control, recovery and GPU state.
+- Web: `apps/papel-web/src/main.rs::main` uses `eframe::WebRunner::start` with `WebOptions { renderer: Glow }`, `?file=`, `?host=parent` and the before-unload warning.
+- Headless: `crates/ui-egui/examples/shot.rs` uses `egui_kittest::Harness::build_eframe` plus `Harness::render`; `apps/papel-cli` has no egui/eframe dependency.
+- Tests: `crates/ui-egui/tests/it/main.rs` links the integrated UI tests; `apps/papel/tests/it/main.rs` links twelve winit source guards; `crates/ui-egui/src/control.rs` has the in-crate control/pointer probes; `crates/ui-egui/tests/perf.rs` is the existing timing harness.
 
 Targets to keep green:
 
-- `apps/pdfcraft` (native binary; wgpu plus glow fallback, accesskit, persistence, links, x11/wayland, native clipboard).
-- `apps/pdfcraft-web` (wasm32, eframe glow; no egui-winit clipboard feature is needed or available there).
-- `apps/pdfcraft-cli` (no egui dependency; unchanged).
+- `apps/papel` (native binary; wgpu plus glow fallback, accesskit, persistence, links, x11/wayland, native clipboard).
+- `apps/papel-web` (wasm32, eframe glow; no egui-winit clipboard feature is needed or available there).
+- `apps/papel-cli` (no egui dependency; unchanged).
 - `crates/ui-egui` (library, unit tests, `tests/it` integrated binary, `tests/perf.rs`, `examples/shot.rs`).
 - `xtask` gates (`fmt`, clippy, test, layers, wasm, assets, deny, parity).
 
@@ -95,7 +95,7 @@ Targets to keep green:
 
 ### 2.1 App boundary
 
-`PdfCraftApp` is declared in `crates/ui-egui/src/lib.rs`; the eframe implementation is `impl eframe::App for PdfCraftApp`:
+`PapelApp` is declared in `crates/ui-egui/src/lib.rs`; the eframe implementation is `impl eframe::App for PapelApp`:
 
 - `raw_input_hook` applies line-scroll speed and injects the OS drag pointer position before egui reads the frame.
 - `save` repairs minimized-window storage through `window_state::WindowState::keep`.
@@ -127,8 +127,8 @@ No `run_ui_with_logic`/E22 scheduler API is adopted. There is no stable one-fram
 
 | cfg / feature | Where it matters |
 |---|---|
-| `target_arch = "wasm32"` | `apps/pdfcraft-web`; `ui-egui` disables `file_watch`, `pickers`, `system_fonts`; `fill_sign` image inbox and host bridge; no native window and no egui-winit clipboard |
-| `windows` | hidden-maximized restore, DPI change, DWM frame, IME cursor, auto language, measurement units, DX12 presentation (`apps/pdfcraft/src/main.rs`, `motion.rs`, `single_instance.rs`, winit patches W1/W3/W4/W18/W19) |
+| `target_arch = "wasm32"` | `apps/papel-web`; `ui-egui` disables `file_watch`, `pickers`, `system_fonts`; `fill_sign` image inbox and host bridge; no native window and no egui-winit clipboard |
+| `windows` | hidden-maximized restore, DPI change, DWM frame, IME cursor, auto language, measurement units, DX12 presentation (`apps/papel/src/main.rs`, `motion.rs`, `single_instance.rs`, winit patches W1/W3/W4/W18/W19) |
 | `target_os = "macos"` | Apple events, traffic lights/full-size content view, ⌘Q menu (`craft-quit`), title-bar drag, IME commit/discard/emoji/Korean (W6–W10, W12, W22–W24, W26) |
 | `target_os = "linux"` | GNOME/Wayland frame decision, compositor GPU selection, Wayland regular clipboard and W15P PRIMARY (W15/W15P/E4), X11 DPI/IME (W5/W11/W20/W21), Wayland scroll phases (W13) |
 | `unix, not macos` | single-instance Unix socket, Wayland/X11 detection, fontconfig directory parsing |
@@ -139,7 +139,7 @@ No `run_ui_with_logic`/E22 scheduler API is adopted. There is no stable one-fram
 | egui features | `bytemuck` in `ui-egui`; `default_fonts` explicit; **`monochrome_emoji_fonts`** in every egui-consuming target that draws Papel UI text |
 | eframe `system_fonts` | stays off; `NativeOptions::system_font_fallback = false` |
 
-`cargo xtask wasm` checks crates below L8; `cargo check -p pdfcraft-web --target wasm32-unknown-unknown` remains required for the actual web shell. A CI feature-identity assertion must show `egui-winit/clipboard` enabled for native roots after the migration, and `cargo deny`/`cargo metadata` must show exactly the approved fork sources.
+`cargo xtask wasm` checks crates below L8; `cargo check -p papel-web --target wasm32-unknown-unknown` remains required for the actual web shell. A CI feature-identity assertion must show `egui-winit/clipboard` enabled for native roots after the migration, and `cargo deny`/`cargo metadata` must show exactly the approved fork sources.
 
 ### 2.5 Control channel and screenshots
 
@@ -161,17 +161,17 @@ Papel uses the 0.37 `Panel` API already in its 0.36 form:
 
 0.36 stores `PanelState` under the panel `Id` passed to the constructor. 0.37 derives it as `parent_ui.scope_id().with_salt(IdSalt::new(id_salt))`; the panel child `Ui` is also salted with the new panel ID. Every named panel key therefore changes, and in-panel widget/focus/scroll state may reset. This is not left to implementation: §6.2 migrates the persisted keys in the first compatibility PR and tests the upgrade from a 0.36 fixture.
 
-Docking is `crates/ui-egui/src/docking.rs`; `DockArea::new(egui::Id::unique("pdfcraft-docking"))` wraps `craft_ui::docking`. Persistence is Papel's own `Workspace` JSON, not egui panel memory. `DockArea::direction` is a new opt-in stock-compatible API planned in craft-libs CL-3; the explicit RTL adoption in PR 4 waits for that reviewed revision. Its visual policy preserves saved physical splits, rectangles and logical tab order.
+Docking is `crates/ui-egui/src/docking.rs`; `DockArea::new(egui::Id::unique("papel-docking"))` wraps `craft_ui::docking`. Persistence is Papel's own `Workspace` JSON, not egui panel memory. `DockArea::direction` is a new opt-in stock-compatible API planned in craft-libs CL-3; the explicit RTL adoption in PR 4 waits for that reviewed revision. Its visual policy preserves saved physical splits, rectangles and logical tab order.
 
 ### 2.7 Window frame, decorations and restoration
 
-`apps/pdfcraft/src/main.rs` owns native options, app creation and GPU setup. `apps/pdfcraft/src/decorations.rs` decides whether GNOME Wayland leaves the frame to the app. `crates/ui-egui/src/platform/window_controls.rs` draws the app frame and resize edges, and `window_state.rs` repairs a 64×64 restored window.
+`apps/papel/src/main.rs` owns native options, app creation and GPU setup. `apps/papel/src/decorations.rs` decides whether GNOME Wayland leaves the frame to the app. `crates/ui-egui/src/platform/window_controls.rs` draws the app frame and resize edges, and `window_state.rs` repairs a 64×64 restored window.
 
-`craft-window` owns `Frame`, `Layout` and `Button`; `window_controls.rs` currently has distinct duplicate types and its own GNOME `button-layout` parser. The migration makes `window_controls` re-export `craft_window::{Button, Layout}` and removes the duplicate parser. `decorations::app_drawn` uses `craft_window::Choice::probe(Prefix::new("PDFCRAFT"))`; `PDFCRAFT_TITLEBAR` accepts `app`, `system` and `desktop` (the last two force the desktop frame), matching craft-window. Papel still applies `with_decorations(false)` only when it will draw its own header bar, and the runtime “Use system title bar” preference still toggles `ViewportCommand::Decorations`; craft-window decides the startup frame, not the runtime preference. The probe is called once at startup and never from `App::ui`.
+`craft-window` owns `Frame`, `Layout` and `Button`; `window_controls.rs` currently has distinct duplicate types and its own GNOME `button-layout` parser. The migration makes `window_controls` re-export `craft_window::{Button, Layout}` and removes the duplicate parser. `decorations::app_drawn` uses `craft_window::Choice::probe(Prefix::new("PAPEL"))`; `PAPEL_TITLEBAR` accepts `app`, `system` and `desktop` (the last two force the desktop frame), matching craft-window. Papel still applies `with_decorations(false)` only when it will draw its own header bar, and the runtime “Use system title bar” preference still toggles `ViewportCommand::Decorations`; craft-window decides the startup frame, not the runtime preference. The probe is called once at startup and never from `App::ui`.
 
 ### 2.8 Fonts and language
 
-`theme::install_fonts_for` calls `ctx.set_fonts(installed_font_definitions(cjk))`; `installed_font_definitions` appends one installed face plus optional script fallbacks. `theme::on_interface_baseline` computes `FontTweak::y_offset_factor` from primary and fallback metrics. `system_fonts::fallback` is the single-face, last-resort policy; `PDFCRAFT_SYSTEM_FONTS=0` disables it.
+`theme::install_fonts_for` calls `ctx.set_fonts(installed_font_definitions(cjk))`; `installed_font_definitions` appends one installed face plus optional script fallbacks. `theme::on_interface_baseline` computes `FontTweak::y_offset_factor` from primary and fallback metrics. `system_fonts::fallback` is the single-face, last-resort policy; `PAPEL_SYSTEM_FONTS=0` disables it.
 
 At the planning baseline, the i18n layer preordered right-to-left translations at catalog load (`i18n::LangInfo.rtl`, `catalog.map_translations(display_rtl)`), and `bidi::display_rtl`, `bidi::visual`, `bidi::wrap` and `bidi::visual_auto` preordered runs because egui 0.36 does not. The current migration removed catalog preordering; `display_rtl` and the other preordering helpers remain test-only. The fork's E5/E12/E13/E15/E16/E17/E20 own reordering now. Keeping `display_rtl` in production alongside E5 would double-reorder text.
 
@@ -189,11 +189,11 @@ Papel uses ordinary `egui::TextEdit` for its dialogs, forms, comments composer a
 |---|---|
 | `Cargo.toml` workspace | egui/eframe/egui_extras/egui_kittest 0.36; `[patch.crates-io]` contains `winit = vendor/winit` and `egui-wgpu = vendor/egui-wgpu`. Replace window-stack path patches with approved immutable fork revisions; retain PDF vendors |
 | `crates/ui-egui/Cargo.toml` | eframe features `default_fonts`, `wgpu`, `accesskit`, `persistence`, `links`; add `clipboard`; egui features gain `monochrome_emoji_fonts`; egui_kittest dev-dep `eframe`, `wgpu` |
-| `apps/pdfcraft/Cargo.toml` | eframe features `default_fonts`, `wgpu`, `glow`, `accesskit`, `wayland`, `x11`, `persistence`, `links`; add `clipboard`; Linux dev-dep winit 0.30 for the scroll-policy test |
-| `apps/pdfcraft-web/Cargo.toml` | eframe features `default_fonts`, `glow`, `persistence`, `accesskit`; no clipboard feature or egui-winit dependency |
-| `apps/pdfcraft-cli/Cargo.toml` | no egui/eframe; unaffected |
+| `apps/papel/Cargo.toml` | eframe features `default_fonts`, `wgpu`, `glow`, `accesskit`, `wayland`, `x11`, `persistence`, `links`; add `clipboard`; Linux dev-dep winit 0.30 for the scroll-policy test |
+| `apps/papel-web/Cargo.toml` | eframe features `default_fonts`, `glow`, `persistence`, `accesskit`; no clipboard feature or egui-winit dependency |
+| `apps/papel-cli/Cargo.toml` | no egui/eframe; unaffected |
 
-egui 0.37 no longer enables `default_fonts` by default. Papel explicitly enables it in its own features. `monochrome_emoji_fonts` is chosen (not replacing `✔`/`▲`/`▼` with new SVG glyphs): the fonts are already OFL/MIT, attributed, and preserve existing text symbols deterministically with `PDFCRAFT_SYSTEM_FONTS=0`. The painted submenu arrow is not a font glyph after 0.37 and needs no emoji font.
+egui 0.37 no longer enables `default_fonts` by default. Papel explicitly enables it in its own features. `monochrome_emoji_fonts` is chosen (not replacing `✔`/`▲`/`▼` with new SVG glyphs): the fonts are already OFL/MIT, attributed, and preserve existing text symbols deterministically with `PAPEL_SYSTEM_FONTS=0`. The painted submenu arrow is not a font glyph after 0.37 and needs no emoji font.
 
 ### 3.2 Lockfile duplicates and family resolution
 
@@ -215,7 +215,7 @@ The egui fork requires companion winit APIs on their target platforms. Integrate
 
 ### 3.4 Source-guard migration and exact inventory
 
-`apps/pdfcraft/tests/it/main.rs` links twelve winit guard modules. All twelve must be transferred to the winit fork (or replaced by equivalent fork-owned immutable tests), and only behavioral/ABI tests remain in Papel:
+`apps/papel/tests/it/main.rs` links twelve winit guard modules. All twelve must be transferred to the winit fork (or replaced by equivalent fork-owned immutable tests), and only behavioral/ABI tests remain in Papel:
 
 `winit_macos_emoji_picker`, `winit_macos_ime_commit`, `winit_macos_ime_discard`, `winit_macos_korean_first_key`, `winit_macos_korean_space`, `winit_macos_title_bar_drag` (W12), `winit_wayland_scroll` (W13), `winit_wayland_text_input` (W2), `winit_windows_hidden_maximized` (W4), `winit_windows_ime_cursor` (W3), `winit_x11_dpi` (W11), `winit_x11_ime_focus` (W5).
 
@@ -225,12 +225,12 @@ Papel keeps the retained `vendor/winit` and `vendor/egui-wgpu` copies as provena
 
 `vendor/egui-wgpu` is 0.36.2 (`49682f8b…`) with E2+E3. The target is 0.37.0 plus the same two patches. The reviewed fork's E2+E3 commit is `9dd799ab` and adds a `surface_fit` unit test; Papel also has stronger guards:
 
-- `apps/pdfcraft/src/main.rs::a_window_larger_than_the_gpu_limit_gets_a_surface_within_it`
-- `apps/pdfcraft/src/main.rs::surface_fit_never_empties_or_overflows_a_surface`
-- `apps/pdfcraft/src/main.rs::vendor_provenance_egui_wgpu_surface_fit_identity`
-- `apps/pdfcraft/src/main.rs::a_gpu_error_while_a_window_is_set_up_is_returned_not_a_panic`
-- `apps/pdfcraft/src/main.rs::vendor_provenance_egui_wgpu_catch_errors_identity`
-- `apps/pdfcraft/src/main.rs::pipeline_creation_error_is_returned_and_device_remains_usable`
+- `apps/papel/src/main.rs::a_window_larger_than_the_gpu_limit_gets_a_surface_within_it`
+- `apps/papel/src/main.rs::surface_fit_never_empties_or_overflows_a_surface`
+- `apps/papel/src/main.rs::vendor_provenance_egui_wgpu_surface_fit_identity`
+- `apps/papel/src/main.rs::a_gpu_error_while_a_window_is_set_up_is_returned_not_a_panic`
+- `apps/papel/src/main.rs::vendor_provenance_egui_wgpu_catch_errors_identity`
+- `apps/papel/src/main.rs::pipeline_creation_error_is_returned_and_device_remains_usable`
 
 Integrate E2+E3 and the behavioral regressions into the central 0.37 fork, then consume the approved revision. Replace the source-path/source-absence assertions with immutable package identity checks. `surface_texture_limits` and `configure_gpu` remain: the first raises the enabled 2D limit, the second preserves adapter selection, DX12 presentation and indirect-validation behavior.
 
@@ -240,7 +240,7 @@ PR 199's egui port changes `craft-ui` roles, `Id::unique`/`Ui::scope_id`, `egui_
 
 Bumping all four craft-libs crates from their four current pins listed in section 1 to a revision based on `3832c47` carries more than a new field:
 
-- `craft-print` adds the unconditional `craft-winprint-gdi` dependency (`storytold/winprint.rs`, revision `417ac3c4…`), a public `rgb` re-export of the GDI transport, `lpstat -l` description parsing and `Printer.description`.
+- `craft-print` adds the unconditional `craft-winprint-gdi` dependency (`getnodalia/foundation (vendor/winprint.rs)`, revision `417ac3c4…`), a public `rgb` re-export of the GDI transport, `lpstat -l` description parsing and `Printer.description`.
 - Audit `craft-winprint-gdi` licensing/target cfg/`cargo deny`/Windows build, and the non-Windows `rgb::PrintError::Unsupported` behavior.
 - `Printer` now has `description`; update every literal in the repository. At baseline there are 19 `Printer { … }` literals across `crates/print` and UI tests, not 13. This is a mechanical compile fix, with the craft-print tests and Windows native checks re-run.
 - Keep Papel's own `print_ui.rs` sheet preview and options. `description` is not automatically displayed; a product change to show it is separate.
@@ -261,7 +261,7 @@ Bumping all four craft-libs crates from their four current pins listed in sectio
 
 | Change | Papel use | Required action |
 |---|---|---|
-| `default_fonts` no longer a default feature | explicit in ui-egui, pdfcraft, web, craft-ui dev-dep | keep explicit |
+| `default_fonts` no longer a default feature | explicit in ui-egui, papel, web, craft-ui dev-dep | keep explicit |
 | `monochrome_emoji_fonts` gates emoji faces | `✔`, `▲`, `▼` and previously `⏵` text | enable the feature; add `egui-icons.ttf` attribution; keep painted submenu arrows out of font coverage |
 | eframe `clipboard` becomes explicit | native eframe with `default-features = false` | enable in native app and native UI tests; web needs none; add feature-identity check |
 | `WidgetType` deprecated alias for `Role` | 52 references, 56 `widget_info` closures | map roles explicitly |
@@ -286,7 +286,7 @@ Base: `0.37.0` = `841a328b`. The E1–E21 audit below was made against the plann
 | # | Fork commits | Crate | Upstream status at 0.37.0 | Papel need | Papel tests / removal condition |
 |---|---|---|---|---|---|
 | E1 | `8f3abf06` | eframe | not upstream; `ViewportHooks` absent | none today: Papel opens one root viewport; `--new-window` is a separate process | compile only; keep for craft-tablet. Remove when upstream adds per-viewport hooks or craft-tablet no longer needs it |
-| E2+E3 | `9dd799ab` | egui-wgpu | not upstream; #8361 open | required: `Surface::configure` panic and start-up errors | six `apps/pdfcraft/src/main.rs` surface/GPU guards plus fork-owned behavioral tests; remove when upstream fixes #8361 and the start-up error path |
+| E2+E3 | `9dd799ab` | egui-wgpu | not upstream; #8361 open | required: `Surface::configure` panic and start-up errors | six `apps/papel/src/main.rs` surface/GPU guards plus fork-owned behavioral tests; remove when upstream fixes #8361 and the start-up error path |
 | E4 | `66bacf23` | egui-winit | upstream #8657 draft; 0.37 still uses smithay | required on Hyprland and every Wayland compositor serving one data device | W15 regular clipboard plus W15P PRIMARY; native Wayland single-data-device test; remove when upstream has the behavior |
 | E5 | `0e27d87e`, `777977b7`, `f7e89e23`, `5b2b8e19` | epaint, egui | #8577 open, #8698 reviewed; not in 0.37 | required for Arabic, Kurdish, Hebrew and mixed-direction text | bidi shaping, caret, selection, mark and no-default-fonts tests; remove only when upstream merges #8577 plus fixes |
 | E6 | `0abfabcf` | egui | not proposed | required: caret moves must not kill IME composition | text-edit IME focus test; remove when upstream has equivalent |
@@ -372,7 +372,7 @@ Further tests:
 - Panel order: tab strip → mode bar → right rail → central panel. Read-mode inspector must not reorder the rail or duplicate a panel ID.
 - A panel's content clip is a subset of the panel rect and parent clip; popups/comment overlays use `Area`/`Window` layers.
 - Floating docking, tab detach, group move and split resize survive restart from `Workspace` JSON, not egui memory.
-- `DockArea::new(Id::unique("pdfcraft-docking"))`; keep the same salt for craft-ui state. If RTL is selected, pass the explicit direction; persisted split/rectangles/logical tab order stay unchanged.
+- `DockArea::new(Id::unique("papel-docking"))`; keep the same salt for craft-ui state. If RTL is selected, pass the explicit direction; persisted split/rectangles/logical tab order stay unchanged.
 
 ### 6.3 Viewports
 
@@ -413,7 +413,7 @@ be intercepted before egui sees a Key event, so Ctrl+C/Cmd+V alone is not a stuc
 
 Keep Papel's single-face, last-resort system-font policy. Do not enable eframe's `system_fonts` provider silently. Set `NativeOptions.system_font_fallback = false` and keep a source/feature guard that `eframe/system_fonts` stays off.
 
-Glyph decision: enable `egui/monochrome_emoji_fonts` in `pdfcraft-ui-egui`, the native app and the web dependency graph. This keeps the existing `✔`, `▲` and `▼` text symbols and the OFL/MIT attributed Noto Emoji/emoji-icon fonts deterministic with `PDFCRAFT_SYSTEM_FONTS=0`; do not replace them with new SVG assets in this migration. The new painted submenu arrow is an atom, not text, and is removed from glyph expectations.
+Glyph decision: enable `egui/monochrome_emoji_fonts` in `papel-ui-egui`, the native app and the web dependency graph. This keeps the existing `✔`, `▲` and `▼` text symbols and the OFL/MIT attributed Noto Emoji/emoji-icon fonts deterministic with `PAPEL_SYSTEM_FONTS=0`; do not replace them with new SVG assets in this migration. The new painted submenu arrow is an atom, not text, and is removed from glyph expectations.
 
 Attribution and assets in the first green PR:
 
@@ -422,7 +422,7 @@ Attribution and assets in the first green PR:
 - add `egui-icons.ttf`, SHA-256 `122806555c73df7cef55aa1d945289ae27fbc4dbbd31abbb4204ee0cda829cc8`, recorded as the MIT-licensed `emoji-icon-font` subset by John Slegers, with its exact usage;
 - run `cargo xtask assets --write` and then `cargo xtask assets`.
 
-Adopt E14 for fallbacks: set `FontTweak::fallback_align = FallbackAlign::Baseline` for script fallbacks; remove metric-derived `y_offset_factor`; keep Windows JetBrains Mono hinting. Add a glyph-coverage test for every UI literal and catalog translation with `MissingGlyphPolicy::Panic` (or `Fonts::has_glyphs`) for embedded-only, craft-fonts, each script fallback, and `PDFCRAFT_SYSTEM_FONTS=0/1`. A missing glyph is a failure, not a snapshot update.
+Adopt E14 for fallbacks: set `FontTweak::fallback_align = FallbackAlign::Baseline` for script fallbacks; remove metric-derived `y_offset_factor`; keep Windows JetBrains Mono hinting. Add a glyph-coverage test for every UI literal and catalog translation with `MissingGlyphPolicy::Panic` (or `Fonts::has_glyphs`) for embedded-only, craft-fonts, each script fallback, and `PAPEL_SYSTEM_FONTS=0/1`. A missing glyph is a failure, not a snapshot update.
 
 ### 6.6 Language and RTL
 
@@ -463,12 +463,12 @@ Current integration note: the shared side panes and rail described at the top su
 - Keep `surface_texture_limits` and `configure_gpu`. E2+E3 remain required.
 - Do **not** skip `DocView::receive` uploads on `will_discard`. A first-pass texture is carried into the final merged `TexturesDelta`; skipping it can lose a page. Use generation identity to avoid re-scheduling renders and avoid duplicate whole-image deltas.
 - Assert the final merged `FullOutput.textures_delta.set` contains one whole delta per texture generation; a forced-late-discard test must show the page after the next accepted pass.
-- Keep `RESULTS_PER_FRAME`/`UPLOAD_BYTES_PER_FRAME`, hidden-tab suspension, `PDFCRAFT_RENDERER=wgpu|gl`, OpenGL retry and software-renderer notice.
+- Keep `RESULTS_PER_FRAME`/`UPLOAD_BYTES_PER_FRAME`, hidden-tab suspension, `PAPEL_RENDERER=wgpu|gl`, OpenGL retry and software-renderer notice.
 - Screenshot readback is callback-driven; never assume it is ready in the same input frame.
 
 ### 6.10 Commands, undo and persistence
 
-No command ID, tool ID, `parity/` entry, undo transaction or saved-settings key changes in this port. Preserve `commands.rs` registry IDs, `Session` document generations and undo steps, `Workspace` JSON, `window_state` storage key `window`, and `persist()` keys `pdfcraft`/legacy `printcraft`. The only persistence migration is egui's panel `PanelState` keys in §6.2.
+No command ID, tool ID, `parity/` entry, undo transaction or saved-settings key changes in this port. Preserve `commands.rs` registry IDs, `Session` document generations and undo steps, `Workspace` JSON, `window_state` storage key `window`, and `persist()` keys `papel`/legacy `printcraft`. The only persistence migration is egui's panel `PanelState` keys in §6.2.
 
 ## 7. PR stages and rollback
 
@@ -478,7 +478,7 @@ All publication is gated by explicit human approval. No push or PR is authorized
 
 - Land only this document and a test-only measurement driver/harness; no production behavior changes.
 - The harness must run on the unmodified baseline `a2ec27b` and, where its adapter permits, stock 0.36.2, stock 0.37.0 and the fork.
-- Record baseline frame/idle/RSS samples, `Context::tessellate` with 120 ASCII labels (#8731), startup phase split (instance/adapter/device → pipeline creation → first frame; #8736), and font install/discovery with `PDFCRAFT_SYSTEM_FONTS=0/1` and provider on/off (#8512).
+- Record baseline frame/idle/RSS samples, `Context::tessellate` with 120 ASCII labels (#8731), startup phase split (instance/adapter/device → pipeline creation → first frame; #8736), and font install/discovery with `PAPEL_SYSTEM_FONTS=0/1` and provider on/off (#8512).
 - Record `cargo metadata`, lock hash, vendor hashes, hardware, renderer/driver, DPI, fixtures and actual commands. A baseline may not be measured after production changes.
 
 ### Shared fork prerequisites (external to Papel)
@@ -498,19 +498,19 @@ Depends on: Stage 0 and the complete approved egui/winit revisions (P2b bounded 
 Scope (one reviewable change set; commits may split by file only if every commit is green):
 
 - Pin the egui 0.37 family and winit 0.30.13 fork revision; update `Cargo.lock`.
-- Enable native eframe `clipboard` in `apps/pdfcraft` and `crates/ui-egui`; add the feature-identity assertion. State that web has no egui-winit clipboard.
+- Enable native eframe `clipboard` in `apps/papel` and `crates/ui-egui`; add the feature-identity assertion. State that web has no egui-winit clipboard.
 - Enable `monochrome_emoji_fonts`; update `ATTRIBUTION.toml` bundled versions and add `egui-icons.ttf`; run assets write/check.
 - Add storytold egui/winit git URLs to `deny.toml` `allow-git`; keep `unknown-git = "deny"`.
 - Rename `WidgetType`/`Id::new`/`Ui::id`/`UiBuilder::id`; map roles; fix all kittest accessible-name and missing-glyph failures (204 harnesses).
 - Update painted submenu labels: `"File ⏵"` → `"File"`, etc.; update AccessKit/name expectations across `commands.rs`, `theme.rs`, `editing.rs`, `control.rs`, `text_select.rs`, `view.rs`; assert the arrow is painted.
 - Add `MouseWheel.source` with the real variants; migrate the screenshot path to the bounded callback; add panel-key migration.
-- Port from craft-libs current main using only the reviewed API hunks and `craft-window`; add `craft-window` type reuse and retain `PDFCRAFT_TITLEBAR`/runtime preference semantics. Add `Printer.description` to every literal (19 at baseline) and audit craft-print/GDI/rgb drift.
+- Port from craft-libs current main using only the reviewed API hunks and `craft-window`; add `craft-window` type reuse and retain `PAPEL_TITLEBAR`/runtime preference semantics. Add `Printer.description` to every literal (19 at baseline) and audit craft-print/GDI/rgb drift.
 - Transfer winit/egui-wgpu source guards centrally; replace Papel source-path and `source =` assertions with immutable git graph checks.
 - Remove catalog preordering and `display_rtl` as the fork becomes the sole UI bidi owner;
   include the focused logical-text/selection regression in this first fork pin.
 - Do not defer names, glyphs, attribution, required bidi adaptation or `deny` to PR 3.
 
-Tests: fmt, clippy `-D warnings`, `cargo test -p pdfcraft-ui-egui`, `cargo test -p pdfcraft`, wasm check, `cargo xtask layers/assets/deny/parity`, native feature/graph assertions, source-guard replacements. Snapshot changes must be reviewed, never auto-accepted.
+Tests: fmt, clippy `-D warnings`, `cargo test -p papel-ui-egui`, `cargo test -p papel`, wasm check, `cargo xtask layers/assets/deny/parity`, native feature/graph assertions, source-guard replacements. Snapshot changes must be reviewed, never auto-accepted.
 
 Rollback: revert PR 1; keep the 0.36 lock and vendor directories in history. Do not leave a 0.37 manifest with a 0.36 lock.
 
@@ -550,7 +550,7 @@ Depends on: PR 1 (can run in parallel with PR 2/3 after rebase).
 
 Scope:
 
-- The type re-export/parser replacement lands in PR 1; PR 4 completes extended native policy tests for `craft-window`: `window_controls` re-exports `craft_window::{Button, Layout}`; `decorations` uses `Choice::probe(Prefix::new("PDFCRAFT"))`; remove duplicate parser; keep runtime `Use system title bar` toggle.
+- The type re-export/parser replacement lands in PR 1; PR 4 completes extended native policy tests for `craft-window`: `window_controls` re-exports `craft_window::{Button, Layout}`; `decorations` uses `Choice::probe(Prefix::new("PAPEL"))`; remove duplicate parser; keep runtime `Use system title bar` toggle.
 - Native Linux/Windows GUI checks, web build, packaging checks and clipboard/PRIMARY/IME workflows.
 - Update `vendor/README.md`/`SOURCE.json` only for retained vendors; document removed window-stack copies and exact replacement revisions.
 - Update `docs/development.md` and version statements.
@@ -578,8 +578,8 @@ PR4 may be rebased alongside PR2/PR3, but do not land two PRs that both rewrite 
 
 - `crates/ui-egui/tests/it` (one binary): accessibility, actions, panels, controls, comments, content, editing, export, fonts, forms, links, pickers, print, recovery, signing, text selection, viewer, XFA.
 - `crates/ui-egui/tests/perf.rs`: collapsed comments, 500-page scrolling and panel budget tests.
-- `apps/pdfcraft/tests/it`: twelve winit guards (transferred/replaced), and the Wayland scroll-policy compile test.
-- `apps/pdfcraft/src/main.rs`: GPU/surface/adapter guards.
+- `apps/papel/tests/it`: twelve winit guards (transferred/replaced), and the Wayland scroll-policy compile test.
+- `apps/papel/src/main.rs`: GPU/surface/adapter guards.
 - `examples/shot.rs`: headless screenshot of the real shell.
 - `crates/ui-egui/src/control.rs`: in-crate control, pointer and multi-pass probes.
 
@@ -645,7 +645,7 @@ Before accepting each test, temporarily revert the fix and confirm the named tes
 Record for every run:
 
 - exact source SHA, lockfile SHA-256, `cargo metadata` package IDs and sources;
-- features (`CRAFT_FONTS_DIR` set/unset, `PDFCRAFT_SYSTEM_FONTS=0/1`, `PDFCRAFT_RENDERER=wgpu/gl`, `monochrome_emoji_fonts`, `clipboard`);
+- features (`CRAFT_FONTS_DIR` set/unset, `PAPEL_SYSTEM_FONTS=0/1`, `PAPEL_RENDERER=wgpu/gl`, `monochrome_emoji_fonts`, `clipboard`);
 - fixture hash (`tests/perf.rs::big(500)`, `named_comments(10_000)`, panel fixture);
 - OS/kernel, CPU, RAM, GPU/adapter/driver/backend, DPI/scale, window size (1400×900), renderer, profile;
 - software adapter (llvmpipe/WARP) versus real GPU;
@@ -658,7 +658,7 @@ Baseline is measured **before** any production change, on `a2ec27b`, in its own 
 The Stage 0 harness must exist on the baseline before PR 1. It has three layers:
 
 1. **Frame/idle/memory**: open the 500-page fixture and named-comment fixture; warm up, then alternating paired runs.
-2. **Targeted engine measurements**: `Context::tessellate` of 120 ASCII labels for #8731; startup phases (instance/adapter/device → pipeline creation → first frame) for #8736 on WARP and a real GPU; font install/discovery with `PDFCRAFT_SYSTEM_FONTS=0/1` and provider enabled/disabled in an isolated fixture for #8512.
+2. **Targeted engine measurements**: `Context::tessellate` of 120 ASCII labels for #8731; startup phases (instance/adapter/device → pipeline creation → first frame) for #8736 on WARP and a real GPU; font install/discovery with `PAPEL_SYSTEM_FONTS=0/1` and provider enabled/disabled in an isolated fixture for #8512.
 3. **Operations**: open + first frame, zoom, page scroll, dock/float, save/reopen.
 
 Method:
@@ -694,10 +694,10 @@ Noise policy: if baseline median varies by more than 3% across repetitions, disc
 Required for every PR:
 
 - `cargo fmt --check`
-- `cargo clippy -p pdfcraft-ui-egui -p pdfcraft -p pdfcraft-web --all-targets -- -D warnings`
-- `cargo test -p pdfcraft-ui-egui`
-- `cargo test -p pdfcraft`
-- `cargo check -p pdfcraft-web --target wasm32-unknown-unknown`
+- `cargo clippy -p papel-ui-egui -p papel -p papel-web --all-targets -- -D warnings`
+- `cargo test -p papel-ui-egui`
+- `cargo test -p papel`
+- `cargo check -p papel-web --target wasm32-unknown-unknown`
 - `cargo xtask layers`
 - `cargo xtask assets`
 - `cargo xtask deny`
@@ -733,7 +733,7 @@ Headless `egui_kittest` is not proof of native focus, IME, file pickers, clipboa
 7. **Screenshot assumptions.** A screenshot command itself paints a hidden window; injected input needs `RequestPaintWhileHidden`. Callback completion may be off-thread and has no built-in DPI metadata.
 8. **Texture uploads.** Skipping uploads on `will_discard` can lose first-pass textures. Use generation identity and the final merged delta.
 9. **Kinetic scroll.** Use real `MouseWheelSource` variants; `Unknown` is normal on Wayland/Windows/X11/web. Keep one document glide.
-10. **Font provider policy.** eframe's system-font provider can read many installed faces, including proprietary ones; keep it off and preserve `PDFCRAFT_SYSTEM_FONTS=0`.
+10. **Font provider policy.** eframe's system-font provider can read many installed faces, including proprietary ones; keep it off and preserve `PAPEL_SYSTEM_FONTS=0`.
 11. **Default-font glyph loss.** 0.37 gates emoji fonts; enable `monochrome_emoji_fonts`, add `egui-icons.ttf`, and keep the kittest glyph panic.
 12. **Kittest stricter accessibility.** Unnamed inputs fail; fix labels rather than disabling checks.
 13. **`WidgetType::TextEdit` does not exist as a `Role`.** It is `Role::TextInput`; `Checkbox` is `Role::CheckBox`.
@@ -753,7 +753,7 @@ Decisions made by this plan:
 - **PRIMARY:** adopt W15P on the existing winit connection/event queue; no app-level filtering and no second regular data device.
 - **RTL:** remove catalog preordering; explicit `TextDirection` for UI labels; `Style::right_to_left` after manual-layout audit; explicit craft-ui dock direction; saved workspace order unchanged.
 - **Fonts:** `monochrome_emoji_fonts` on; no broad system provider.
-- **Window frame:** `craft_window::Choice` at startup; `PDFCRAFT_TITLEBAR=app|system|desktop`; `window_controls` uses craft-window types; runtime preference remains a `ViewportCommand::Decorations` toggle.
+- **Window frame:** `craft_window::Choice` at startup; `PAPEL_TITLEBAR=app|system|desktop`; `window_controls` uses craft-window types; runtime preference remains a `ViewportCommand::Decorations` toggle.
 - **Screenshot helper:** PR 1 waits for and directly adopts the reviewed craft-ui helper after CL-2F; no local duplicate.
 - **Performance:** harness and baseline precede production; stock-0.37 control accompanies first baseline and regressions.
 
@@ -780,7 +780,7 @@ External gates that cannot be decided from this host:
 Papel:
 
 - `Cargo.toml`, `Cargo.lock`, `deny.toml`, `ATTRIBUTION.toml`, `xtask/src/assets.rs`.
-- `apps/pdfcraft/Cargo.toml`, `apps/pdfcraft-web/Cargo.toml`, `apps/pdfcraft/src/main.rs`, `apps/pdfcraft/src/decorations.rs`, `apps/pdfcraft/tests/it/*.rs`.
+- `apps/papel/Cargo.toml`, `apps/papel-web/Cargo.toml`, `apps/papel/src/main.rs`, `apps/papel/src/decorations.rs`, `apps/papel/tests/it/*.rs`.
 - `crates/ui-egui/Cargo.toml`, `crates/ui-egui/src/lib.rs`, `control.rs`, `canvas.rs`, `chrome.rs`, `window_controls.rs`, `window_state.rs`, `theme.rs`, `system_fonts.rs`, `motion.rs`, `recovery.rs`, `fling.rs`, `wheel_pager.rs`, `wheel_boost.rs`, `scroll_speed.rs`, `bidi.rs`, `widgets.rs`, `print_ui.rs`.
 - `crates/print/src/tests.rs`, `crates/ui-egui/tests/it/*.rs`, `crates/ui-egui/tests/perf.rs`, `crates/ui-egui/examples/shot.rs`.
 - `vendor/README.md`, `vendor/winit`, `vendor/egui-wgpu`, retained `vendor/hayro*`, `vendor/lopdf`, `vendor/vello_common`.

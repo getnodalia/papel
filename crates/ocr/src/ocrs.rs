@@ -55,7 +55,7 @@ pub struct Models {
 
 impl Models {
     pub fn dirs_beside_exe(exe_dir: &Path) -> Vec<PathBuf> {
-        vec![exe_dir.join("models"), exe_dir.join("../Resources/models"), exe_dir.join("../share/pdfcraft/models")]
+        vec![exe_dir.join("models"), exe_dir.join("../Resources/models"), exe_dir.join("../share/papel/models")]
     }
 
     /// The models in `dir`, preferring current ONNX files over legacy RTEN files. An incomplete
@@ -67,7 +67,7 @@ impl Models {
         })
     }
 
-    /// Look for the models: `$PDFCRAFT_MODELS`, then `models/` beside the executable (and
+    /// Look for the models: `$PAPEL_MODELS`, then `models/` beside the executable (and
     /// `Resources/models` in a macOS bundle), then the source tree's `assets/models/`.
     pub fn find() -> Option<Models> {
         Self::search_dirs().iter().find_map(|d| Self::in_dir(d))
@@ -76,7 +76,7 @@ impl Models {
     /// The directories [`Models::find`] looks in, in order.
     pub fn search_dirs() -> Vec<PathBuf> {
         let mut dirs = Vec::new();
-        if let Some(d) = std::env::var_os("PDFCRAFT_MODELS") {
+        if let Some(d) = std::env::var_os("PAPEL_MODELS") {
             dirs.push(PathBuf::from(d));
         }
         if let Some(exe) = std::env::current_exe().ok().and_then(|e| e.parent().map(Path::to_path_buf)) {
@@ -345,7 +345,7 @@ mod tests {
         }
     }
 
-    /// Existing source builds and PDFCRAFT_MODELS overrides retain their complete RTEN pair.
+    /// Existing source builds and PAPEL_MODELS overrides retain their complete RTEN pair.
     #[test]
     fn model_discovery_keeps_legacy_only_installations() {
         let dir = tempfile::tempdir().unwrap();

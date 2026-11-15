@@ -1,15 +1,15 @@
-//! `window.pdfcraft`: the page command API (`craft-web-api`, storytold/craft-libs#413) over the app's
-//! UI control channel (`pdfcraft_ui_egui::control`), opt-in with `?control`.
+//! `window.papel`: the page command API (`craft-web-api`, storytold/craft-libs#413) over the app's
+//! UI control channel (`papel_ui_egui::control`), opt-in with `?control`.
 //!
 //! The crate owns the JavaScript side (`request`, `execute`, `commands`, `docInspect`, `uiInspect`,
-//! `screenshot`, as promises with a timeout). This module is PdfCraft's part: a [`Request`] that
+//! `screenshot`, as promises with a timeout). This module is Papel's part: a [`Request`] that
 //! sends each call through the app's [`ControlClient`] and waits for the reply, and the table that
-//! names PdfCraft's methods: its control channel drives the UI, so `commands` is `ui.commands`,
+//! names Papel's methods: its control channel drives the UI, so `commands` is `ui.commands`,
 //! `execute` runs a registry command with `ui.command`, `docInspect` is `ui.state` and `uiInspect`
 //! is `ui.inspect`.
 //!
 //! The channel keeps the accessibility tree of every frame, so it is off unless the page asks for it
-//! (`?control`), as FigCraft's is. PdfCraft's control requests cannot be withdrawn, so a call the page
+//! (`?control`), as FigCraft's is. Papel's control requests cannot be withdrawn, so a call the page
 //! gave up on may still run (or be rejected) when the app reaches it, as it does for a desktop client that timed out.
 
 use serde_json::{Value, json};
@@ -42,19 +42,19 @@ mod web {
 
     use craft_web_api::methods::Methods;
     use craft_web_api::page::{PageApi, Request};
-    use pdfcraft_ui_egui::control::{ControlClient, Reply};
+    use papel_ui_egui::control::{ControlClient, Reply};
     use serde_json::{Value, json};
     use wasm_bindgen_futures::JsFuture;
 
     use super::{command_params, reply_object};
 
     /// The app id in `window.<app>`.
-    const APP: &str = "pdfcraft";
+    const APP: &str = "papel";
 
     /// How often a waiting call looks for the app's reply, in milliseconds (about a frame).
     const POLL_MS: i32 = 16;
 
-    /// PdfCraft's control methods behind each function.
+    /// Papel's control methods behind each function.
     fn methods() -> Methods {
         Methods {
             commands: Some("ui.commands"),
@@ -65,15 +65,15 @@ mod web {
         }
     }
 
-    /// Put `window.pdfcraft` on the page, sending its calls through `client`. An existing
-    /// `window.pdfcraft` keeps the functions it already has.
+    /// Put `window.papel` on the page, sending its calls through `client`. An existing
+    /// `window.papel` keeps the functions it already has.
     pub fn install(client: ControlClient) {
         let request: Request = Rc::new(move |method, params| {
             let params = if method == "ui.command" { command_params(params) } else { params };
             Box::pin(wait(client.send(&method, params)))
         });
         if let Err(e) = Rc::new(PageApi::new(APP, methods(), request)).install() {
-            eframe::web_sys::console::warn_1(&format!("PdfCraft: couldn't install window.{APP}: {e:?}").into());
+            eframe::web_sys::console::warn_1(&format!("Papel: couldn't install window.{APP}: {e:?}").into());
         }
     }
 

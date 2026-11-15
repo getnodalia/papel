@@ -1,7 +1,7 @@
 //! A replacement through the run sources must leave the rows it does not reach as they were.
 use std::sync::Arc;
 
-use pdfcraft_cos::{Document, SaveOptions, write_incremental};
+use papel_cos::{Document, SaveOptions, write_incremental};
 
 use super::*;
 
@@ -31,7 +31,7 @@ fn page(content: &str) -> Document {
 fn content(doc: &Document) -> String {
     let bytes = write_incremental(doc, &SaveOptions::default()).unwrap();
     let doc = Document::open(Arc::new(bytes)).unwrap();
-    let p = pdfcraft_model::pages(&doc).swap_remove(0);
+    let p = papel_model::pages(&doc).swap_remove(0);
     let list = match doc.resolve(p.dict.get(b"Contents").unwrap()).as_ref() {
         Object::Array(a) => a.clone(),
         _ => vec![p.dict.get(b"Contents").unwrap().clone()],

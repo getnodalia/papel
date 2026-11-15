@@ -1,4 +1,4 @@
-# pdfcraft-print
+# papel-print
 
 Layer L4: printing (execution plan M10.5).
 
@@ -67,7 +67,7 @@ This change does not alter persistence of other print preferences.
 Headless `doc_print` defaults are unchanged.
 
 `spool` delegates discovery, driver options, preferences and submission to
-[`craft-print`](https://github.com/storytold/craft-libs/tree/main/crates/print).
+[`craft-print`](https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main/crates/print).
 Papel retains page selection, imposition, annotations and print-permission checks.
 CUPS jobs stream through stdin with `fit-to-page=false`, and with `orientation-requested=4` when
 every sheet is landscape (`cups_orientation`), since CUPS would otherwise shrink a landscape
@@ -94,7 +94,7 @@ the driver exposes only document-level duplex, and validates the retained bindin
 ([craft-libs #411](https://github.com/storytold/craft-libs/pull/411)).
 
 Before a job reaches the Windows spooler, every embedded TrueType or OpenType program is
-renamed `PdfCraftPrint<n>` in its `name` table and in the PDF (`/BaseFont`, `/FontName`; a
+renamed `PapelPrint<n>` in its `name` table and in the PDF (`/BaseFont`, `/FontName`; a
 subset keeps its tag). Windows otherwise draws a subset's renumbered glyphs with the installed
 font of the same name, so ReportLab's Arial subsets printed as shifted letters (#3132). Glyphs,
 encodings and `/ToUnicode` are unchanged, and CUPS and Save as PDF get the PDF as it was. A
@@ -107,7 +107,7 @@ The desktop UI discovers printers and submits jobs on workers, so neither operat
 the dialog; the Windows backend starts without a console window. Physical printer output
 still needs hardware validation.
 
-In a browser there is no spooler: the app (`pdfcraft-ui-egui`'s `web_print`) draws the print-ready
+In a browser there is no spooler: the app (`papel-ui-egui`'s `web_print`) draws the print-ready
 PDF's sheets with Papel's renderer and prints them through the browser's print dialog, which
 sets copies, two-sided printing and colour. This crate stays free of web APIs.
 

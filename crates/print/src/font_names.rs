@@ -7,18 +7,18 @@
 //! subset's glyph numbers but draws them with the installed font of the same name, so every letter
 //! prints as the installed glyph with that number: `Revisión de clientes,` in the bold subset comes
 //! out as `Wj{nxn s%ij%hqnjsyjx1`, its `z` as `Ä`. Both Brother queues and the Adobe PDF printer
-//! show it; PdfCraft's renderer, CUPS and Chrome on Windows draw the embedded program and are right.
+//! show it; Papel's renderer, CUPS and Chrome on Windows draw the embedded program and are right.
 //!
-//! [`distinct`] renames each program to `PdfCraftPrint<n>`: the identity records of its `name`
+//! [`distinct`] renames each program to `PapelPrint<n>`: the identity records of its `name`
 //! table, `/FontName` of its descriptors and `/BaseFont` of the fonts drawn with it (a subset keeps
-//! its tag, `AAAAAA+PdfCraftPrint1`). Glyphs, glyph numbers, cmaps, encodings, widths and
+//! its tag, `AAAAAA+PapelPrint1`). Glyphs, glyph numbers, cmaps, encodings, widths and
 //! `/ToUnicode` are not touched, so pages draw and extract as before. A program that can't be
 //! read and rewritten keeps its old name everywhere.
 
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
-use pdfcraft_cos::{DecodeBudget, Dict, Document, ObjRef, Object, SaveOptions, Stream, write_full};
+use papel_cos::{DecodeBudget, Dict, Document, ObjRef, Object, SaveOptions, Stream, write_full};
 
 use crate::PrintError;
 
@@ -76,7 +76,7 @@ impl Found {
         let descriptor = font.get(b"FontDescriptor")?;
         let (program, true_type) = doc.dict(descriptor).and_then(|d| program(doc, &d))?;
         let number = self.programs.len() + 1;
-        self.programs.entry(program).or_insert_with(|| Program { name: format!("PdfCraftPrint{number}"), true_type });
+        self.programs.entry(program).or_insert_with(|| Program { name: format!("PapelPrint{number}"), true_type });
         if let Object::Ref(descriptor) = descriptor {
             self.descriptors.insert(*descriptor, program);
         }
@@ -242,7 +242,7 @@ fn checksum(data: &[u8]) -> u32 {
 }
 
 /// `program` with the identity records of its `name` table saying `name`. The new table goes
-/// after the others, as `pdfcraft_fonts` writes its editor cmap, and the directory entry and
+/// after the others, as `papel_fonts` writes its editor cmap, and the directory entry and
 /// `head`'s checksum adjustment are brought up to date. `None` when `program` is not a single
 /// sfnt font with a `name` table that can be read.
 pub(crate) fn renamed_sfnt(program: &[u8], name: &str) -> Option<Vec<u8>> {

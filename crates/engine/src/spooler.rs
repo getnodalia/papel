@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use pdfcraft_cos::{SaveOptions, write_full};
+use papel_cos::{SaveOptions, write_full};
 
 use crate::guard;
 
@@ -13,7 +13,7 @@ use crate::guard;
 ///   Windows has no colour conversion of its own, and a driver that lists no grey option (Microsoft
 ///   Print to PDF, or one with only a vendor's own grey setting) refused the job outright
 ///   (#5806). The driver is still asked for grey where it has it.
-/// - Large images are drawn as tiles ([`pdfcraft_optimize::tile_large_images`], #5131): Windows'
+/// - Large images are drawn as tiles ([`papel_optimize::tile_large_images`], #5131): Windows'
 ///   PDF renderer prints an image of more than 2²² pixels from a shrunk copy, so a scan comes out
 ///   at the printer's resolution.
 ///
@@ -48,14 +48,13 @@ pub fn spooler_copy(bytes: Vec<u8>, job: &mut crate::print::spool::Job) -> Vec<u
 /// grey option makes those grey too, and one without prints them as they are.
 pub fn greyed(bytes: Arc<Vec<u8>>) -> Option<Option<Vec<u8>>> {
     guard(|| {
-        let mut doc = pdfcraft_cos::Document::open(bytes).ok()?;
-        let pages: Vec<usize> = (0..pdfcraft_model::pages(&doc).len()).collect();
-        let settings =
-            pdfcraft_edit::ConvertColours { target: pdfcraft_edit::ColourTarget::Gray, preserve_black: true, images: true, annotations: true };
-        let mut recolour = |doc: &pdfcraft_cos::Document, s: &pdfcraft_cos::Stream, _: pdfcraft_edit::ColourTarget| {
-            pdfcraft_optimize::recolour_image(doc, s, pdfcraft_optimize::ImageTarget::Gray)
+        let mut doc = papel_cos::Document::open(bytes).ok()?;
+        let pages: Vec<usize> = (0..papel_model::pages(&doc).len()).collect();
+        let settings = papel_edit::ConvertColours { target: papel_edit::ColourTarget::Gray, preserve_black: true, images: true, annotations: true };
+        let mut recolour = |doc: &papel_cos::Document, s: &papel_cos::Stream, _: papel_edit::ColourTarget| {
+            papel_optimize::recolour_image(doc, s, papel_optimize::ImageTarget::Gray)
         };
-        let done = pdfcraft_edit::convert_colours(&mut doc, &pages, &settings, &mut recolour).ok()?;
+        let done = papel_edit::convert_colours(&mut doc, &pages, &settings, &mut recolour).ok()?;
         if done.colours == 0 && done.images == 0 {
             return Some(None);
         }
@@ -69,8 +68,8 @@ pub fn greyed(bytes: Arc<Vec<u8>>) -> Option<Option<Vec<u8>>> {
 /// can't be read or written.
 pub fn tiled(bytes: Arc<Vec<u8>>) -> Option<Vec<u8>> {
     guard(|| {
-        let mut doc = pdfcraft_cos::Document::open(bytes).ok()?;
-        let report = pdfcraft_optimize::tile_large_images(&mut doc);
+        let mut doc = papel_cos::Document::open(bytes).ok()?;
+        let report = papel_optimize::tile_large_images(&mut doc);
         (report.tiled > 0).then(|| write_full(&doc, &SaveOptions::default()).ok()).flatten()
     })
     .ok()
@@ -79,7 +78,7 @@ pub fn tiled(bytes: Arc<Vec<u8>>) -> Option<Vec<u8>> {
 
 #[cfg(test)]
 mod tests {
-    use pdfcraft_cos::{Dict, Document, Object, Stream};
+    use papel_cos::{Dict, Document, Object, Stream};
 
     use super::*;
     use crate::print::spool::Job;
@@ -169,7 +168,7 @@ mod tests {
     /// The operators of the first page's content.
     fn first_page_content(bytes: Vec<u8>) -> String {
         let doc = Document::open(Arc::new(bytes)).unwrap();
-        let page = pdfcraft_model::pages(&doc)[0].obj;
+        let page = papel_model::pages(&doc)[0].obj;
         let contents = doc.get(page).as_dict().and_then(|d| d.reference(b"Contents")).unwrap();
         match &*doc.get(contents) {
             Object::Stream(s) => String::from_utf8_lossy(&s.decoded().unwrap()).into_owned(),

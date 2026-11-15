@@ -2,12 +2,12 @@
 //! and Edit ▸ Take a Snapshot (drag a rectangle to copy that area as an image).
 
 use egui::{Color32, CornerRadius, Pos2, Rect, Stroke};
-use pdfcraft_render::{RenderConfig, RenderRequest, RequestKind, Tile};
+use papel_render::{RenderConfig, RenderRequest, RequestKind, Tile};
 
 use crate::canvas::{DocView, PageXform};
 use crate::page_cursor::Layer;
 use crate::page_pointer::PagePointer;
-use crate::{PdfCraftApp, QuickTool};
+use crate::{PapelApp, QuickTool};
 
 /// A finished gesture: (page, the rectangle on screen, the same in page view points
 /// [x0, y0, x1, y1]); a plain click has an empty rectangle.
@@ -82,7 +82,7 @@ pub(crate) fn page_input(ui: &egui::Ui, resp: &egui::Response, xf: &PageXform, p
     }
 }
 
-impl PdfCraftApp {
+impl PapelApp {
     /// Finish a marquee gesture for the current tool.
     pub(crate) fn finish_marquee(&mut self, index: usize, done: Marquee) {
         let (page, rect, view_rect) = done;
@@ -125,7 +125,7 @@ impl PdfCraftApp {
         let page = view.current;
         let doc = self.session.get(view.id).ok_or("no document")?;
         let config = RenderConfig { password: doc.password.as_deref().map(std::sync::Arc::from), ..RenderConfig::default() };
-        let mut r = pdfcraft_render::PageRenderer::new(doc.bytes.clone(), config);
+        let mut r = papel_render::PageRenderer::new(doc.bytes.clone(), config);
         // About 800 px along the longer side is plenty to find the margins.
         let size = doc.info.pages.get(page).map_or(792.0, |p| p.width.max(p.height));
         let out =
@@ -177,8 +177,8 @@ impl PdfCraftApp {
     pub(crate) fn save_snapshot_image(&mut self, index: usize, page: usize, view_rect: [f32; 4]) {
         let this_area = self.views.get(index).is_some_and(|v| self.last_snapshot_of == Some((v.id, page, view_rect)));
         let png = match self.last_snapshot.as_ref() {
-            Some((w, h, pixels)) if this_area => pdfcraft_engine::export::encode_png(*w, *h, pixels),
-            _ => self.render_area(index, page, view_rect).and_then(|(w, h, pixels)| pdfcraft_engine::export::encode_png(w, h, &pixels)),
+            Some((w, h, pixels)) if this_area => papel_engine::export::encode_png(*w, *h, pixels),
+            _ => self.render_area(index, page, view_rect).and_then(|(w, h, pixels)| papel_engine::export::encode_png(w, h, &pixels)),
         };
         let png = match png {
             Ok(png) => png,
@@ -229,7 +229,7 @@ impl PdfCraftApp {
 
     /// Render `view_rect` (page view points) of `page` in view `index` at its current zoom:
     /// (width, height, premultiplied RGBA).
-    fn render_area(&self, index: usize, page: usize, view_rect: [f32; 4]) -> Result<(u32, u32, pdfcraft_render::Pixels), String> {
+    fn render_area(&self, index: usize, page: usize, view_rect: [f32; 4]) -> Result<(u32, u32, papel_render::Pixels), String> {
         let view = self.views.get(index).ok_or("no document")?;
         let doc = self.session.get(view.id).ok_or("no document")?;
         let ppp = self.ctx.as_ref().map_or(2.0, |c| c.pixels_per_point());
@@ -244,7 +244,7 @@ impl PdfCraftApp {
             return Err("the area is too large at this zoom".into());
         }
         let config = RenderConfig { password: doc.password.as_deref().map(std::sync::Arc::from), ..RenderConfig::default() };
-        let mut r = pdfcraft_render::PageRenderer::new(doc.bytes.clone(), config);
+        let mut r = papel_render::PageRenderer::new(doc.bytes.clone(), config);
         let out = r.render(RenderRequest { page, kind: RequestKind::Pixels, tile: Some(tile), scale, tag: 0, preview: false });
         if let Some(e) = out.error {
             return Err(e);

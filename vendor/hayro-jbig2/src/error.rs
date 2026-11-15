@@ -135,13 +135,13 @@ pub enum OverflowError {
     Index,
     /// A symbol dictionary has too many symbols, or a segment refers to too many.
     SymbolCount,
-    /// PdfCraft patch: the segments retain more bitmaps than a page may hold.
+    /// Papel patch: the segments retain more bitmaps than a page may hold.
     RetainedBitmaps,
-    /// PdfCraft patch: a stream has more segments, or references, than it may.
+    /// Papel patch: a stream has more segments, or references, than it may.
     SegmentCount,
-    /// PdfCraft patch: a stream asks for more decoding work than it may.
+    /// Papel patch: a stream asks for more decoding work than it may.
     DecodingWork,
-    /// PdfCraft patch: a bitmap, gray-scale image or symbol dictionary is larger than the decoder
+    /// Papel patch: a bitmap, gray-scale image or symbol dictionary is larger than the decoder
     /// holds (see `bitmap::MAX_PIXELS`): one of its limits, where `BitmapDimension` is arithmetic
     /// that overflows.
     BitmapLimit,
@@ -318,7 +318,7 @@ impl From<OverflowError> for DecodeError {
 }
 
 impl DecodeError {
-    /// PdfCraft patch: whether one of the decoder's limits refused the stream (on a bitmap's size,
+    /// Papel patch: whether one of the decoder's limits refused the stream (on a bitmap's size,
     /// a dictionary's symbols, a region's instances, the bitmaps retained, the segments or the
     /// decoding work) rather than its data failing to decode. A file within the format can reach
     /// these, so a caller can tell a refusal of its own from a damaged file. A size or count the
@@ -340,10 +340,10 @@ impl DecodeError {
 }
 
 #[cfg(test)]
-mod pdfcraft_limit_tests {
+mod papel_limit_tests {
     use super::*;
 
-    /// PdfCraft patch: the decoder's own limits are limits, and arithmetic that overflows,
+    /// Papel patch: the decoder's own limits are limits, and arithmetic that overflows,
     /// damage, is not.
     #[test]
     fn the_decoders_limits_are_limits_and_overflowing_arithmetic_is_not() {

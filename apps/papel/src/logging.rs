@@ -3,14 +3,14 @@
 //! Without a logger every `log::warn!`/`log::error!` in the workspace (a failed autosave, a page
 //! that would not render, a render worker that could not start, the panic hook's report) vanished.
 //! A launch from a desktop menu has no terminal, so the file is what a bug report can attach:
-//! `<data dir>/logs/pdfcraft.log` (the PdfCraft eframe storage directory, or portable data). Each
-//! start moves the previous log to `pdfcraft.1.log` (and that one to `.2`), so the log of a run
+//! `<data dir>/logs/papel.log` (the Papel eframe storage directory, or portable data). Each
+//! start moves the previous log to `papel.1.log` (and that one to `.2`), so the log of a run
 //! that crashed survives the next launch.
 //!
-//! Levels: `info` for PdfCraft's own crates, `warn` for everything else (wgpu and naga are
+//! Levels: `info` for Papel's own crates, `warn` for everything else (wgpu and naga are
 //! chatty). `RUST_LOG` replaces that with env_logger-style directives: `debug`,
-//! `warn,pdfcraft_render=trace`, `wgpu_core=info`. A directive ending in `*` matches every target
-//! that starts with it (`pdfcraft*=debug`).
+//! `warn,papel_render=trace`, `wgpu_core=info`. A directive ending in `*` matches every target
+//! that starts with it (`papel*=debug`).
 //!
 //! Records logged before the settings directory is known are kept (up to [`MAX_PENDING`]) and
 //! written once the file is attached. Writing never panics: a file that can't be created or
@@ -26,15 +26,15 @@ use std::time::SystemTime;
 use log::LevelFilter;
 
 /// The current log file's name inside the log directory.
-pub const LOG_FILE: &str = "pdfcraft.log";
-/// How many previous logs are kept (`pdfcraft.1.log` … `pdfcraft.<KEEP>.log`).
+pub const LOG_FILE: &str = "papel.log";
+/// How many previous logs are kept (`papel.1.log` … `papel.<KEEP>.log`).
 pub const KEEP: usize = 2;
 /// The log file stops growing past this size (a runaway warning can't fill the disk).
 pub const MAX_FILE_BYTES: u64 = 16 * 1024 * 1024;
 /// Records kept in memory until the log file is attached.
 pub const MAX_PENDING: usize = 512;
 /// The built-in filter when `RUST_LOG` is unset or empty.
-pub const DEFAULT_FILTER: &str = "warn,pdfcraft*=info";
+pub const DEFAULT_FILTER: &str = "warn,papel*=info";
 
 /// Per-target level filter parsed from env_logger-style directives.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -102,16 +102,16 @@ pub fn timestamp(t: SystemTime) -> String {
     format!("{y:04}-{m:02}-{d:02}T{:02}:{:02}:{:02}.{:03}Z", rem / 3600, rem % 3600 / 60, rem % 60, since.subsec_millis())
 }
 
-/// Days since 1970-01-01 → proleptic Gregorian (year, month, day): `pdfcraft_engine::civil_from_days`,
+/// Days since 1970-01-01 → proleptic Gregorian (year, month, day): `papel_engine::civil_from_days`,
 /// which keeps the date past chrono's range by whole 400-year cycles. `days` is a `u64` second
 /// count over 86_400, at most about 2.1e14, so it always fits an `i64`.
 fn civil_from_days(days: u64) -> (i64, u32, u32) {
     // The fallback is unreachable: `days` is at most `u64::MAX / 86_400`, far below `i64::MAX`.
-    pdfcraft_engine::civil_from_days(i64::try_from(days).unwrap_or(i64::MAX))
+    papel_engine::civil_from_days(i64::try_from(days).unwrap_or(i64::MAX))
 }
 
 fn numbered(dir: &Path, n: usize) -> PathBuf {
-    if n == 0 { dir.join(LOG_FILE) } else { dir.join(format!("pdfcraft.{n}.log")) }
+    if n == 0 { dir.join(LOG_FILE) } else { dir.join(format!("papel.{n}.log")) }
 }
 
 /// Shift the previous logs up one (`.log` → `.1.log` → … → `.<KEEP>.log`, the oldest dropped)
@@ -260,7 +260,7 @@ mod tests {
 
     fn temp_dir(tag: &str) -> PathBuf {
         static N: AtomicUsize = AtomicUsize::new(0);
-        let d = std::env::temp_dir().join(format!("pdfcraft-logging-{tag}-{}-{}", std::process::id(), N.fetch_add(1, Ordering::Relaxed)));
+        let d = std::env::temp_dir().join(format!("papel-logging-{tag}-{}-{}", std::process::id(), N.fetch_add(1, Ordering::Relaxed)));
         let _ = std::fs::remove_dir_all(&d);
         d
     }
@@ -270,12 +270,12 @@ mod tests {
     }
 
     #[test]
-    fn the_default_filter_shows_pdfcraft_info_and_other_crates_warnings() {
+    fn the_default_filter_shows_papel_info_and_other_crates_warnings() {
         let f = Filter::parse(DEFAULT_FILTER);
-        assert_eq!(f.level_for("pdfcraft"), LevelFilter::Info);
-        assert_eq!(f.level_for("pdfcraft::updates"), LevelFilter::Info);
-        assert_eq!(f.level_for("pdfcraft_ui_egui::recovery"), LevelFilter::Info);
-        assert_eq!(f.level_for("pdfcraft_render::raster"), LevelFilter::Info);
+        assert_eq!(f.level_for("papel"), LevelFilter::Info);
+        assert_eq!(f.level_for("papel::updates"), LevelFilter::Info);
+        assert_eq!(f.level_for("papel_ui_egui::recovery"), LevelFilter::Info);
+        assert_eq!(f.level_for("papel_render::raster"), LevelFilter::Info);
         assert_eq!(f.level_for("wgpu_core::device"), LevelFilter::Warn);
         assert_eq!(f.level_for("naga"), LevelFilter::Warn);
         assert_eq!(f.level_for("printcraft"), LevelFilter::Warn);
@@ -284,37 +284,37 @@ mod tests {
 
     #[test]
     fn directives_follow_env_logger_and_the_most_specific_one_wins() {
-        let f = Filter::parse("info,wgpu_core=error,pdfcraft_render=trace,pdfcraft_render::raster=off");
+        let f = Filter::parse("info,wgpu_core=error,papel_render=trace,papel_render::raster=off");
         assert_eq!(f.level_for("eframe"), LevelFilter::Info);
         assert_eq!(f.level_for("wgpu_core::instance"), LevelFilter::Error);
-        assert_eq!(f.level_for("pdfcraft_render::text"), LevelFilter::Trace);
-        assert_eq!(f.level_for("pdfcraft_render::raster"), LevelFilter::Off);
+        assert_eq!(f.level_for("papel_render::text"), LevelFilter::Trace);
+        assert_eq!(f.level_for("papel_render::raster"), LevelFilter::Off);
         assert_eq!(f.max(), LevelFilter::Trace);
         // A module name is matched at `::` boundaries, not as a bare prefix.
         assert_eq!(f.level_for("wgpu_core_extra"), LevelFilter::Info);
-        assert_eq!(f.level_for("pdfcraft_render_extra"), LevelFilter::Info);
+        assert_eq!(f.level_for("papel_render_extra"), LevelFilter::Info);
         // A bare target name sets that target to the most verbose level, as env_logger does.
         assert_eq!(Filter::parse("naga").level_for("naga::front"), LevelFilter::Trace);
         assert_eq!(Filter::parse("naga").level_for("eframe"), LevelFilter::Error);
         // A trailing `*` is a plain prefix match.
-        assert_eq!(Filter::parse("pdfcraft*=debug").level_for("pdfcraft_ui_egui::canvas"), LevelFilter::Debug);
-        assert_eq!(Filter::parse("pdfcraft*=debug").level_for("eframe"), LevelFilter::Error);
+        assert_eq!(Filter::parse("papel*=debug").level_for("papel_ui_egui::canvas"), LevelFilter::Debug);
+        assert_eq!(Filter::parse("papel*=debug").level_for("eframe"), LevelFilter::Error);
     }
 
     #[test]
     fn hostile_specs_never_panic_and_fall_back_sensibly() {
         let long = "x".repeat(100_000);
-        let odd = ["", ",,,", "=", "=debug", "pdfcraft=", "nonsense=loud", "🦀=info", "*", "**=info", "a=b=c", " = ", "é*=warn"];
-        for spec in odd.into_iter().chain([long.as_str(), "warn,,pdfcraft=DEBUG"]) {
+        let odd = ["", ",,,", "=", "=debug", "papel=", "nonsense=loud", "🦀=info", "*", "**=info", "a=b=c", " = ", "é*=warn"];
+        for spec in odd.into_iter().chain([long.as_str(), "warn,,papel=DEBUG"]) {
             let f = Filter::parse(spec);
-            let _ = f.level_for("pdfcraft");
+            let _ = f.level_for("papel");
             let _ = f.level_for("");
             let _ = f.level_for("🦀::x");
             let _ = f.max();
         }
-        assert_eq!(Filter::parse("warn,,pdfcraft=DEBUG").level_for("pdfcraft"), LevelFilter::Debug);
+        assert_eq!(Filter::parse("warn,,papel=DEBUG").level_for("papel"), LevelFilter::Debug);
         assert_eq!(Filter::parse("nonsense=loud").level_for("nonsense"), LevelFilter::Error);
-        assert_eq!(Filter::parse("pdfcraft=").level_for("pdfcraft"), LevelFilter::Error);
+        assert_eq!(Filter::parse("papel=").level_for("papel"), LevelFilter::Error);
         assert_eq!(Filter::parse("=debug").max(), LevelFilter::Error);
         // `*` alone is a prefix of everything.
         assert_eq!(Filter::parse("*").level_for("anything"), LevelFilter::Trace);
@@ -356,9 +356,9 @@ mod tests {
             std::fs::write(&path, format!("run {run}")).expect("write");
         }
         assert_eq!(read(&dir.join(LOG_FILE)), "run 4");
-        assert_eq!(read(&dir.join("pdfcraft.1.log")), "run 3");
-        assert_eq!(read(&dir.join("pdfcraft.2.log")), "run 2");
-        assert!(!dir.join("pdfcraft.3.log").exists(), "only {KEEP} old logs are kept");
+        assert_eq!(read(&dir.join("papel.1.log")), "run 3");
+        assert_eq!(read(&dir.join("papel.2.log")), "run 2");
+        assert!(!dir.join("papel.3.log").exists(), "only {KEEP} old logs are kept");
         let _ = std::fs::remove_dir_all(&dir);
     }
 
@@ -374,8 +374,8 @@ mod tests {
     #[test]
     fn a_line_carries_time_level_thread_target_and_message() {
         assert_eq!(
-            format_line("2026-10-08T07:59:17.728Z", log::Level::Warn, "main", "pdfcraft_ui_egui::recovery", "autosave failed: disk full"),
-            "2026-10-08T07:59:17.728Z WARN  [main] pdfcraft_ui_egui::recovery: autosave failed: disk full\n"
+            format_line("2026-10-08T07:59:17.728Z", log::Level::Warn, "main", "papel_ui_egui::recovery", "autosave failed: disk full"),
+            "2026-10-08T07:59:17.728Z WARN  [main] papel_ui_egui::recovery: autosave failed: disk full\n"
         );
         // A multi-line message (a panic with a backtrace) keeps its lines; the record still ends in one newline.
         assert!(format_line("t", log::Level::Error, "w", "x", "a\nb\n").ends_with("x: a\nb\n"));
@@ -433,17 +433,17 @@ mod tests {
         let record = |level, target: &'static str, msg: &'static str| {
             logger.log(&log::Record::builder().level(level).target(target).args(format_args!("{msg}")).build());
         };
-        record(log::Level::Info, "pdfcraft", "moved the PrintCraft settings");
+        record(log::Level::Info, "papel", "moved the PrintCraft settings");
         record(log::Level::Info, "wgpu_core::device", "too chatty");
         let path = logger.attach_dir(&dir).expect("attach");
         assert_eq!(path, dir.join(LOG_FILE));
         record(log::Level::Warn, "wgpu_hal::vulkan", "a real warning");
-        record(log::Level::Debug, "pdfcraft", "below info");
+        record(log::Level::Debug, "papel", "below info");
         let text = read(&path);
-        assert!(text.contains(" INFO  [") && text.contains("pdfcraft: moved the PrintCraft settings\n"), "{text}");
+        assert!(text.contains(" INFO  [") && text.contains("papel: moved the PrintCraft settings\n"), "{text}");
         assert!(text.contains("wgpu_hal::vulkan: a real warning\n"), "{text}");
         assert!(!text.contains("too chatty") && !text.contains("below info"), "{text}");
-        assert!(logger.enabled(&log::Metadata::builder().level(log::Level::Info).target("pdfcraft_ui_egui").build()));
+        assert!(logger.enabled(&log::Metadata::builder().level(log::Level::Info).target("papel_ui_egui").build()));
         assert!(!logger.enabled(&log::Metadata::builder().level(log::Level::Info).target("naga").build()));
         let _ = std::fs::remove_dir_all(&dir);
     }
@@ -474,8 +474,8 @@ mod tests {
                 .join();
         });
         assert!(logger.sink.is_poisoned());
-        logger.log(&log::Record::builder().level(log::Level::Warn).target("pdfcraft").args(format_args!("after the panic")).build());
-        assert!(read(&path).contains("pdfcraft: after the panic\n"));
+        logger.log(&log::Record::builder().level(log::Level::Warn).target("papel").args(format_args!("after the panic")).build());
+        assert!(read(&path).contains("papel: after the panic\n"));
         let _ = std::fs::remove_dir_all(&dir);
     }
 }

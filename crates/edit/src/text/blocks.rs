@@ -383,7 +383,7 @@ pub fn clear_block(doc: &mut Document, page: usize, block: usize) -> Result<(), 
         if let Some(op) = ops.get(s.op) {
             replacement.extend(show_side_effects(op));
         }
-        replacement.push(Op::new("TJ", vec![Object::Array(vec![pdfcraft_content::num(adjustment)])]));
+        replacement.push(Op::new("TJ", vec![Object::Array(vec![papel_content::num(adjustment)])]));
         patches.insert(s.op, replacement);
     }
     let data = splice(&pieces, &ops, |i| patches.remove(&i).map_or((Vec::new(), true), |v| (v, false)));

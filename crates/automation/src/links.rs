@@ -1,10 +1,10 @@
 //! Link tools: list, add, edit and delete links; create links from URLs in the text; remove
 //! all links. Rectangles are points from the top-left of the displayed page.
 
-use pdfcraft_engine::{
+use papel_engine::{
     Edit, LinkAction, LinkHighlight, LinkStyle, LinkZoom, read_remote_document, remote_document_path_is_absolute, resolve_remote_document_path,
 };
-use pdfcraft_render::{DestView, LinkTarget, RemoteDestination};
+use papel_render::{DestView, LinkTarget, RemoteDestination};
 use serde_json::{Value, json};
 use std::path::Path;
 
@@ -14,11 +14,11 @@ use crate::{Args, Automation, Result, ToolError, failed};
 /// Where `destination` puts `doc`, a document just opened from a link or with open parameters:
 /// whether it applies, the destination as reported, and a warning when it doesn't. A named
 /// destination is looked up in the document, as the app does.
-pub(crate) fn destination_report(doc: &pdfcraft_engine::Document, destination: RemoteDestination) -> (bool, Value, Option<&'static str>) {
+pub(crate) fn destination_report(doc: &papel_engine::Document, destination: RemoteDestination) -> (bool, Value, Option<&'static str>) {
     let (name, page, view) = match destination {
         RemoteDestination::Default => return (true, json!({ "kind": "default" }), None),
         RemoteDestination::Page { page, view } => (None, page, view),
-        RemoteDestination::Named(name) => match pdfcraft_render::named_destination(doc.bytes.clone(), doc.password.as_deref(), &name) {
+        RemoteDestination::Named(name) => match papel_render::named_destination(doc.bytes.clone(), doc.password.as_deref(), &name) {
             Some((page, view)) => (Some(name), page, view),
             None => return (false, json!({ "kind": "named", "name": name }), Some("The PDF opened, but the named destination was not applied.")),
         },
@@ -97,8 +97,7 @@ impl Automation {
 
     pub(crate) fn link_list(&self, a: &Args) -> Result<Value> {
         let doc = self.doc(a)?;
-        let viewed: std::collections::HashMap<(usize, usize), &pdfcraft_render::Link> =
-            doc.info.links.iter().map(|t| ((t.page, t.index), t)).collect();
+        let viewed: std::collections::HashMap<(usize, usize), &papel_render::Link> = doc.info.links.iter().map(|t| ((t.page, t.index), t)).collect();
         let items: Vec<Value> = doc
             .links()
             .iter()
@@ -143,7 +142,7 @@ impl Automation {
                         let opened = match link.map(|t| &t.target) {
                             Some(LinkTarget::Uri(kept)) => Some(kept.clone()),
                             Some(_) => None,
-                            None => pdfcraft_render::resolve_uri(doc.info.uri_base.as_deref(), u),
+                            None => papel_render::resolve_uri(doc.info.uri_base.as_deref(), u),
                         };
                         if let Some(opened) = opened.filter(|o| o != u) {
                             v["resolved_url"] = json!(opened);
@@ -195,7 +194,7 @@ impl Automation {
                 .map(|(page, l)| {
                     let mut v = json!({ "page": page + 1, "rects": l.rects, "url": l.uri });
                     // What the viewer does on a click: the same check every document link gets.
-                    if let Err(e) = pdfcraft_engine::links::document_url(&l.uri) {
+                    if let Err(e) = papel_engine::links::document_url(&l.uri) {
                         v["blocked"] = json!(e.to_string());
                     }
                     v

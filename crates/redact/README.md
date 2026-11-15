@@ -1,9 +1,9 @@
-# pdfcraft-redact
+# papel-redact
 
 Layer L4 (may use `edit`): redaction, architecture §11.2.
 
 ```rust
-// Marks are Redact annotations (pdfcraft-annot: Shape::Redact { quads, overlay }).
+// Marks are Redact annotations (papel-annot: Shape::Redact { quads, overlay }).
 let marks: Vec<Mark> = marks(&doc);                 // page, areas (user space), fill, overlay text
 let report = apply(&mut doc, None)?;                 // everything, or Some(&[pages])
 clear_marks(&mut doc, None)?;                        // remove marks without applying
@@ -57,7 +57,7 @@ clear_marks(&mut doc, None)?;                        // remove marks without app
   and a byte per row, plus 4 KiB (ASCIIHex text broken into lines under Flate is a little over
   twice; for a fax image's code, about a byte per pixel), are removed whole;
   cleared copies drop `/Alternates` so alternate pixels cannot survive;
-  A run that would decode more of its images than one redaction may (`pdfcraft_cos::ImageBudget`,
+  A run that would decode more of its images than one redaction may (`papel_cos::ImageBudget`,
   filters, decoders and pixels alike) is refused
   and changes nothing: such an image can't be cleared, and removing it whole would take what no mark
   covers with it.

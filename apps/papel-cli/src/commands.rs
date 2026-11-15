@@ -28,7 +28,7 @@ pub(crate) fn info(args: &[String]) -> Result<(), CliError> {
     let bytes = read(path)?;
     let password = flag(args, "--password");
     // The renderer takes only the user password of R2–R4 files; `Session::open` takes either.
-    let render_password = pdfcraft_engine::render_password_for(bytes.clone(), password);
+    let render_password = papel_engine::render_password_for(bytes.clone(), password);
     let mut info = inspect(bytes.clone(), render_password.as_deref()).map_err(|e| e.to_string())?;
     let pdf_pages = info.pages.len();
     let acroform_fields = info.fields.len();
@@ -36,11 +36,11 @@ pub(crate) fn info(args: &[String]) -> Result<(), CliError> {
     // app shows in Document Properties, and for a dynamic XFA form the laid-out pages and fields.
     // Inspection runs none of the document's scripts: an XFA form's initialize and calculate
     // scripts, which the app runs on opening, are left alone, as with JavaScript turned off.
-    let mut session = pdfcraft_engine::Session::new();
+    let mut session = papel_engine::Session::new();
     session.set_javascript(false);
     let opened = session.open("info.pdf", None, bytes.clone(), password).ok().and_then(|id| session.get(id));
     // Dynamic XFA forms: say what laying the template out gives (what the app shows).
-    let xfa_layout = opened.filter(|_| info.xfa == Some(pdfcraft_render::Xfa::Dynamic)).and_then(|d| {
+    let xfa_layout = opened.filter(|_| info.xfa == Some(papel_render::Xfa::Dynamic)).and_then(|d| {
         d.xfa.as_ref().map(|x| {
             info = d.info.clone();
             // The in-memory layout is an appended revision, not the file being inspected.
@@ -55,8 +55,8 @@ pub(crate) fn info(args: &[String]) -> Result<(), CliError> {
     // A file that declares nothing leaves the standards null and empty.
     let (declared, repairs) = match opened {
         Some(d) => (d.standards(), d.repair_log()),
-        None => pdfcraft_cos::Document::open_with_password(bytes.clone(), password)
-            .map(|cos| (pdfcraft_preflight::declared(&cos), cos.repair_log().to_vec()))
+        None => papel_cos::Document::open_with_password(bytes.clone(), password)
+            .map(|cos| (papel_preflight::declared(&cos), cos.repair_log().to_vec()))
             .unwrap_or_default(),
     };
     let json = serde_json::json!({
@@ -71,7 +71,7 @@ pub(crate) fn info(args: &[String]) -> Result<(), CliError> {
         "pdfa": declared.pdfa.as_ref().map(|(part, conformance)| format!("PDF/A-{part}{}", conformance.to_lowercase())),
         "pdfua": declared.pdfua,
         "output_intents": declared.output_intents,
-        "xfa": info.xfa.map(|x| match x { pdfcraft_render::Xfa::Static => "static", pdfcraft_render::Xfa::Dynamic => "dynamic" }),
+        "xfa": info.xfa.map(|x| match x { papel_render::Xfa::Static => "static", papel_render::Xfa::Dynamic => "dynamic" }),
         "xfa_layout": xfa_layout,
         "bookmarks": info.outline.len(), "annotations": info.annotations.len(), "fields": info.fields.len(),
         "links": info.links.len(), "layers": info.layers.len(), "attachments": info.attachments.len(),
@@ -108,10 +108,10 @@ pub(crate) fn text(args: &[String]) -> Result<(), CliError> {
     let mut bytes = read(path)?;
     // The renderer takes only the user password of R2–R4 files; `Session::open` takes either.
     // Worked out from the file as read: `bytes` may become the session's display copy below.
-    let render_password = pdfcraft_engine::render_password_for(bytes.clone(), password);
+    let render_password = papel_engine::render_password_for(bytes.clone(), password);
     // Printing the text is copying it, so ask what `text_extract` asks (#1645): without the
     // permissions password, a document that doesn't allow copying gives no text.
-    let mut session = pdfcraft_engine::Session::new();
+    let mut session = papel_engine::Session::new();
     if let Some(doc) = session.open(path, None, bytes.clone(), password).ok().and_then(|id| session.get(id)) {
         // The engine's hint is about editing in the app; on the command line the way in is
         // `--password`.
@@ -190,7 +190,7 @@ const EDIT_OPTIONS: &str = "--out, --password, --full, --rotate, --delete, --mov
 /// (a typo like `--rotat`) is an error, not something to skip — skipping it would write an
 /// unchanged copy and exit 0, which looks like a successful edit (#133).
 pub(crate) fn edit(args: &[String]) -> Result<(), CliError> {
-    use pdfcraft_engine::{Edit, Session};
+    use papel_engine::{Edit, Session};
     let mut path: Option<&str> = None;
     let mut out: Option<&str> = None;
     let mut password: Option<&str> = None;
@@ -297,7 +297,7 @@ pub(crate) fn edit(args: &[String]) -> Result<(), CliError> {
 /// Write a PDF a command produced, through a staging file beside the target (#2166): a write
 /// that fails, or `--out` naming the input, never leaves a truncated file where a good one was.
 fn write_pdf(out: &Path, bytes: &[u8]) -> Result<(), CliError> {
-    use pdfcraft_platform::staging::{StagingName, write_atomically};
+    use papel_platform::staging::{StagingName, write_atomically};
     write_atomically(out, bytes, StagingName::SuffixThenTag).map_err(|e| format!("{}: {e}", out.display()).into())
 }
 
@@ -313,7 +313,7 @@ pub(crate) fn combine(args: &[String]) -> Result<(), CliError> {
         return Err("combine: give at least two input files".into());
     }
     let sources = inputs.iter().map(|p| Ok((file_stem(p), read(p)?))).collect::<Result<Vec<_>, String>>()?;
-    let bytes = pdfcraft_engine::Session::new().combine(&sources).map_err(|e| e.to_string())?;
+    let bytes = papel_engine::Session::new().combine(&sources).map_err(|e| e.to_string())?;
     write_pdf(Path::new(out), &bytes)
 }
 
@@ -322,7 +322,7 @@ pub(crate) fn extract(args: &[String]) -> Result<(), CliError> {
     let path = *positional(args, EXTRACT_OPTIONS).first().ok_or("extract: missing file")?;
     let out = flag(args, "--out").ok_or("extract: missing --out")?;
     let pages = page_list(flag(args, "--pages").ok_or("extract: missing --pages")?)?;
-    let mut session = pdfcraft_engine::Session::new();
+    let mut session = papel_engine::Session::new();
     let id = session.open(path, None, read(path)?, flag(args, "--password")).map_err(|e| e.to_string())?;
     let bytes = session.extract(id, &pages).map_err(|e| e.to_string())?;
     write_pdf(Path::new(out), &bytes)
@@ -330,7 +330,7 @@ pub(crate) fn extract(args: &[String]) -> Result<(), CliError> {
 
 pub(crate) fn split(args: &[String]) -> Result<(), CliError> {
     validate_options("split", args, SPLIT_OPTIONS)?;
-    use pdfcraft_engine::SplitBy;
+    use papel_engine::SplitBy;
     let path = *positional(args, SPLIT_OPTIONS).first().ok_or("split: missing file")?;
     let by = match (flag(args, "--every"), flag(args, "--before")) {
         (Some(n), None) => {
@@ -347,7 +347,7 @@ pub(crate) fn split(args: &[String]) -> Result<(), CliError> {
         _ => return Err("split: give either --every N or --before PAGES".into()),
     };
     let dir = PathBuf::from(flag(args, "--out-dir").unwrap_or("."));
-    let mut session = pdfcraft_engine::Session::new();
+    let mut session = papel_engine::Session::new();
     let id = session.open(path, None, read(path)?, flag(args, "--password")).map_err(|e| e.to_string())?;
     let stem = file_stem(path);
     let parts = session.split(id, &by).map_err(|e| e.to_string())?;
@@ -397,21 +397,21 @@ pub(crate) fn render(args: &[String]) -> Result<(), CliError> {
     let password = flag(args, "--password");
     // The renderer takes only the user password of R2–R4 files; `Session::open` and the display
     // copy take either.
-    let render_password = pdfcraft_engine::render_password_for(bytes.clone(), password);
+    let render_password = papel_engine::render_password_for(bytes.clone(), password);
     // A page image is an image taken out of the document, as a snapshot or Export is in the app:
     // like `text`, it needs the document to allow copying (or the permissions password).
-    let mut session = pdfcraft_engine::Session::new();
+    let mut session = papel_engine::Session::new();
     if let Some(doc) = session.open(path, None, bytes.clone(), password).ok().and_then(|id| session.get(id)) {
         doc.check_copying().map_err(
             |_| "render: the document's permissions don't allow copying its pages as images; pass the owner password with --password to render it",
         )?;
     }
-    let display = if inspect(bytes.clone(), render_password.as_deref()).is_ok_and(|info| info.xfa == Some(pdfcraft_render::Xfa::Dynamic)) {
-        let mut session = pdfcraft_engine::Session::new();
+    let display = if inspect(bytes.clone(), render_password.as_deref()).is_ok_and(|info| info.xfa == Some(papel_render::Xfa::Dynamic)) {
+        let mut session = papel_engine::Session::new();
         let id = session.open(path, None, bytes, password).map_err(|e| e.to_string())?;
         session.get(id).ok_or("render: the document could not be opened")?.display.clone()
     } else {
-        pdfcraft_engine::display_bytes_for(bytes, password)
+        papel_engine::display_bytes_for(bytes, password)
     };
     let mut r =
         PageRenderer::new(display, RenderConfig { password: render_password.as_deref().map(Arc::from), reject_oversize: true, ..Default::default() });
@@ -421,7 +421,7 @@ pub(crate) fn render(args: &[String]) -> Result<(), CliError> {
     }
     let bytes = match format {
         // With `reject_oversize` the page is drawn at `--dpi` or not at all, so the file can say so.
-        Some(f) => pdfcraft_engine::export::encode_image(p.width, p.height, &p.rgba, f, f64::from(dpi))?,
+        Some(f) => papel_engine::export::encode_image(p.width, p.height, &p.rgba, f, f64::from(dpi))?,
         None => {
             // PAM (netpbm RGB_ALPHA): the raw premultiplied pixels, for tools that read it.
             let mut pam = format!("P7\nWIDTH {}\nHEIGHT {}\nDEPTH 4\nMAXVAL 255\nTUPLTYPE RGB_ALPHA\nENDHDR\n", p.width, p.height).into_bytes();
@@ -433,23 +433,23 @@ pub(crate) fn render(args: &[String]) -> Result<(), CliError> {
     let _ = writeln!(std::io::stderr().lock(), "rendered page {page} at {dpi} dpi: {}×{} px in {} ms", p.width, p.height, p.millis);
     for warning in &p.warnings {
         match warning {
-            pdfcraft_render::RenderWarning::ContentTruncated => {
+            papel_render::RenderWarning::ContentTruncated => {
                 let _ = writeln!(
                     std::io::stderr().lock(),
                     "warning: page {page}: content past the page's safety budget, or a picture whose JBIG2 mask is past a decoder limit, was skipped"
                 );
             }
-            pdfcraft_render::RenderWarning::ColourFallback => {
+            papel_render::RenderWarning::ColourFallback => {
                 let _ =
                     writeln!(std::io::stderr().lock(), "warning: page {page}: a colour that could not be computed was painted in a fallback colour");
             }
-            pdfcraft_render::RenderWarning::MalformedIndexedImage => {
+            papel_render::RenderWarning::MalformedIndexedImage => {
                 let _ = writeln!(
                     std::io::stderr().lock(),
                     "warning: page {page}: an image with a malformed Indexed colour table may be drawn wrongly or not at all"
                 );
             }
-            pdfcraft_render::RenderWarning::Type3WidthsMissing => {
+            papel_render::RenderWarning::Type3WidthsMissing => {
                 let _ = writeln!(
                     std::io::stderr().lock(),
                     "warning: page {page}: a Type 3 font has no /Widths; its glyphs were spaced by the widths their glyph procedures give"

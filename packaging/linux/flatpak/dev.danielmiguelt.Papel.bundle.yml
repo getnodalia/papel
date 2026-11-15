@@ -1,7 +1,7 @@
 # Flatpak manifest for the single-file bundle attached to every GitHub release
-# (pdfcraft-<version>-linux-<arch>.flatpak). Build it with packaging/linux/flatpak-bundle.sh.
+# (papel-<version>-linux-<arch>.flatpak). Build it with packaging/linux/flatpak-bundle.sh.
 #
-# It repackages the release's own Linux tarball (pdfcraft-<version>-linux-<arch>.tar.gz, built on
+# It repackages the release's own Linux tarball (papel-<version>-linux-<arch>.tar.gz, built on
 # Ubuntu 22.04 by package.sh) instead of compiling Rust inside flatpak-builder: no network and no
 # vendored crate sources during the build, a few seconds instead of 20+ minutes, and byte-for-byte
 # the same binaries as the AppImage/deb/rpm. The script unpacks the tarball into `stage/` next to a
@@ -9,15 +9,15 @@
 # at runtime; the freedesktop runtime has all of them, and the GPU driver comes from its
 # org.freedesktop.Platform.GL extension.
 #
-# ai.storyteller.pdfcraft.yml (same directory) is the from-source manifest for Flathub. Keep
+# dev.danielmiguelt.Papel.yml (same directory) is the from-source manifest for Flathub. Keep
 # runtime-version and finish-args identical in both (packaging-lint checks this).
-id: ai.storyteller.pdfcraft
+id: dev.danielmiguelt.Papel
 runtime: org.freedesktop.Platform
 runtime-version: '25.08'
 sdk: org.freedesktop.Sdk
-command: pdfcraft
+command: papel
 finish-args:
-  - --filesystem=xdg-data/ArtCraft/versions:ro
+  - --filesystem=xdg-data/Nodalia/versions:ro
   # Display: Wayland first; X11 only when no Wayland compositor is running.
   - --socket=wayland
   - --socket=fallback-x11
@@ -99,7 +99,7 @@ modules:
           - '  esac'
           - 'fi'
           - 'exec "/app/libexec/cups/${0##*/}" "$@"'
-  - name: pdfcraft
+  - name: papel
     buildsystem: simple
     # The release binaries were built with the interface translations at the commit in
     # craft-i18n.rev (the craft-i18n source below); nothing here compiles, so this records which
@@ -107,20 +107,20 @@ modules:
     # keeps both equal to the pin).
     build-options:
       env:
-        CRAFT_I18N_DIR: /run/build/pdfcraft/craft-i18n
+        CRAFT_I18N_DIR: /run/build/papel/craft-i18n
     build-commands:
-      - install -Dm755 bin/pdfcraft /app/bin/pdfcraft
-      - install -Dm755 bin/pdfcraft-cli /app/bin/pdfcraft-cli
-      - install -Dm644 share/applications/ai.storyteller.pdfcraft.desktop /app/share/applications/ai.storyteller.pdfcraft.desktop
-      # Flatpak only exports icons named after the app ID, so the sandbox keeps the Craft icon name.
-      - sed -i "s/^Icon=.*/Icon=ai.storyteller.pdfcraft/" /app/share/applications/ai.storyteller.pdfcraft.desktop
-      - install -Dm644 share/mime/packages/ai.storyteller.pdfcraft.xml /app/share/mime/packages/ai.storyteller.pdfcraft.xml
+      - install -Dm755 bin/papel /app/bin/papel
+      - install -Dm755 bin/papel-cli /app/bin/papel-cli
+      - install -Dm644 share/applications/dev.danielmiguelt.Papel.desktop /app/share/applications/dev.danielmiguelt.Papel.desktop
+      # Flatpak only exports icons named after the app ID, so the sandbox keeps the app's icon name.
+      - sed -i "s/^Icon=.*/Icon=dev.danielmiguelt.Papel/" /app/share/applications/dev.danielmiguelt.Papel.desktop
+      - install -Dm644 share/mime/packages/dev.danielmiguelt.Papel.xml /app/share/mime/packages/dev.danielmiguelt.Papel.xml
       # Already has the release's version and date substituted by package.sh.
-      - install -Dm644 share/metainfo/ai.storyteller.pdfcraft.metainfo.xml /app/share/metainfo/ai.storyteller.pdfcraft.metainfo.xml
-      # OCR models (with their licences), found at /app/bin/../share/pdfcraft/models.
-      - mkdir -p /app/share/pdfcraft && cp -R share/pdfcraft/models /app/share/pdfcraft/
+      - install -Dm644 share/metainfo/dev.danielmiguelt.Papel.metainfo.xml /app/share/metainfo/dev.danielmiguelt.Papel.metainfo.xml
+      # OCR models (with their licences), found at /app/bin/../share/papel/models.
+      - mkdir -p /app/share/papel && cp -R share/papel/models /app/share/papel/
       # Licences, including the embedded craft-fonts' OFL texts.
-      - mkdir -p /app/share/icons /app/share/doc && cp -R share/icons/hicolor /app/share/icons/ && cp -R share/doc/pdfcraft /app/share/doc/
+      - mkdir -p /app/share/icons /app/share/doc && cp -R share/icons/hicolor /app/share/icons/ && cp -R share/doc/papel /app/share/doc/
     sources:
       - type: dir
         path: stage

@@ -1,6 +1,6 @@
 [package]
-name = "pdfcraft-web"
-description = "PdfCraft in the browser (wasm32; build with `trunk build --release` in this directory)"
+name = "papel-web"
+description = "Papel in the browser (wasm32; build with `trunk build --release` in this directory)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -10,9 +10,9 @@ publish = false
 workspace = true
 
 [dependencies]
-pdfcraft-ui-egui = { workspace = true }
-# The host messages (storytold/craft-libs): one contract and one bridge for the web builds.
-# The page command API (storytold/craft-libs#413): window.pdfcraft over the UI control channel.
+papel-ui-egui = { workspace = true }
+# The host messages (getnodalia/foundation (vendor/craft-libs)): one contract and one bridge for the web builds.
+# The page command API (storytold/craft-libs#413): window.papel over the UI control channel.
 craft-web-api = { git = "https://github.com/getnodalia/foundation", rev = "fd5e2feff6ea25bed371a99cc732b3968d621505", version = "0.1.0" }
 craft-web-host = { git = "https://github.com/getnodalia/foundation", rev = "fd5e2feff6ea25bed371a99cc732b3968d621505", version = "0.1.0" }
 eframe = { workspace = true, features = ["default_fonts", "glow", "persistence", "accesskit"] }

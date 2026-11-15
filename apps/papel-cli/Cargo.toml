@@ -1,26 +1,26 @@
 [package]
-name = "pdfcraft-cli"
-description = "PdfCraft command-line tool: inspect, render and robustness-check PDFs"
+name = "papel-cli"
+description = "Papel command-line tool: inspect, render and robustness-check PDFs"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 
 [[bin]]
-name = "pdfcraft-cli"
+name = "papel-cli"
 path = "src/main.rs"
 
 [lints]
 workspace = true
 
 [dependencies]
-pdfcraft-render = { workspace = true }
+papel-render = { workspace = true }
 serde_json = { workspace = true }
-pdfcraft-engine = { workspace = true }
-pdfcraft-audit = { workspace = true }
-pdfcraft-cos = { workspace = true }
-pdfcraft-preflight = { workspace = true }
-pdfcraft-automation = { workspace = true }
-pdfcraft-platform = { workspace = true }
+papel-engine = { workspace = true }
+papel-audit = { workspace = true }
+papel-cos = { workspace = true }
+papel-preflight = { workspace = true }
+papel-automation = { workspace = true }
+papel-platform = { workspace = true }
 base64 = "0.23"
 
 [dev-dependencies]
@@ -33,10 +33,10 @@ png = "0.18"
 rustix = { version = "1", features = ["process"] }
 
 [build-dependencies]
-# VERSIONINFO for pdfcraft-cli.exe; build.rs only uses it when targeting Windows.
+# VERSIONINFO for papel-cli.exe; build.rs only uses it when targeting Windows.
 winresource = "0.1"
 
 [features]
 default = ["mcp"]
-# The opt-in MCP server (`pdfcraft-cli mcp`). Build with --no-default-features to leave it out.
-mcp = ["pdfcraft-automation/mcp"]
+# The opt-in MCP server (`papel-cli mcp`). Build with --no-default-features to leave it out.
+mcp = ["papel-automation/mcp"]

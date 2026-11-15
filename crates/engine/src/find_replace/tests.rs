@@ -57,10 +57,10 @@ fn texts(s: &Session, id: DocId, page: usize) -> Vec<String> {
 }
 
 /// The page text as the find bar reads it (the text layer's glyphs).
-fn page_text(s: &Session, id: DocId, page: usize) -> pdfcraft_render::PageText {
+fn page_text(s: &Session, id: DocId, page: usize) -> papel_render::PageText {
     let doc = s.get(id).unwrap();
-    let mut r = pdfcraft_render::PageRenderer::new(doc.bytes.clone(), pdfcraft_render::RenderConfig::default());
-    let out = r.render(pdfcraft_render::RenderRequest { page, kind: pdfcraft_render::RequestKind::Text, scale: 1.0, ..Default::default() });
+    let mut r = papel_render::PageRenderer::new(doc.bytes.clone(), papel_render::RenderConfig::default());
+    let out = r.render(papel_render::RenderRequest { page, kind: papel_render::RequestKind::Text, scale: 1.0, ..Default::default() });
     out.text.map(|t| t.as_ref().clone()).unwrap_or_default()
 }
 

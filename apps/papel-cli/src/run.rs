@@ -7,8 +7,8 @@ use super::{CliError, stdout_line};
 
 // ---- automation --------------------------------------------------------------------------------
 
-pub(crate) fn automation(args: &[String]) -> Result<pdfcraft_automation::Automation, String> {
-    let a = pdfcraft_automation::Automation::new();
+pub(crate) fn automation(args: &[String]) -> Result<papel_automation::Automation, String> {
+    let a = papel_automation::Automation::new();
     match flag(args, "--root") {
         Some(root) => a.with_root(root).map_err(|e| format!("--root {root}: {e}")),
         None => Ok(a),
@@ -16,7 +16,7 @@ pub(crate) fn automation(args: &[String]) -> Result<pdfcraft_automation::Automat
 }
 
 pub(crate) fn tools() -> Result<(), CliError> {
-    let list: Vec<serde_json::Value> = pdfcraft_automation::tools()
+    let list: Vec<serde_json::Value> = papel_automation::tools()
         .iter()
         .map(|t| serde_json::json!({ "name": t.name, "description": t.description, "read_only": t.read_only, "command": t.command, "input_schema": t.input_schema }))
         .collect();
@@ -26,15 +26,11 @@ pub(crate) fn tools() -> Result<(), CliError> {
 
 /// Print a tool's result: JSON as JSON; images go to `--out` (or are summarised). The image is
 /// written like a tool's own output, so `--root` confines it too.
-pub(crate) fn print_output(
-    auto: &pdfcraft_automation::Automation,
-    content: Vec<pdfcraft_automation::Content>,
-    out: Option<&str>,
-) -> Result<(), CliError> {
+pub(crate) fn print_output(auto: &papel_automation::Automation, content: Vec<papel_automation::Content>, out: Option<&str>) -> Result<(), CliError> {
     for c in content {
         match c {
-            pdfcraft_automation::Content::Json(v) => stdout_line(format_args!("{}", serde_json::to_string_pretty(&v).unwrap_or_default()))?,
-            pdfcraft_automation::Content::Png { data, width, height } => match out {
+            papel_automation::Content::Json(v) => stdout_line(format_args!("{}", serde_json::to_string_pretty(&v).unwrap_or_default()))?,
+            papel_automation::Content::Png { data, width, height } => match out {
                 Some(path) => {
                     let written = auto.write_output(path, &data).map_err(|e| e.to_string())?;
                     stdout_line(format_args!("{}", serde_json::json!({ "image": written.to_string_lossy(), "width": width, "height": height })))?;
@@ -54,15 +50,15 @@ fn png_summary(data: &[u8], width: u32, height: u32) -> serde_json::Value {
 /// A tool's result as JSON values, for the `--report` of a script. Same content as
 /// [`print_output`], collected instead of printed.
 fn output_values(
-    auto: &pdfcraft_automation::Automation,
-    content: Vec<pdfcraft_automation::Content>,
+    auto: &papel_automation::Automation,
+    content: Vec<papel_automation::Content>,
     out: Option<&str>,
 ) -> Result<Vec<serde_json::Value>, String> {
     let mut values = Vec::new();
     for c in content {
         values.push(match c {
-            pdfcraft_automation::Content::Json(v) => v,
-            pdfcraft_automation::Content::Png { data, width, height } => match out {
+            papel_automation::Content::Json(v) => v,
+            papel_automation::Content::Png { data, width, height } => match out {
                 Some(path) => {
                     let written = auto.write_output(path, &data).map_err(|e| e.to_string())?;
                     serde_json::json!({ "image": written.to_string_lossy(), "width": width, "height": height })
@@ -77,7 +73,7 @@ fn output_values(
 /// Run a script and print one JSON document: per step its number, tool and `ok`/`error`/`skipped`
 /// with the result or the message. The first failing step ends the run, as without `--report`;
 /// the steps after it are listed as skipped and the exit status is the same.
-fn run_script_report(auto: &mut pdfcraft_automation::Automation, steps: &[serde_json::Value]) -> Result<(), CliError> {
+fn run_script_report(auto: &mut papel_automation::Automation, steps: &[serde_json::Value]) -> Result<(), CliError> {
     let mut report = Vec::with_capacity(steps.len());
     let mut failure: Option<String> = None;
     for (i, step) in steps.iter().enumerate() {
@@ -131,7 +127,7 @@ pub(crate) fn run(args: &[String]) -> Result<(), CliError> {
         }
         return Ok(());
     }
-    let tool = *positional(args, RUN_OPTIONS).first().ok_or("run: missing tool name (see `pdfcraft-cli tools`)")?;
+    let tool = *positional(args, RUN_OPTIONS).first().ok_or("run: missing tool name (see `papel-cli tools`)")?;
     let mut obj = serde_json::Map::new();
     for kv in positional(args, RUN_OPTIONS).iter().skip(1) {
         let (k, v) = kv.split_once('=').ok_or(format!("run: expected key=value, got {kv:?}"))?;
@@ -146,7 +142,7 @@ pub(crate) fn run(args: &[String]) -> Result<(), CliError> {
 /// once) out of `args`, and open the roots, which must be existing folders. Returns the arguments
 /// that are left. A malformed root flag is an error, never a root silently left out.
 #[cfg(feature = "mcp")]
-fn automation_roots(command: &str, args: &[String]) -> Result<(Option<Arc<pdfcraft_automation::file_access::AutomationRoots>>, Vec<String>), String> {
+fn automation_roots(command: &str, args: &[String]) -> Result<(Option<Arc<papel_automation::file_access::AutomationRoots>>, Vec<String>), String> {
     let mut found = automation_args::AutomationArgs::new(None, None);
     let mut left = Vec::new();
     let mut it = args.iter().cloned();
@@ -155,7 +151,7 @@ fn automation_roots(command: &str, args: &[String]) -> Result<(Option<Arc<pdfcra
             left.push(arg);
         }
     }
-    let roots = pdfcraft_automation::file_access::AutomationRoots::new(found.read_root.as_deref(), found.write_root.as_deref())
+    let roots = papel_automation::file_access::AutomationRoots::new(found.read_root.as_deref(), found.write_root.as_deref())
         .map_err(|e| format!("{command}: {e}"))?;
     Ok((roots, left))
 }
@@ -171,17 +167,17 @@ pub(crate) fn mcp(args: &[String]) -> Result<(), CliError> {
         let show = |root: Option<&Path>| root.map_or_else(|| "none".to_string(), |r| r.display().to_string());
         let _ = writeln!(
             std::io::stderr().lock(),
-            "pdfcraft-cli: files confined: read root {}, write root {}",
+            "papel-cli: files confined: read root {}, write root {}",
             show(roots.read_root()),
             show(roots.write_root())
         );
         auto = auto.with_automation_roots(Some(roots));
     }
-    let mut server = pdfcraft_automation::mcp::McpServer::new(auto).with_compact(compact);
+    let mut server = papel_automation::mcp::McpServer::new(auto).with_compact(compact);
     let _ = writeln!(
         std::io::stderr().lock(),
-        "pdfcraft-cli: MCP server on stdio (protocol {}{}); close stdin to stop",
-        pdfcraft_automation::mcp::PROTOCOL_VERSIONS[0],
+        "papel-cli: MCP server on stdio (protocol {}{}); close stdin to stop",
+        papel_automation::mcp::PROTOCOL_VERSIONS[0],
         if compact { ", compact tool list" } else { "" }
     );
     server.serve(std::io::stdin().lock(), std::io::stdout().lock()).map_err(|e| CliError::Message(e.to_string()))

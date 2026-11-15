@@ -8,8 +8,8 @@ collects what the desktop app reads from its environment and where it writes its
 When local build storage is constrained, select the opt-in `low-disk` profile explicitly:
 
 ```sh
-cargo build --profile low-disk -p pdfcraft-cli
-cargo test --profile low-disk -p pdfcraft-cos --lib
+cargo build --profile low-disk -p papel-cli
+cargo test --profile low-disk -p papel-cos --lib
 ```
 
 The profile inherits the normal development settings, including debug assertions, overflow
@@ -39,8 +39,8 @@ the current choice and the other valid settings.
 The existing opt-in UI control channel uses the same preference:
 
 ```sh
-pdfcraft-cli ui --control /path/to/control.json set key=comment-tool-pinned value=true
-pdfcraft-cli ui --control /path/to/control.json state
+papel-cli ui --control /path/to/control.json set key=comment-tool-pinned value=true
+papel-cli ui --control /path/to/control.json state
 ```
 
 `ui.state.comment_tool_pinned` reports the boolean. `ui.set` accepts `true` or `false` and refuses
@@ -70,24 +70,24 @@ do not contact a desktop session bus. Page and document colours retain their exi
 
 ## Logs
 
-The desktop app writes its `log` records to standard error and to `logs/pdfcraft.log` in its
-data folder: Linux and FreeBSD `~/.local/share/pdfcraft/logs/` (or
-`$XDG_DATA_HOME/pdfcraft/logs/`), macOS `~/Library/Application Support/PdfCraft/logs/`, Windows
-`%APPDATA%\PdfCraft\data\logs\`. In portable mode (a `portable.txt` file next to the executable, as
-the Windows portable zip ships) the settings folder is `PdfCraftData\` beside the executable, and
+The desktop app writes its `log` records to standard error and to `logs/papel.log` in its
+data folder: Linux and FreeBSD `~/.local/share/papel/logs/` (or
+`$XDG_DATA_HOME/papel/logs/`), macOS `~/Library/Application Support/Papel/logs/`, Windows
+`%APPDATA%\Papel\data\logs\`. In portable mode (a `portable.txt` file next to the executable, as
+the Windows portable zip ships) the settings folder is `PapelData\` beside the executable, and
 crash recovery and new digital IDs go there too. A start from a desktop menu, Finder or the Start
 menu has no terminal, so this file is what to attach to a bug report: a failed autosave, a page that
 would not render, a render worker that could not start and the report of an internal error all land
 there.
-Each launch moves the previous log to `pdfcraft.1.log` (and that one to `pdfcraft.2.log`), so the
+Each launch moves the previous log to `papel.1.log` (and that one to `papel.2.log`), so the
 log of a run that crashed survives the next start. The file stops growing at 16 MiB. `--version`
 writes no file.
 
-By default Papel's own crates (`pdfcraft*`) log at `info` and everything else at `warn`.
+By default Papel's own crates (`papel*`) log at `info` and everything else at `warn`.
 `RUST_LOG` replaces that with env_logger-style directives, for example `RUST_LOG=debug`,
-`RUST_LOG=warn,pdfcraft_render=trace` or `RUST_LOG=info,wgpu_core=warn`; a directive ending in `*`
-covers every target starting with it (`pdfcraft*=debug`). The logger is
-`apps/pdfcraft/src/logging.rs`. It never records the control-channel token or document passwords.
+`RUST_LOG=warn,papel_render=trace` or `RUST_LOG=info,wgpu_core=warn`; a directive ending in `*`
+covers every target starting with it (`papel*=debug`). The logger is
+`apps/papel/src/logging.rs`. It never records the control-channel token or document passwords.
 
 ## GPU surface limits
 
@@ -101,7 +101,7 @@ at a correspondingly lower scale instead of panicking in `Surface::configure` (v
 stretched over the window: softer, but complete and lined up with the pointer. wgpu's GL backend
 copies it unscaled into a corner of the window instead.
 
-For blurry or incorrectly scaled UI reports, attach `pdfcraft.log`. Look for the successful
+For blurry or incorrectly scaled UI reports, attach `papel.log`. Look for the successful
 startup `renderer:` line, which records the wgpu adapter, device type, backend and enabled texture
 limit, or the OpenGL renderer. Also look for the `drawing it at … and scaling it up` warning: it
 means Papel hit the surface-size safety fallback and rendered below the physical window size, so
@@ -123,13 +123,13 @@ OpenGL can't start either, Papel exits with both errors in the log. The fallback
 `error`, with the wgpu error. Renderer resource creation now uses the same scopes and returns
 `WgpuError::CreateRenderer` before the app is created, so a rejected `egui_pipeline` can also
 reach this retry instead of the uncaptured-error panic handler. This does not fix the failing
-driver's shader compilation, and explicit `PDFCRAFT_RENDERER=wgpu` still disables the retry.
-`PDFCRAFT_RENDERER` skips it or chooses OpenGL from the start.
+driver's shader compilation, and explicit `PAPEL_RENDERER=wgpu` still disables the retry.
+`PAPEL_RENDERER` skips it or chooses OpenGL from the start.
 
 ## Preferences
 
-Linux and FreeBSD store `app.ron` in `$XDG_CONFIG_HOME/pdfcraft/`, or
-`~/.config/pdfcraft/` when that variable is unset, empty or relative. This follows the
+Linux and FreeBSD store `app.ron` in `$XDG_CONFIG_HOME/papel/`, or
+`~/.config/papel/` when that variable is unset, empty or relative. This follows the
 [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir/latest/).
 On first launch after upgrading, existing `app.ron` preferences are copied from the old
 data folder without replacing an existing configuration file. The old copy is retained;
@@ -144,17 +144,17 @@ copies retain their current preferences locations.
 |---|---|
 | `RUST_LOG` | Log levels for standard error and the log file (see [Logs](#logs)) |
 | `RUST_BACKTRACE` | `1` adds a backtrace to the report of an internal error |
-| `XDG_CONFIG_HOME` | Linux/FreeBSD: absolute configuration base for `pdfcraft/app.ron`; defaults to `~/.config` |
+| `XDG_CONFIG_HOME` | Linux/FreeBSD: absolute configuration base for `papel/app.ron`; defaults to `~/.config` |
 | `XDG_DATA_HOME` | Linux/FreeBSD: base of the log folder and crash recovery; previous preferences are migrated from here |
 | `WGPU_POWER_PREF` | GPU choice; by default Papel draws on the GPU the Wayland compositor draws with (it says so through linux-dmabuf feedback), else the GPU that drives the primary display (Windows) or the built-in panel (Linux), else the low-power (integrated) GPU. The log says which one was chosen |
 | `WGPU_BACKEND` | Graphics backend; by default Windows uses Direct3D 12, falling back to OpenGL |
 | `WGPU_DX12_PRESENTATION_SYSTEM` | Windows, Direct3D 12: `hwnd` presents through a swap chain on the window itself, which Windows stretches while the window is resized (#2738); unset or `visual`, Papel presents through a DirectComposition visual |
 | `WGPU_VALIDATION_INDIRECT_CALL` | `1` turns wgpu's check of indirect draw arguments back on. Papel draws nothing indirectly and turns it off, since the compute shader the check needs fails to compile on some drivers (Metal on an Intel Iris Pro), which lost the device at start-up |
-| `PDFCRAFT_RENDERER` | `gl` starts with OpenGL (glow) and never loads wgpu; `wgpu` reports a wgpu failure instead of retrying with OpenGL; unset, wgpu is retried with OpenGL when it can't start (see [Renderer fallback](#renderer-fallback)) |
-| `PDFCRAFT_TITLEBAR` | Linux: `app` draws Papel's own title bar (window buttons in the tab strip, in the order of GNOME's `button-layout`, and resize edges); `system` keeps the frame winit or the desktop draws; unset, Papel draws its own when the Wayland compositor draws no frames (GNOME), and leaves it to the desktop otherwise (KDE, Sway, Hyprland, X11). Where Papel draws it, Preferences ▸ Use system title bar switches back to winit's frame without a restart; `system` also hides that option |
-| `PDFCRAFT_BUILD_LABEL` | Build time: a label for a local or patched build (letters, digits, inner dots), shown after the version in `--version`, About and the log (`0.7.1 (titlebar)`). `packaging/linux/package.sh` also puts it in the file names and the .rpm/.deb release (`1.titlebar`), which upgrades over the release of the same version |
-| `CRAFT_FONTS_DIR` | Build time: a [craft-fonts](https://github.com/storytold/craft-fonts) checkout to embed (Japanese fonts) |
-| `PDFCRAFT_SYSTEM_FONTS` | `0` disables installed-font fallback for both interface text and non-embedded CJK page text in the desktop viewer, Combine thumbnails and accessibility figure previews (`cargo xtask screenshots` sets it). Document fallback is display-only: exports, printing, OCR and automation retain the bundled-font path. |
+| `PAPEL_RENDERER` | `gl` starts with OpenGL (glow) and never loads wgpu; `wgpu` reports a wgpu failure instead of retrying with OpenGL; unset, wgpu is retried with OpenGL when it can't start (see [Renderer fallback](#renderer-fallback)) |
+| `PAPEL_TITLEBAR` | Linux: `app` draws Papel's own title bar (window buttons in the tab strip, in the order of GNOME's `button-layout`, and resize edges); `system` keeps the frame winit or the desktop draws; unset, Papel draws its own when the Wayland compositor draws no frames (GNOME), and leaves it to the desktop otherwise (KDE, Sway, Hyprland, X11). Where Papel draws it, Preferences ▸ Use system title bar switches back to winit's frame without a restart; `system` also hides that option |
+| `PAPEL_BUILD_LABEL` | Build time: a label for a local or patched build (letters, digits, inner dots), shown after the version in `--version`, About and the log (`0.7.1 (titlebar)`). `packaging/linux/package.sh` also puts it in the file names and the .rpm/.deb release (`1.titlebar`), which upgrades over the release of the same version |
+| `CRAFT_FONTS_DIR` | Build time: a [craft-fonts](https://github.com/getnodalia/foundation/tree/vendor/craft-fonts/main) checkout to embed (Japanese fonts) |
+| `PAPEL_SYSTEM_FONTS` | `0` disables installed-font fallback for both interface text and non-embedded CJK page text in the desktop viewer, Combine thumbnails and accessibility figure previews (`cargo xtask screenshots` sets it). Document fallback is display-only: exports, printing, OCR and automation retain the bundled-font path. |
 | `FONTCONFIG_FILE` | On Linux/Unix, the Fontconfig configuration file used to discover installed UI fallback fonts (default: `/etc/fonts/fonts.conf`); relative filenames are resolved under `FONTCONFIG_PATH` |
 | `FONTCONFIG_PATH` | Directory for a relative `FONTCONFIG_FILE` (default: `/etc/fonts`; the first entry of a search path is used) |
 

@@ -1,21 +1,21 @@
-//! One PdfCraft per Windows sign-in or Linux/BSD display: a launch that only names files hands them
-//! to the PdfCraft that is already running, where they open as tabs, and exits (#282, #317, #1726).
+//! One Papel per Windows sign-in or Linux/BSD display: a launch that only names files hands them
+//! to the Papel that is already running, where they open as tabs, and exits (#282, #317, #1726).
 //!
-//! Outlook attachments, Explorer double-clicks and Open With all start `pdfcraft.exe "<file>"`, and
-//! a file manager or `xdg-open` starts `pdfcraft <file>` the same way, so until now every file got
-//! its own process and window. The first PdfCraft listens on a Unix domain socket. On Windows (10
-//! 1803 and later) it is in `%LOCALAPPDATA%\PdfCraft` (a portable copy's too, as
+//! Outlook attachments, Explorer double-clicks and Open With all start `papel.exe "<file>"`, and
+//! a file manager or `xdg-open` starts `papel <file>` the same way, so until now every file got
+//! its own process and window. The first Papel listens on a Unix domain socket. On Windows (10
+//! 1803 and later) it is in `%LOCALAPPDATA%\Papel` (a portable copy's too, as
 //! `portable-instance-…` and never in its own folder, #889) and is named after the Windows
 //! session (`instance-s1.sock` for session 1), so two sign-ins of the same
 //! user never open files in each other's windows. On Linux and the BSDs it is in
-//! `$XDG_RUNTIME_DIR/pdfcraft` and is named after the display (`instance-wayland-0.sock`), so a
+//! `$XDG_RUNTIME_DIR/papel` and is named after the display (`instance-wayland-0.sock`), so a
 //! launch on another display or seat opens its own window there. Either way it lives in a folder
 //! only the user can reach, so other accounts can't create, replace or reach it: nobody else can
 //! intercept a launch or open files in this user's window. Inside a Flatpak, `$XDG_RUNTIME_DIR` is
 //! the app's own and is shared by every run of it, so the handoff works there too. The exchange is
 //! one line each way, a JSON request naming absolute paths and `ok`, and the running app opens the
 //! paths exactly as File ▸ Open would. A `--combine` launch (File Explorer's "Combine files in
-//! PdfCraft", #585, one launch per selected file) hands them over the same way with
+//! Papel", #585, one launch per selected file) hands them over the same way with
 //! `"combine": true`, and the running app adds them to its Combine files tab instead.
 //!
 //! Every failure falls back to the old behaviour: a launch that can't hand its files over within
@@ -36,7 +36,7 @@ use std::os::unix::net::{UnixListener, UnixStream};
 #[cfg(windows)]
 use uds_windows::{UnixListener, UnixStream};
 
-use pdfcraft_ui_egui::{OsEvent, OsEventsFn};
+use papel_ui_egui::{OsEvent, OsEventsFn};
 
 /// Longest request read: one line of JSON, far longer than any real list of paths.
 #[cfg_attr(not(any(windows, all(unix, not(target_os = "macos")))), allow(dead_code))]
@@ -49,9 +49,9 @@ const TIMEOUT: Duration = Duration::from_secs(5);
 /// What this launch should do.
 #[cfg_attr(not(any(windows, all(unix, not(target_os = "macos")))), allow(dead_code))]
 pub enum Claim {
-    /// The running PdfCraft took the files: exit without a window.
+    /// The running Papel took the files: exit without a window.
     HandedOff,
-    /// This is the first PdfCraft: open a window and accept later launches' files.
+    /// This is the first Papel: open a window and accept later launches' files.
     Primary(Server),
     /// Open a window of its own and accept nothing (the behaviour before #282).
     Alone,
@@ -67,7 +67,7 @@ struct Inbox {
     wake: Option<Box<dyn Fn() + Send>>,
 }
 
-/// The first PdfCraft's end of the socket. A background thread accepts launches until the
+/// The first Papel's end of the socket. A background thread accepts launches until the
 /// process exits; the UI picks their files up through [`Server::connect`].
 pub struct Server {
     inbox: Arc<Mutex<Inbox>>,
@@ -98,7 +98,7 @@ impl Server {
         }
     }
 
-    /// The queue the UI drains every frame (`PdfCraftApp::os_events`). Files that arrived before
+    /// The queue the UI drains every frame (`PapelApp::os_events`). Files that arrived before
     /// the window existed are in the first batch. A batch also brings the window forward, as the
     /// new window it replaces would have been. A Wayland window can't bring itself forward (winit
     /// ignores `Focus` there), so on `native_wayland` it asks for the user's attention instead,
@@ -160,7 +160,7 @@ pub fn absolute(paths: &[String]) -> Vec<String> {
     let made = |p: &str| std::path::absolute(p).map_or_else(|_| p.to_string(), |a| a.to_string_lossy().into_owned());
     paths
         .iter()
-        .map(|p| match pdfcraft_engine::open_parameters::split(p, |f| std::path::Path::new(f).is_file()) {
+        .map(|p| match papel_engine::open_parameters::split(p, |f| std::path::Path::new(f).is_file()) {
             // `file` is what comes before one of `p`'s `#`, so the rest starts at that `#`.
             Some((file, _)) => format!("{}{}", made(&file), p.get(file.len()..).unwrap_or_default()),
             None => made(p),
@@ -186,7 +186,7 @@ pub fn claim(files: &[String], may_hand_off: bool, combine: bool) -> Claim {
     }
 }
 
-/// The socket in `%LOCALAPPDATA%\PdfCraft` (beside the crash-recovery folder); none when
+/// The socket in `%LOCALAPPDATA%\Papel` (beside the crash-recovery folder); none when
 /// `%LOCALAPPDATA%` is unset.
 #[cfg(windows)]
 fn socket_path() -> Option<std::path::PathBuf> {
@@ -195,11 +195,11 @@ fn socket_path() -> Option<std::path::PathBuf> {
     // user's file paths or send it files to open. A portable copy uses it too (#889), under its
     // own name so it never hands files to an installed copy (which keeps its settings elsewhere).
     // Never the portable folder itself: it may sit where other accounts can write (`C:\Tools`).
-    let name = if pdfcraft_ui_egui::portable::data_dir().is_some() { format!("portable-{name}") } else { name };
-    std::env::var_os("LOCALAPPDATA").filter(|v| !v.is_empty()).map(|d| std::path::PathBuf::from(d).join("PdfCraft").join(name))
+    let name = if papel_ui_egui::portable::data_dir().is_some() { format!("portable-{name}") } else { name };
+    std::env::var_os("LOCALAPPDATA").filter(|v| !v.is_empty()).map(|d| std::path::PathBuf::from(d).join("Papel").join(name))
 }
 
-/// The socket in `$XDG_RUNTIME_DIR/pdfcraft`; none when `$XDG_RUNTIME_DIR` is unset. Never `/tmp`
+/// The socket in `$XDG_RUNTIME_DIR/papel`; none when `$XDG_RUNTIME_DIR` is unset. Never `/tmp`
 /// instead: other accounts can create files there, and so could listen in this user's place.
 #[cfg(all(unix, not(target_os = "macos")))]
 fn socket_path() -> Option<std::path::PathBuf> {
@@ -207,7 +207,7 @@ fn socket_path() -> Option<std::path::PathBuf> {
     let name = display_socket_name(var("WAYLAND_DISPLAY").or_else(|| var("DISPLAY")).as_deref());
     // The XDG base directory spec makes it the user's own (mode 0700), so the folder inside it is
     // out of other accounts' reach whatever the umask.
-    var("XDG_RUNTIME_DIR").map(|d| std::path::PathBuf::from(d).join("pdfcraft").join(name))
+    var("XDG_RUNTIME_DIR").map(|d| std::path::PathBuf::from(d).join("papel").join(name))
 }
 
 /// The socket's file name for a display (`WAYLAND_DISPLAY`, else `DISPLAY`): a launch opens its
@@ -289,12 +289,12 @@ fn claim_at(path: &std::path::Path, files: &[String], may_hand_off: bool, combin
                 return match hand_off(&stream, files, combine) {
                     Ok(()) => Claim::HandedOff,
                     Err(e) => {
-                        log::warn!("couldn't hand the files to the running PdfCraft ({e}); opening a new window");
+                        log::warn!("couldn't hand the files to the running Papel ({e}); opening a new window");
                         Claim::Alone
                     }
                 };
             }
-            // Nobody is listening: no socket yet, or one left by a PdfCraft that didn't exit
+            // Nobody is listening: no socket yet, or one left by a Papel that didn't exit
             // cleanly (connecting to it is refused). Clear it and become the first. Removed
             // without asking `path.exists()` first: on Windows that follows the socket's reparse
             // point, which can fail, and a leftover socket would then block every later start.
@@ -340,7 +340,7 @@ fn hand_off(stream: &UnixStream, files: &[String], combine: bool) -> std::io::Re
     writer.write_all(request(files, combine).as_bytes())?;
     let mut reply = String::new();
     std::io::BufReader::new(stream.take(16)).read_line(&mut reply)?;
-    if reply == "ok\n" { Ok(()) } else { Err(std::io::Error::other("the running PdfCraft didn't confirm")) }
+    if reply == "ok\n" { Ok(()) } else { Err(std::io::Error::other("the running Papel didn't confirm")) }
 }
 
 /// Accept launches on a background thread for as long as the process runs.
@@ -432,7 +432,7 @@ mod tests {
     /// `x/../y` lost the file name and `Intro.` its dot.
     #[test]
     fn only_the_file_before_open_parameters_is_made_absolute() {
-        let dir = std::env::temp_dir().join(format!("pdfcraft-instance-{}-open-parameters", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("papel-instance-{}-open-parameters", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let (manual, notes) = (dir.join("manual.pdf"), dir.join("notes#2.pdf"));
         std::fs::write(&manual, b"%PDF-1.7").unwrap();
@@ -522,7 +522,7 @@ mod tests {
 
     #[cfg(any(windows, all(unix, not(target_os = "macos"))))]
     fn socket(test: &str) -> std::path::PathBuf {
-        let dir = std::env::temp_dir().join(format!("pdfcraft-instance-{}-{test}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("papel-instance-{}-{test}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         dir.join(socket_name(None, None))
     }

@@ -5,7 +5,7 @@
 use egui::{Key, Modifiers};
 use egui_kittest::Harness;
 use egui_kittest::kittest::Queryable;
-use pdfcraft_ui_egui::{PdfCraftApp, QuickTool};
+use papel_ui_egui::{PapelApp, QuickTool};
 
 /// Two 300×200 pages of Helvetica text: "cat and cat" and "a cat".
 fn fixture() -> Vec<u8> {
@@ -34,20 +34,20 @@ fn fixture() -> Vec<u8> {
     out
 }
 
-fn texts(h: &Harness<'static, PdfCraftApp>) -> Vec<String> {
+fn texts(h: &Harness<'static, PapelApp>) -> Vec<String> {
     let s = h.state();
     let doc = s.session.get(s.views[0].id).unwrap();
     (0..2).flat_map(|p| doc.text_blocks(p).into_iter().map(|b| b.text)).collect()
 }
 
-fn has_field(h: &Harness<'static, PdfCraftApp>, placeholder: &str) -> bool {
+fn has_field(h: &Harness<'static, PapelApp>, placeholder: &str) -> bool {
     h.query_all_by(|n| n.placeholder() == Some(placeholder)).next().is_some()
 }
 
 #[test]
 fn replace_all_from_the_find_bar_is_one_undo_step() {
     let mut h = Harness::builder().with_size(egui::vec2(1400.0, 900.0)).build_eframe(|_cc| {
-        let mut app = PdfCraftApp::new();
+        let mut app = PapelApp::new();
         app.set_option("language", "en").unwrap();
         app.open_bytes("cats.pdf", None, fixture()).expect("opens");
         app
@@ -100,7 +100,7 @@ fn replace_all_from_the_find_bar_is_one_undo_step() {
 #[test]
 fn replace_changes_the_highlighted_match() {
     let mut h = Harness::builder().with_size(egui::vec2(1400.0, 900.0)).build_eframe(|_cc| {
-        let mut app = PdfCraftApp::new();
+        let mut app = PapelApp::new();
         app.set_option("language", "en").unwrap();
         app.open_bytes("cats.pdf", None, fixture()).expect("opens");
         app

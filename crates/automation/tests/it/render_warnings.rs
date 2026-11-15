@@ -1,12 +1,12 @@
 //! `page_render` reports the renderer's warnings next to the PNG, so a headless caller can tell
-//! that a picture is incomplete or approximate, as `pdfcraft-cli render` can (#4340).
+//! that a picture is incomplete or approximate, as `papel-cli render` can (#4340).
 
 use std::path::PathBuf;
 
-use pdfcraft_automation::{Automation, Content};
+use papel_automation::{Automation, Content};
 use serde_json::{Value, json};
 
-/// The warning a colour that falls back gives, worded as `pdfcraft-cli render` prints it.
+/// The warning a colour that falls back gives, worded as `papel-cli render` prints it.
 const FALLBACK: &str = "a colour that could not be computed was painted in a fallback colour";
 
 /// A one-page 200 × 200 pt PDF that draws `content`, with the colour space `CS1` defined as
@@ -38,7 +38,7 @@ fn clean_pdf() -> Vec<u8> {
 
 /// A fresh folder holding `fallback.pdf` and `clean.pdf`, and an automation rooted there.
 fn setup(test: &str) -> (PathBuf, Automation) {
-    let dir = std::env::temp_dir().join(format!("pdfcraft-render-warnings-{test}-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("papel-render-warnings-{test}-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(&dir).unwrap();
     std::fs::write(dir.join("fallback.pdf"), fallback_pdf()).unwrap();
@@ -97,10 +97,10 @@ fn a_clean_page_renders_to_the_png_alone() {
 }
 
 /// An image whose Indexed lookup table is too short (ISO 32000-2 §8.6.6.3) is drawn recovered, and
-/// `page_render` says so in the words `pdfcraft-cli render` prints.
+/// `page_render` says so in the words `papel-cli render` prints.
 #[test]
 fn page_render_reports_a_recovered_malformed_indexed_image() {
-    let dir = std::env::temp_dir().join(format!("pdfcraft-render-warnings-indexed-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("papel-render-warnings-indexed-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(&dir).unwrap();
     let content = "q 200 0 0 200 0 0 cm /Im Do Q";
@@ -124,10 +124,10 @@ fn page_render_reports_a_recovered_malformed_indexed_image() {
 }
 
 /// A picture whose JBIG2 soft mask is past one of the decoder's limits isn't drawn (#6722), and
-/// `page_render` says why the page is incomplete, in the words `pdfcraft-cli render` prints.
+/// `page_render` says why the page is incomplete, in the words `papel-cli render` prints.
 #[test]
 fn page_render_says_a_picture_was_left_out_for_its_jbig2_mask() {
-    let dir = std::env::temp_dir().join(format!("pdfcraft-render-warnings-jbig2-mask-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("papel-render-warnings-jbig2-mask-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(&dir).unwrap();
     // One JBIG2 segment (ISO 14492 §7.4.8): the information of a page 65,536 columns wide, a
@@ -166,7 +166,7 @@ fn page_render_says_a_picture_was_left_out_for_its_jbig2_mask() {
 #[cfg(feature = "mcp")]
 #[test]
 fn mcp_page_render_carries_the_warnings_as_structured_content() {
-    use pdfcraft_automation::mcp::McpServer;
+    use papel_automation::mcp::McpServer;
     let (dir, a) = setup("mcp");
     let mut s = McpServer::new(a);
     let mut rpc = |id: u64, method: &str, params: Value| -> Value {

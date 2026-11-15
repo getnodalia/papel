@@ -24,21 +24,21 @@ hicolor PNG, so it has the Linux margin and shadow.
 
 | File | What it is |
 |---|---|
-| `pdfcraft.svg` | master: the portrait as a 1024 px image embedded in an SVG with the tile clip (canonical) |
-| `pdfcraft-small.svg` | lighter 512 px version; also the web favicon where there is one |
-| `pdfcraft-1024.png` | 1024 px on Apple's grid; also the runtime Dock icon on macOS |
-| `pdfcraft.icns` | macOS icon (16–1024 px) |
-| `pdfcraft.ico` | Windows icon (16–256 px), embedded in `pdfcraft.exe` by `apps/pdfcraft/build.rs` |
-| `pdfcraft-document.svg` | Windows PDF file icon master: a Lucide document outline, red badge and outlined PDF lettering; no font dependency |
-| `pdfcraft-document.ico` | Windows PDF file icon (16–256 px), embedded as resource 2 in `pdfcraft.exe` |
-| `hicolor/<n>x<n>/apps/ai.storyteller.pdfcraft.png` | Linux hicolor theme, 16–512 px; the 256 px one is the runtime icon on Windows and Linux |
-| `hicolor/scalable/apps/ai.storyteller.pdfcraft.svg` | Linux scalable icon (Nodalix app grid) |
+| `papel.svg` | master: the portrait as a 1024 px image embedded in an SVG with the tile clip (canonical) |
+| `papel-small.svg` | lighter 512 px version; also the web favicon where there is one |
+| `papel-1024.png` | 1024 px on Apple's grid; also the runtime Dock icon on macOS |
+| `papel.icns` | macOS icon (16–1024 px) |
+| `papel.ico` | Windows icon (16–256 px), embedded in `papel.exe` by `apps/papel/build.rs` |
+| `papel-document.svg` | Windows PDF file icon master: a Lucide document outline, red badge and outlined PDF lettering; no font dependency |
+| `papel-document.ico` | Windows PDF file icon (16–256 px), embedded as resource 2 in `papel.exe` |
+| `hicolor/<n>x<n>/apps/dev.danielmiguelt.Papel.png` | Linux hicolor theme, 16–512 px; the 256 px one is the runtime icon on Windows and Linux |
+| `hicolor/scalable/apps/dev.danielmiguelt.Papel.svg` | Linux scalable icon (Nodalix app grid) |
 
-Where it shows: `apps/pdfcraft/src/main.rs` sets the window icon (Dock, taskbar, Alt-Tab, launcher) and the
-Wayland app id `ai.storyteller.pdfcraft`; `packaging/linux/ai.storyteller.pdfcraft.desktop` names the
+Where it shows: `apps/papel/src/main.rs` sets the window icon (Dock, taskbar, Alt-Tab, launcher) and the
+Wayland app id `dev.danielmiguelt.Papel`; `packaging/linux/dev.danielmiguelt.Papel.desktop` names the
 hicolor icon.
 
-Windows PDF files use resource 2 (`"pdfcraft.exe",-2`) when Papel is chosen as the default
+Windows PDF files use resource 2 (`"papel.exe",-2`) when Papel is chosen as the default
 reader; the app keeps resource 1. The document outline is adapted from Lucide `file-text`
 1.49.0 (ISC); its badge and outlined lettering are original (`MIT OR Apache-2.0`), covered by
 [LICENSE-document.txt](LICENSE-document.txt). Both icons are embedded, requiring no runtime
@@ -48,5 +48,5 @@ sidecar. This provides a file type icon; first-page thumbnails still need a thum
 
 The icon is a raster portrait, so the SVG files embed an image instead of traced paths. The
 derived files in this directory were rendered directly from the portrait. `packaging/icons.sh`
-still works on `pdfcraft.svg` (resvg renders embedded images), but its output will differ slightly
+still works on `papel.svg` (resvg renders embedded images), but its output will differ slightly
 from the committed files in resampling.

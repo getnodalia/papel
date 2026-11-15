@@ -192,7 +192,7 @@ impl Edit {
             Edit::SetPageBox { pages, which: PageBox::Crop, .. } => plural("Crop page", "Crop pages", pages.len()),
             Edit::SetPageBox { .. } => Label::of("Set page boxes"),
             Edit::SetTransition { .. } => Label::of("Set page transitions"),
-            // The four `/Info` keys PdfCraft itself offers get a wording of their own, so each can
+            // The four `/Info` keys Papel itself offers get a wording of their own, so each can
             // be said in another language; any other key is the document's and goes in as it stands.
             Edit::SetInfo { key, .. } => match key.as_str() {
                 "Title" => Label::of("Change Title"),
@@ -216,9 +216,9 @@ impl Edit {
             Edit::NumberPages { .. } => Label::of("Number pages"),
             // What was measured is part of the wording too, for the same reason.
             Edit::AddMeasurement(m) => Label::of(match m.kind {
-                pdfcraft_measure::Kind::Distance => "Measure distance",
-                pdfcraft_measure::Kind::Perimeter => "Measure perimeter",
-                pdfcraft_measure::Kind::Area => "Measure area",
+                papel_measure::Kind::Distance => "Measure distance",
+                papel_measure::Kind::Perimeter => "Measure perimeter",
+                papel_measure::Kind::Area => "Measure area",
             }),
             Edit::SetMeasurementScale { .. } => Label::of("Set measurement scale"),
             Edit::AddAnnotation(a) => Label::of(add_annotation(&a.shape)),
@@ -301,10 +301,10 @@ impl Edit {
                 ImageEdit::Replace { .. } => "Replace image",
                 ImageEdit::Delete => "Delete image",
                 ImageEdit::Arrange(ord) => match ord {
-                    pdfcraft_edit::ArrangeOrder::BringToFront => "Bring to front",
-                    pdfcraft_edit::ArrangeOrder::BringForward => "Bring forward",
-                    pdfcraft_edit::ArrangeOrder::SendBackward => "Send backward",
-                    pdfcraft_edit::ArrangeOrder::SendToBack => "Send to back",
+                    papel_edit::ArrangeOrder::BringToFront => "Bring to front",
+                    papel_edit::ArrangeOrder::BringForward => "Bring forward",
+                    papel_edit::ArrangeOrder::SendBackward => "Send backward",
+                    papel_edit::ArrangeOrder::SendToBack => "Send to back",
                 },
                 ImageEdit::RemoveCrop => "Remove crop",
                 ImageEdit::Ungroup => "Ungroup artwork",

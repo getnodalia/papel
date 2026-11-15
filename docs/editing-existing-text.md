@@ -66,7 +66,7 @@ Original subset bytes are
 preserved. Optional matching faces from `CRAFT_FONTS_DIR` can also complete source subsets;
 this works only when that build input actually contains the full face. This change does not
 add a font binary or change the release font pin. Fonts shared by releases belong in
-`storytold/craft-fonts` under the repository's asset rules.
+`getnodalia/foundation (vendor/craft-fonts)` under the repository's asset rules.
 
 With **Keep source fonts**, an upright single-style paragraph can combine its source font
 with a fallback even when the replacement has no explicit line break (#2750). Characters

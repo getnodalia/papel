@@ -1,14 +1,14 @@
 use super::*;
-use pdfcraft_engine::print::names as print_names;
+use papel_engine::print::names as print_names;
 
-/// [`PdfCraftApp::date_text`] for callers that already borrow other parts of the app.
+/// [`PapelApp::date_text`] for callers that already borrow other parts of the app.
 pub(crate) fn date_text(session: &Session, fmt: Option<&str>) -> Result<String, String> {
     let lang = session.date_language().unwrap_or(i18n::current().code());
     session.today_text(fmt, Some(lang))
 }
 
 /// Today in Preferences ▸ Date format for stamping into a PDF; refused when it has characters
-/// Fill & Sign can't write yet (see [`pdfcraft_engine::dates::unwritable`]).
+/// Fill & Sign can't write yet (see [`papel_engine::dates::unwritable`]).
 pub(crate) fn date_text_for_pdf(session: &Session) -> Result<String, String> {
     let lang = session.date_language().unwrap_or(i18n::current().code());
     session.today_text_for_pdf(None, Some(lang))
@@ -36,7 +36,7 @@ fn rgb_triple(v: &serde_json::Value) -> Option<[f64; 3]> {
     Some(out)
 }
 
-impl PdfCraftApp {
+impl PapelApp {
     pub fn set_theme_preference(&mut self, preference: ThemePreference) {
         self.theme_preference = preference;
         if let Some(ctx) = self.ctx.clone() {
@@ -50,7 +50,7 @@ impl PdfCraftApp {
     /// The app-wide reading-colours preference: sets it and applies it to every open document,
     /// not just the active one (Preferences ▸ Reading colours, Acrobat's Replace Document
     /// Colors). A document the change actually touches re-renders.
-    pub fn set_reading_colors(&mut self, colors: pdfcraft_render::ReadingColors) {
+    pub fn set_reading_colors(&mut self, colors: papel_render::ReadingColors) {
         self.reading_colors = colors;
         for i in 0..self.views.len() {
             // Idempotent per document: the engine says whether anything changed.
@@ -75,7 +75,7 @@ impl PdfCraftApp {
 
     /// Serialize the user's persistent state (recent files, theme). Local only.
     pub fn persist(&self) -> String {
-        let trusted: Vec<String> = self.session.trusted_certificates().iter().map(pdfcraft_engine::sign::x509::to_pem).collect();
+        let trusted: Vec<String> = self.session.trusted_certificates().iter().map(papel_engine::sign::x509::to_pem).collect();
         // The Print dialog's choices that describe how this computer prints (#2001), named as
         // `doc_print` names them. Copies, pages, layout and orientation are one job's.
         let print = serde_json::json!({
@@ -276,7 +276,7 @@ impl PdfCraftApp {
             let mut tools = Vec::new();
             for item in items {
                 if let Some(id) = item.as_str()
-                    && pdfcraft_engine::catalog::group(id).is_some()
+                    && papel_engine::catalog::group(id).is_some()
                     && !tools.iter().any(|t| t == id)
                 {
                     tools.push(id.to_string());
@@ -405,7 +405,7 @@ impl PdfCraftApp {
         if let Some(width) = v["fill_text_border"].as_f64().and_then(fill_sign::valid_text_border) {
             self.fill_text_default.width = width;
         }
-        if let Some(shape) = v["fill_text_border_shape"].as_str().and_then(pdfcraft_engine::BorderShape::parse) {
+        if let Some(shape) = v["fill_text_border_shape"].as_str().and_then(papel_engine::BorderShape::parse) {
             self.fill_text_default.shape = shape;
         }
         // `null` is a saved "the text's colour"; a missing or malformed one keeps the setting.
@@ -432,7 +432,7 @@ impl PdfCraftApp {
     fn restore_view_prefs(&mut self, v: &serde_json::Value) {
         // Settings are untrusted: an unreadable value (a colour that isn't three bytes, say)
         // fails to deserialize and keeps Off.
-        if let Ok(colors) = serde_json::from_value::<pdfcraft_render::ReadingColors>(v["reading_colors"].clone()) {
+        if let Ok(colors) = serde_json::from_value::<papel_render::ReadingColors>(v["reading_colors"].clone()) {
             self.reading_colors = colors;
         }
         // Settings are untrusted: a size out of range follows the system instead.
@@ -498,7 +498,7 @@ impl PdfCraftApp {
                     }
                     None => {}
                 }
-                if let Some(shape) = e["border_shape"].as_str().and_then(pdfcraft_engine::BorderShape::parse) {
+                if let Some(shape) = e["border_shape"].as_str().and_then(papel_engine::BorderShape::parse) {
                     self.comment_prefs.set_border_shape(tool, shape);
                 }
             }
@@ -542,7 +542,7 @@ impl PdfCraftApp {
             self.session.set_javascript(on);
         }
         if let Ok(pems) = serde_json::from_value::<Vec<String>>(v["trusted"].clone()) {
-            let certs = pems.iter().filter_map(|p| pdfcraft_engine::sign::x509::load_certificates(p.as_bytes()).ok()).flatten().collect();
+            let certs = pems.iter().filter_map(|p| papel_engine::sign::x509::load_certificates(p.as_bytes()).ok()).flatten().collect();
             self.apply_trusted_certificates(certs);
         }
     }

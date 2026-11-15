@@ -5,9 +5,9 @@
 use std::process::Command;
 use std::sync::Arc;
 
-use pdfcraft_cos::{Algorithm, NewEncryption};
+use papel_cos::{Algorithm, NewEncryption};
 
-const BIN: &str = env!("CARGO_BIN_EXE_pdfcraft-cli");
+const BIN: &str = env!("CARGO_BIN_EXE_papel-cli");
 
 /// A one-page 200×300 pt PDF reading "Page 1", drawn by `content`.
 fn fixture(content: &str) -> Vec<u8> {
@@ -45,7 +45,7 @@ fn protected(algorithm: Algorithm) -> Vec<u8> {
 }
 
 fn protected_with(algorithm: Algorithm, content: &str) -> Vec<u8> {
-    let mut doc = pdfcraft_cos::Document::open(Arc::new(fixture(content))).unwrap();
+    let mut doc = papel_cos::Document::open(Arc::new(fixture(content))).unwrap();
     doc.set_encryption(&NewEncryption {
         algorithm,
         user_password: "user",
@@ -55,11 +55,11 @@ fn protected_with(algorithm: Algorithm, content: &str) -> Vec<u8> {
         seed: [3; 32],
     })
     .unwrap();
-    pdfcraft_cos::write_full(&doc, &Default::default()).unwrap()
+    papel_cos::write_full(&doc, &Default::default()).unwrap()
 }
 
 fn tmp(name: &str) -> std::path::PathBuf {
-    let d = std::env::temp_dir().join(format!("pdfcraft-cli-owner-{}", std::process::id()));
+    let d = std::env::temp_dir().join(format!("papel-cli-owner-{}", std::process::id()));
     std::fs::create_dir_all(&d).unwrap();
     d.join(name)
 }
@@ -108,7 +108,7 @@ fn assert_rendered_page(data: &[u8], dpi: u32, what: &str) {
     let mut buf = vec![0; reader.output_buffer_size().unwrap()];
     let frame = reader.next_frame(&mut buf).unwrap();
     assert_eq!((frame.width, frame.height), (200 * dpi / 72, 300 * dpi / 72), "{what}");
-    // A rendered page is opaque, so `render` writes it as 8-bit RGB (`pdfcraft_engine::export::encode_png`).
+    // A rendered page is opaque, so `render` writes it as 8-bit RGB (`papel_engine::export::encode_png`).
     assert_eq!((frame.color_type, frame.bit_depth), (png::ColorType::Rgb, png::BitDepth::Eight), "{what}");
     // Pixels with every colour channel below half intensity: ink, not white paper.
     let inked = buf[..frame.buffer_size()].as_chunks::<3>().0.iter().filter(|px| px.iter().all(|c| *c < 128)).count();

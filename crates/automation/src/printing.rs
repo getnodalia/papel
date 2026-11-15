@@ -1,7 +1,7 @@
 //! Printing tools: list printers, and print (or save the print-ready PDF) with Acrobat's Print
 //! dialog options.
 
-use pdfcraft_engine::print::{self, Binding, BookletSubset, Layout, Orientation, PAPERS, PageOrder, SizeMode, Subset, spool};
+use papel_engine::print::{self, Binding, BookletSubset, Layout, Orientation, PAPERS, PageOrder, SizeMode, Subset, spool};
 use serde_json::{Value, json};
 
 use crate::{Args, Automation, Result, ToolError, failed, write_atomic};
@@ -126,12 +126,12 @@ impl Automation {
             None => (0..n).collect(),
         };
         let target = match a.opt_str("to")?.unwrap_or("gray") {
-            "gray" | "grayscale" => pdfcraft_engine::ColourTarget::Gray,
-            "rgb" => pdfcraft_engine::ColourTarget::Rgb,
-            "cmyk" => pdfcraft_engine::ColourTarget::Cmyk,
+            "gray" | "grayscale" => papel_engine::ColourTarget::Gray,
+            "rgb" => papel_engine::ColourTarget::Rgb,
+            "cmyk" => papel_engine::ColourTarget::Cmyk,
             other => return Err(ToolError::InvalidArgs(format!("unknown target {other:?} (gray, rgb, cmyk)"))),
         };
-        let settings = pdfcraft_engine::ConvertColours {
+        let settings = papel_engine::ConvertColours {
             target,
             preserve_black: a.opt_bool("preserve_black")?.unwrap_or(true),
             images: a.opt_bool("images")?.unwrap_or(true),
@@ -146,7 +146,7 @@ impl Automation {
         let declared = self.doc(a)?.standards();
         let pdfa = declared.pdfa.map(|(part, level)| format!("PDF/A-{part}{}", level.to_lowercase()));
         let loses: Vec<String> = pdfa.into_iter().chain(declared.output_intents.iter().map(|i| format!("output intent {i}"))).collect();
-        let r = self.apply(a, pdfcraft_engine::Edit::ConvertColours { pages, settings })?;
+        let r = self.apply(a, papel_engine::Edit::ConvertColours { pages, settings })?;
         Ok(json!({
             "colours": found.colours,
             "images": found.images,
@@ -313,7 +313,7 @@ impl Automation {
             (None, Some(printer)) => {
                 let printer = asked.as_ref().map_or(printer, |p| p.name.as_str());
                 let mut job = spool_job(a, printer, self.doc(a)?.name.clone(), duplex, paper_index, settings.raster, &laid_out)?;
-                let bytes = pdfcraft_engine::spooler::spooler_copy(bytes, &mut job);
+                let bytes = papel_engine::spooler::spooler_copy(bytes, &mut job);
                 out["job"] = json!(spool::submit(&bytes, &job).map_err(|e| failed(e.to_string()))?);
             }
             _ => return Err(bad("pass either path (save the print-ready PDF) or printer (a name from printers, or \"default\")")),

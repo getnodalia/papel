@@ -4,7 +4,7 @@
 
 use std::process::Command;
 
-const BIN: &str = env!("CARGO_BIN_EXE_pdfcraft-cli");
+const BIN: &str = env!("CARGO_BIN_EXE_papel-cli");
 
 /// A PDF with `pages` pages, each drawing a rectangle (a page found by scanning has content), and
 /// `catalog` as object 1; `startxref` points at its cross-reference table, or at `bad_startxref`.
@@ -36,7 +36,7 @@ fn fixture(catalog: &str, pages: usize, bad_startxref: Option<usize>) -> Vec<u8>
 const CATALOG: &str = "<< /Type /Catalog /Pages 2 0 R >>";
 
 fn info_of(bytes: &[u8], name: &str) -> serde_json::Value {
-    let dir = std::env::temp_dir().join(format!("pdfcraft-info-repairs-{}-{name}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("papel-info-repairs-{}-{name}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
     let path = dir.join("f.pdf");
     std::fs::write(&path, bytes).unwrap();

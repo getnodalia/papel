@@ -3,8 +3,8 @@
 //! dictionary than its filters and parameters, not through a copy of the whole stream. A test
 //! binary of its own, so that the one test is all the process runs while its peak is measured.
 
-use pdfcraft_cos::{DecodeBudget, Dict, Document, ObjRef, Object, Stream};
-use pdfcraft_fonts::pdf::{Metrics, embedded_sfnt_within};
+use papel_cos::{DecodeBudget, Dict, Document, ObjRef, Object, Stream};
+use papel_fonts::pdf::{Metrics, embedded_sfnt_within};
 
 /// How much the process's peak resident memory grows, in KiB, while `f` runs. `None` where the
 /// peak can't be reset (`/proc/self/clear_refs` is Linux's).

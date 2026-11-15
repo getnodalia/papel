@@ -1,6 +1,6 @@
-//! PdfCraft in the browser: the Web Worker that recognises text, so reading a scanned page doesn't
+//! Papel in the browser: the Web Worker that recognises text, so reading a scanned page doesn't
 //! stop the page responding and several pages are read at once. Trunk builds it alongside
-//! `pdfcraft-web` (see apps/pdfcraft-web/index.html); the page starts and feeds the workers
+//! `papel-web` (see apps/papel-web/index.html); the page starts and feeds the workers
 //! (crates/ui-egui/src/workflows/ocr_ui.rs).
 //!
 //! Messages are plain objects with a `type`:
@@ -10,7 +10,7 @@
 //!   file. Answered with `loaded`, or `failed` with an `error`.
 //! - `page` (from the page): `{ id, width, height, pixels }`, the RGBA pixels of a rendered page
 //!   as a `Uint8Array`. Answered with `lines` `{ id, lines }`, the recognised lines as
-//!   `pdfcraft_ocr::lines_to_json` writes them, or `failed` `{ id, error }`.
+//!   `papel_ocr::lines_to_json` writes them, or `failed` `{ id, error }`.
 
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 
@@ -34,12 +34,12 @@ fn main() {
 
 #[cfg(not(target_arch = "wasm32"))]
 fn main() {
-    eprintln!("pdfcraft-ocr-worker runs in a browser: trunk builds it with pdfcraft-web");
+    eprintln!("papel-ocr-worker runs in a browser: trunk builds it with papel-web");
 }
 
 #[cfg(target_arch = "wasm32")]
 mod worker {
-    use pdfcraft_ocr::Ocr;
+    use papel_ocr::Ocr;
     use wasm_bindgen::{JsCast, JsValue};
 
     /// The models are about 12 MB together.
@@ -96,6 +96,6 @@ mod worker {
         if u64::from(w).checked_mul(u64::from(h)).and_then(|n| n.checked_mul(4)) != Some(px.len() as u64) {
             return Err("the pixels don't match the page size".into());
         }
-        ocr.recognize(&px, w, h).map(|lines| pdfcraft_ocr::lines_to_json(&lines)).map_err(|e| e.to_string())
+        ocr.recognize(&px, w, h).map(|lines| papel_ocr::lines_to_json(&lines)).map_err(|e| e.to_string())
     }
 }

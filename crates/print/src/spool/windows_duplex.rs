@@ -199,9 +199,9 @@ mod tests {
     /// Reads settings only: never submits a job or changes the printer's preferences.
     #[cfg(windows)]
     #[test]
-    #[ignore = "needs PDFCRAFT_PRINT_TEST_PRINTER naming an installed Windows printer; sends no job"]
+    #[ignore = "needs PAPEL_PRINT_TEST_PRINTER naming an installed Windows printer; sends no job"]
     fn installed_windows_printer_default_is_carried_explicitly() {
-        let printer = std::env::var("PDFCRAFT_PRINT_TEST_PRINTER").unwrap();
+        let printer = std::env::var("PAPEL_PRINT_TEST_PRINTER").unwrap();
         let original = Job { printer: Some(printer.clone()), ..Job::default() };
         let expected = supported_default(duplex(&craft_print::rgb::default_settings(&printer).unwrap()).unwrap(), || {
             super::super::printers().into_iter().find(|p| p.name == printer).and_then(|p| p.two_sided)

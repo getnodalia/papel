@@ -11,14 +11,14 @@ pub(crate) fn audit(args: &[String]) -> Result<(), CliError> {
     let path = *positional(args, AUDIT_OPTIONS).first().ok_or("audit: missing file")?;
     let bytes = read(path)?;
     let password = flag(args, "--password");
-    let doc = pdfcraft_cos::Document::open_with_password(bytes.clone(), password).map_err(|e| format!("{path}: {e}"))?;
-    let findings = pdfcraft_audit::audit_redactions(&doc).map_err(|e| format!("{path}: {e}"))?;
+    let doc = papel_cos::Document::open_with_password(bytes.clone(), password).map_err(|e| format!("{path}: {e}"))?;
+    let findings = papel_audit::audit_redactions(&doc).map_err(|e| format!("{path}: {e}"))?;
     // Rectangles in points from the top-left of the displayed page, as `doc_audit_redactions`
     // reports them; the page geometry is read only when there is something to place.
     let info = if findings.is_empty() {
         None
     } else {
-        let render_password = pdfcraft_engine::render_password_for(bytes.clone(), password);
+        let render_password = papel_engine::render_password_for(bytes.clone(), password);
         Some(inspect(bytes, render_password.as_deref()).map_err(|e| format!("{path}: {e}"))?)
     };
     let items: Vec<serde_json::Value> = findings
@@ -28,7 +28,7 @@ pub(crate) fn audit(args: &[String]) -> Result<(), CliError> {
             serde_json::json!({
                 "page": f.page + 1,
                 "kind": f.kind.id(),
-                "rect": info.as_ref().map_or(rect, |i| pdfcraft_automation::view_rect(i, f.page, rect)),
+                "rect": info.as_ref().map_or(rect, |i| papel_automation::view_rect(i, f.page, rect)),
                 "covered_text": f.covered_text,
             })
         })
@@ -87,7 +87,7 @@ pub(crate) fn check_one(args: &[String]) -> Result<(), CliError> {
 /// Open with cos, touch every object, edit the catalog, save incrementally and in full (both
 /// output styles), and reopen each result. Errors are fine; panics, hangs and aborts are bugs.
 fn edit_round_trip(bytes: &[u8]) {
-    use pdfcraft_cos::{DecodeBudget, Document, Object, SaveOptions, write_full, write_incremental};
+    use papel_cos::{DecodeBudget, Document, Object, SaveOptions, write_full, write_incremental};
     let Ok(mut doc) = Document::open(Arc::new(bytes.to_vec())) else { return };
     // One allowance for every stream, charged for what each decode did (failed ones too), so
     // many small bombs can't each inflate to the per-stream limit.
@@ -103,7 +103,7 @@ fn edit_round_trip(bytes: &[u8]) {
         }
     }
     if let Some(root) = doc.root() {
-        let _ = doc.update_dict(root, |d| d.set(b"PdfCraftFuzz".to_vec(), Object::Bool(true)));
+        let _ = doc.update_dict(root, |d| d.set(b"PapelFuzz".to_vec(), Object::Bool(true)));
     }
     let classic = SaveOptions { object_streams: false, ..SaveOptions::default() };
     for out in [write_incremental(&doc, &SaveOptions::default()), write_full(&doc, &SaveOptions::default()), write_full(&doc, &classic)]

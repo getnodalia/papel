@@ -1,6 +1,6 @@
 [package]
-name = "pdfcraft-ocr-worker"
-description = "PdfCraft in the browser: the Web Worker that recognises text (wasm32; trunk builds it with pdfcraft-web)"
+name = "papel-ocr-worker"
+description = "Papel in the browser: the Web Worker that recognises text (wasm32; trunk builds it with papel-web)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -10,7 +10,7 @@ publish = false
 workspace = true
 
 [dependencies]
-pdfcraft-ocr = { workspace = true }
+papel-ocr = { workspace = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = "0.2"

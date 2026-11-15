@@ -36,7 +36,7 @@ fn assert_window_stack_graph(root: &std::path::Path, name: &str, version: &str) 
     package
 }
 
-use pdfcraft_ui_egui::control::Endpoint;
+use papel_ui_egui::control::Endpoint;
 
 fn endpoint() -> std::io::Result<Endpoint> {
     Ok(Endpoint { port: 4321, token: "0123456789abcdef".into() })
@@ -57,7 +57,7 @@ fn gpu() -> std::sync::MutexGuard<'static, ()> {
 
 #[test]
 fn a_control_channel_that_cant_be_published_stops_the_app() {
-    let dir = std::env::temp_dir().join(format!("pdfcraft-app-control-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("papel-app-control-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(&dir).unwrap();
     let path = |name: &str| dir.join(name).to_str().unwrap().to_owned();
@@ -168,13 +168,13 @@ fn the_window_and_windows_taskbar_icons_load_from_the_bundled_png() {
 #[test]
 fn a_software_renderer_is_shown_to_the_user() {
     use eframe::wgpu::DeviceType;
-    // Issue #519: WARP or llvmpipe is announced in the app, not just in pdfcraft.log.
-    let mut app = super::PdfCraftApp::new();
+    // Issue #519: WARP or llvmpipe is announced in the app, not just in papel.log.
+    let mut app = super::PapelApp::new();
     super::notify_software_renderer(&mut app, DeviceType::Cpu);
     let notice = app.toast.as_ref().map(|(m, _)| m.as_str()).unwrap_or_default();
     assert!(notice.contains("without a graphics processor"), "{notice:?}");
     for gpu in [DeviceType::IntegratedGpu, DeviceType::DiscreteGpu, DeviceType::VirtualGpu, DeviceType::Other] {
-        let mut app = super::PdfCraftApp::new();
+        let mut app = super::PapelApp::new();
         super::notify_software_renderer(&mut app, gpu);
         assert!(app.toast.is_none(), "{gpu:?}: {:?}", app.toast);
     }
@@ -337,8 +337,8 @@ fn vendor_provenance_egui_wgpu_surface_fit_identity() {
 fn a_gpu_error_while_a_window_is_set_up_is_returned_not_a_panic() {
     // Issue #519: on a 2015 Intel GPU, wgpu's GL backend couldn't configure the window's
     // surface (`GpuWaitTimeout`), and wgpu's default error handler panicked before the app was
-    // created, so PdfCraft never got to retry with OpenGL. vendor/egui-wgpu configures a new
-    // window's surface inside `catch_errors`. A real device on PdfCraft's own GPU settings,
+    // created, so Papel never got to retry with OpenGL. vendor/egui-wgpu configures a new
+    // window's surface inside `catch_errors`. A real device on Papel's own GPU settings,
     // and an error wgpu raises before anything reaches the driver: a texture one pixel wider
     // than the device allows.
     use eframe::wgpu;
@@ -409,7 +409,7 @@ fn pipeline_creation_error_is_returned_and_device_remains_usable() {
     let instance = pollster::block_on(native.wgpu_options.wgpu_setup.new_instance());
     let options = wgpu::RequestAdapterOptions { power_preference: setup.power_preference, ..Default::default() };
     let Ok(adapter) = pollster::block_on(instance.request_adapter(&options)) else {
-        assert!(std::env::var_os("PDFCRAFT_TEST_REQUIRE_GPU").is_none(), "a GPU adapter is required for this run");
+        assert!(std::env::var_os("PAPEL_TEST_REQUIRE_GPU").is_none(), "a GPU adapter is required for this run");
         eprintln!("skipping pipeline regression: no GPU adapter");
         return;
     };
@@ -450,7 +450,7 @@ fn winit_carries_the_windows_11_monitor_scale_fix() {
     // The audited W1 hunk itself, not merely the file's presence: Windows 11 applies the
     // rect Windows suggests, while Windows 10 keeps the old adjustment.
     for marker in [
-        "PdfCraft patch: from Windows 11 (build 22000) on, apply the rect Windows suggests",
+        "Papel patch: from Windows 11 (build 22000) on, apply the rect Windows suggests",
         "if !WIN10_BUILD_VERSION.is_some_and(|build| build < 22000) {",
         "new_outer_rect = suggested_rect;",
     ] {
@@ -576,7 +576,7 @@ fn internal_panels_are_edp_lvds_and_dsi_connectors() {
 #[cfg(target_os = "linux")]
 #[test]
 fn linux_display_gpus_reads_connected_connectors() -> std::io::Result<()> {
-    let dir = std::env::temp_dir().join(format!("pdfcraft-drm-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("papel-drm-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
     let card = |name: &str, (vendor, device): (u32, u32)| -> std::io::Result<()> {
         std::fs::create_dir_all(dir.join(name).join("device"))?;
@@ -614,7 +614,7 @@ fn linux_display_gpus_reads_connected_connectors() -> std::io::Result<()> {
 fn scratch() -> std::path::PathBuf {
     static N: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);
     let n = N.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-    let d = std::env::temp_dir().join(format!("pdfcraft-control-file-{}-{n}", std::process::id()));
+    let d = std::env::temp_dir().join(format!("papel-control-file-{}-{n}", std::process::id()));
     let _ = std::fs::remove_dir_all(&d);
     std::fs::create_dir_all(&d).unwrap();
     d
@@ -687,7 +687,7 @@ fn the_control_file_replaces_the_one_a_previous_run_left() {
 #[cfg(windows)]
 #[test]
 fn the_control_file_is_owner_only_in_a_folder_other_users_can_read() {
-    use pdfcraft_platform::owner_only;
+    use papel_platform::owner_only;
     let dir = scratch();
     let users = std::process::Command::new("icacls").arg(&dir).arg("/grant").arg("*S-1-5-32-545:(OI)(CI)R").output().unwrap();
     assert!(users.status.success());
@@ -709,7 +709,7 @@ fn the_control_file_is_owner_only_in_a_folder_other_users_can_read() {
 #[cfg(windows)]
 #[test]
 fn writing_the_control_file_looks_up_the_users_sid_once() {
-    use pdfcraft_platform::owner_only::sid_lookups_on_this_thread;
+    use papel_platform::owner_only::sid_lookups_on_this_thread;
     let dir = scratch();
     let before = sid_lookups_on_this_thread();
     super::write_control_file(&dir.join("ctl.json").to_string_lossy(), 4242, "t0ken").unwrap();
@@ -722,7 +722,7 @@ fn writing_the_control_file_looks_up_the_users_sid_once() {
 /// so it has to be the class the window carries: the app id, on Wayland and X11 alike.
 #[test]
 fn the_desktop_entry_names_the_window_class() {
-    let entry = include_str!("../../../packaging/linux/ai.storyteller.pdfcraft.desktop");
+    let entry = include_str!("../../../packaging/linux/dev.danielmiguelt.Papel.desktop");
     let class = entry.lines().find_map(|line| line.strip_prefix("StartupWMClass="));
     assert_eq!(class, Some(super::APP_ID));
 }
@@ -736,7 +736,7 @@ fn the_flatpak_manifests_pin_the_craft_i18n_rev() {
     let rev = std::fs::read_to_string(root.join("craft-i18n.rev")).unwrap();
     let rev = rev.trim();
     assert!(rev.len() == 40 && rev.bytes().all(|b| b.is_ascii_hexdigit()), "craft-i18n.rev holds one full SHA: {rev:?}");
-    for manifest in ["ai.storyteller.pdfcraft.yml", "ai.storyteller.pdfcraft.bundle.yml"] {
+    for manifest in ["dev.danielmiguelt.Papel.yml", "dev.danielmiguelt.Papel.bundle.yml"] {
         let text = std::fs::read_to_string(root.join("packaging/linux/flatpak").join(manifest)).unwrap();
         let source =
             text.split("url: https://github.com/getnodalia/foundation").nth(1).unwrap_or_else(|| panic!("{manifest}: a craft-i18n git source"));
@@ -746,7 +746,7 @@ fn the_flatpak_manifests_pin_the_craft_i18n_rev() {
             .find_map(|l| l.trim().strip_prefix("commit:"))
             .unwrap_or_else(|| panic!("{manifest}: the craft-i18n source pins a commit"));
         assert_eq!(commit.trim().trim_matches(['\'', '"']), rev, "{manifest}");
-        assert!(text.contains("CRAFT_I18N_DIR: /run/build/pdfcraft/craft-i18n"), "{manifest}: the build names the catalogs");
+        assert!(text.contains("CRAFT_I18N_DIR: /run/build/papel/craft-i18n"), "{manifest}: the build names the catalogs");
     }
 }
 

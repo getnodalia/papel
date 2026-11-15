@@ -4,9 +4,9 @@
 
 use egui::{Key, Modifiers};
 use egui_kittest::Harness;
-use pdfcraft_render::DestView;
-use pdfcraft_ui_egui::canvas::Fit;
-use pdfcraft_ui_egui::{OpenOutcome, PdfCraftApp, RightPanel};
+use papel_render::DestView;
+use papel_ui_egui::canvas::Fit;
+use papel_ui_egui::{OpenOutcome, PapelApp, RightPanel};
 
 /// Six Letter (612×792) pages, objects 3 to 8; `catalog` is added to the catalog dictionary.
 /// Object 9 is an outline (one bookmark, object 10) that `/Outlines 9 0 R` can use.
@@ -34,10 +34,10 @@ fn fixture(catalog: &str) -> Vec<u8> {
     out
 }
 
-fn harness(catalog: &str) -> Harness<'static, PdfCraftApp> {
+fn harness(catalog: &str) -> Harness<'static, PapelApp> {
     let bytes = fixture(catalog);
     let mut h = Harness::builder().with_size(egui::vec2(1400.0, 900.0)).build_eframe(move |_cc| {
-        let mut app = PdfCraftApp::new();
+        let mut app = PapelApp::new();
         app.set_option("language", "en").unwrap();
         app.set_option("left", "closed").unwrap();
         app.open_bytes("open.pdf", None, bytes).expect("opens");
@@ -49,7 +49,7 @@ fn harness(catalog: &str) -> Harness<'static, PdfCraftApp> {
 }
 
 /// Run frames until rendering has finished and the layout holds still.
-fn settle(h: &mut Harness<'static, PdfCraftApp>) {
+fn settle(h: &mut Harness<'static, PapelApp>) {
     for _ in 0..200 {
         h.run_steps(2);
         if !h.state().render_pending() {
@@ -61,7 +61,7 @@ fn settle(h: &mut Harness<'static, PdfCraftApp>) {
 
 /// The page at the top of the window and the user-space height there: where a bookmark made now
 /// (⌘B) goes.
-fn window_top(h: &mut Harness<'static, PdfCraftApp>) -> (usize, f32) {
+fn window_top(h: &mut Harness<'static, PapelApp>) -> (usize, f32) {
     h.key_press_modifiers(Modifiers::COMMAND, Key::B);
     h.run_steps(3);
     let id = h.state().views[0].id;
@@ -74,7 +74,7 @@ fn window_top(h: &mut Harness<'static, PdfCraftApp>) -> (usize, f32) {
 }
 
 /// The left edge of `page` on screen and its scale (screen points per user-space point).
-fn page_left(h: &Harness<'static, PdfCraftApp>, page: usize) -> (f32, f32) {
+fn page_left(h: &Harness<'static, PapelApp>, page: usize) -> (f32, f32) {
     let rects = h.state().views[0].visible_page_rects();
     let (_, r) = rects.iter().find(|(p, _)| *p == page).expect("the page is shown");
     (r.left(), r.width() / 612.0)
@@ -135,7 +135,7 @@ fn a_named_open_destination_opens_its_page() {
 fn always_my_default_view_keeps_the_zoom_and_goes_to_the_page_top() {
     let bytes = fixture("/OpenAction [5 0 R /XYZ 100 500 2]");
     let mut h = Harness::builder().with_size(egui::vec2(1400.0, 900.0)).build_eframe(move |_cc| {
-        let mut app = PdfCraftApp::new();
+        let mut app = PapelApp::new();
         app.set_option("language", "en").unwrap();
         app.set_option("left", "closed").unwrap();
         app.always_default_view = true;
@@ -196,7 +196,7 @@ const NAMED: &str = "/OpenAction [5 0 R /Fit] /Dests << /intro [4 0 R /Fit] >> /
 
 /// `fixture(NAMED)` saved as `manual.pdf` in a folder of its own, whose path is returned.
 fn manual(test: &str) -> String {
-    let dir = std::env::temp_dir().join(format!("pdfcraft-open-parameters-{test}-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("papel-open-parameters-{test}-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(&dir).unwrap();
     let path = dir.join("manual.pdf");
@@ -207,11 +207,11 @@ fn manual(test: &str) -> String {
 #[cfg(not(target_arch = "wasm32"))]
 #[test]
 fn a_file_named_with_open_parameters_opens_at_their_destination() {
-    // #3425: a help system starts PdfCraft with `manual.pdf#nameddest=…`. Files named at launch
+    // #3425: a help system starts Papel with `manual.pdf#nameddest=…`. Files named at launch
     // open before the first frame.
     let path = manual("launch");
     for (parameters, page) in [("#nameddest=Load Flow", 3), ("#nameddest=intro", 1), ("#intro", 1), ("#page=5", 4), ("#zoom=200", 2)] {
-        let mut app = PdfCraftApp::new();
+        let mut app = PapelApp::new();
         app.set_option("language", "en").unwrap();
         assert_eq!(app.open_path(&format!("{path}{parameters}")), OpenOutcome::Opened, "{parameters}");
         assert_eq!(app.views.len(), 1, "{parameters}");
@@ -220,13 +220,13 @@ fn a_file_named_with_open_parameters_opens_at_their_destination() {
         assert_eq!(app.toast, None, "{parameters}");
     }
     // A name the file doesn't define: it opens where it would have, and says so.
-    let mut app = PdfCraftApp::new();
+    let mut app = PapelApp::new();
     app.set_option("language", "en").unwrap();
     assert_eq!(app.open_path(&format!("{path}#nameddest=Nowhere")), OpenOutcome::Opened);
     assert_eq!(app.views[0].current, 2);
     assert!(app.toast.as_ref().is_some_and(|(text, _)| text.contains("named destination was not applied")), "{:?}", app.toast);
     // A path that names no file, before a `#` or as a whole, still fails as before.
-    let mut app = PdfCraftApp::new();
+    let mut app = PapelApp::new();
     app.set_option("language", "en").unwrap();
     assert_eq!(app.open_path(&format!("{path}.missing#page=2")), OpenOutcome::Failed);
     assert!(app.views.is_empty());
@@ -238,7 +238,7 @@ fn open_parameters_handed_to_the_running_app_show_their_destination() {
     // A second launch hands `manual.pdf#…` to the running app, which opens it in the background.
     let path = manual("running");
     let mut h = Harness::builder().with_size(egui::vec2(1400.0, 900.0)).build_eframe(|_cc| {
-        let mut app = PdfCraftApp::new();
+        let mut app = PapelApp::new();
         app.set_option("language", "en").unwrap();
         app
     });
@@ -272,7 +272,7 @@ fn open_parameters_wait_with_their_file_behind_a_password_prompt_and_a_full_queu
     // prompt. A file named with open parameters keeps them while it waits, and named again, it
     // opens at the place asked for last; the protected file named again with them while its
     // password is asked for opens there once unlocked. They opened where they would have.
-    let dir = std::env::temp_dir().join(format!("pdfcraft-open-parameters-queue-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("papel-open-parameters-queue-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(&dir).unwrap();
     let file = |name: &str, bytes: Vec<u8>| {
@@ -280,12 +280,12 @@ fn open_parameters_wait_with_their_file_behind_a_password_prompt_and_a_full_queu
         std::fs::write(&path, bytes).unwrap();
         path.to_string_lossy().into_owned()
     };
-    let locked = file("locked.pdf", crate::editing::encrypted(fixture(NAMED), pdfcraft_cos::Algorithm::Aes256, "reader", "owner", -4));
+    let locked = file("locked.pdf", crate::editing::encrypted(fixture(NAMED), papel_cos::Algorithm::Aes256, "reader", "owner", -4));
     let others: Vec<String> = (0..16).map(|i| file(&format!("other-{i:02}.pdf"), fixture(""))).collect();
     let manual = file("manual.pdf", fixture(NAMED));
     let (first, rest, last) = (locked.clone(), others.clone(), manual.clone());
     let mut h = Harness::builder().with_size(egui::vec2(1400.0, 900.0)).build_eframe(move |_cc| {
-        let mut app = PdfCraftApp::new();
+        let mut app = PapelApp::new();
         app.set_option("language", "en").unwrap();
         app.open_path(&first);
         for path in &rest {

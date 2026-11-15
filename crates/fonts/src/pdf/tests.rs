@@ -1,4 +1,4 @@
-use pdfcraft_cos::{Dict, Document, Object, Stream};
+use papel_cos::{Dict, Document, Object, Stream};
 
 use super::*;
 
@@ -118,7 +118,7 @@ fn behind_parms_by_reference(doc: &mut Document, data: &[u8]) -> Object {
 
 #[test]
 fn embedded_editor_fonts_are_validated_without_installing_or_exporting() {
-    use pdfcraft_cos::Stream;
+    use papel_cos::Stream;
     let mut doc = Document::new_empty();
     let bytes = include_bytes!("../../../../assets/fonts/Inter-Regular.ttf");
     let program = doc.add(Object::Stream(Stream::flate(Dict::new(), bytes)));
@@ -140,7 +140,7 @@ fn embedded_editor_fonts_are_validated_without_installing_or_exporting() {
 /// directly or by reference.
 #[test]
 fn a_font_without_widths_measures_with_its_embedded_program() {
-    use pdfcraft_cos::Stream;
+    use papel_cos::Stream;
     use skrifa::MetadataProvider as _;
     let bytes = include_bytes!("../../../../assets/fonts/Inter-Regular.ttf");
     let face = skrifa::FontRef::new(bytes).unwrap();
@@ -1934,7 +1934,7 @@ fn the_symbolic_readings_of_a_program_are_paid_for() {
 /// A Type 0 font over Inter's program without its `cmap`, Identity-H, whose `/CIDToGIDMap` sends
 /// CID 17 to Inter's Ω and whose ToUnicode says code 17 is Ω; also the program object, the
 /// program, Ω's glyph and what the ToUnicode and the map decode to.
-fn cmapless_composite(doc: &mut Document) -> (Dict, pdfcraft_cos::ObjRef, Vec<u8>, skrifa::GlyphId, [usize; 2]) {
+fn cmapless_composite(doc: &mut Document) -> (Dict, papel_cos::ObjRef, Vec<u8>, skrifa::GlyphId, [usize; 2]) {
     use skrifa::{MetadataProvider as _, raw::TableProvider as _};
     let original = include_bytes!("../../../../assets/fonts/Inter-Regular.ttf");
     let expected = skrifa::FontRef::new(original).unwrap().charmap().map('Ω').unwrap();
@@ -1946,17 +1946,17 @@ fn cmapless_composite(doc: &mut Document) -> (Dict, pdfcraft_cos::ObjRef, Vec<u8
         subset[12 + index * 16..28 + index * 16].copy_from_slice(record);
     }
     assert!(skrifa::FontRef::new(&subset).unwrap().cmap().is_err());
-    let program = doc.add(Object::Stream(pdfcraft_cos::Stream::flate(Dict::new(), &subset)));
+    let program = doc.add(Object::Stream(papel_cos::Stream::flate(Dict::new(), &subset)));
     let mut descriptor = Dict::new();
     descriptor.set(b"FontFile2".to_vec(), Object::Ref(program));
     let mut gids = vec![0; 36];
     gids[34..36].copy_from_slice(&(expected.to_u32() as u16).to_be_bytes());
-    let gids = doc.add(Object::Stream(pdfcraft_cos::Stream::flate(Dict::new(), &gids)));
+    let gids = doc.add(Object::Stream(papel_cos::Stream::flate(Dict::new(), &gids)));
     let mut descendant = Dict::new();
     descendant.set(b"FontDescriptor".to_vec(), Object::Dict(descriptor));
     descendant.set(b"CIDToGIDMap".to_vec(), Object::Ref(gids));
     let cmap = b"1 beginbfchar <0011> <03a9> endbfchar";
-    let unicode = doc.add(Object::Stream(pdfcraft_cos::Stream::flate(Dict::new(), cmap)));
+    let unicode = doc.add(Object::Stream(papel_cos::Stream::flate(Dict::new(), cmap)));
     let source = font(
         doc,
         vec![

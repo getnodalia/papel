@@ -3,7 +3,7 @@
 use std::path::PathBuf;
 use std::process::Command;
 
-const BIN: &str = env!("CARGO_BIN_EXE_pdfcraft-cli");
+const BIN: &str = env!("CARGO_BIN_EXE_papel-cli");
 
 /// A one-page 200×300 pt PDF.
 fn fixture() -> Vec<u8> {
@@ -30,15 +30,15 @@ fn fixture() -> Vec<u8> {
 }
 
 fn tmp(test: &str, name: &str) -> PathBuf {
-    let d = std::env::temp_dir().join(format!("pdfcraft-cli-edit-{test}-{}", std::process::id()));
+    let d = std::env::temp_dir().join(format!("papel-cli-edit-{test}-{}", std::process::id()));
     std::fs::create_dir_all(&d).unwrap();
     d.join(name)
 }
 
-/// The page rotation `pdfcraft-cli info` reports for the first page, via the inspector.
+/// The page rotation `papel-cli info` reports for the first page, via the inspector.
 fn first_page_rotation(path: &std::path::Path) -> u16 {
     let bytes = std::sync::Arc::new(std::fs::read(path).unwrap());
-    pdfcraft_render::inspect(bytes, None).unwrap().pages[0].rotation
+    papel_render::inspect(bytes, None).unwrap().pages[0].rotation
 }
 
 #[test]
@@ -87,7 +87,7 @@ fn the_documented_options_still_edit_and_save() {
         let out = Command::new(BIN).args(&args).output().unwrap();
         assert!(out.status.success(), "{name}: {}", String::from_utf8_lossy(&out.stderr));
         assert_eq!(first_page_rotation(&output), 90, "{name}");
-        let info = pdfcraft_render::inspect(std::sync::Arc::new(std::fs::read(&output).unwrap()), None).unwrap();
+        let info = papel_render::inspect(std::sync::Arc::new(std::fs::read(&output).unwrap()), None).unwrap();
         assert_eq!(info.title.as_deref(), Some("Rotated"), "{name}");
     }
 }
@@ -115,8 +115,7 @@ mod one_based_arguments {
         fn new() -> Self {
             static NEXT: AtomicU64 = AtomicU64::new(0);
             for _ in 0..128 {
-                let path =
-                    std::env::temp_dir().join(format!("pdfcraft-cli-one-based-{}-{}", std::process::id(), NEXT.fetch_add(1, Ordering::Relaxed)));
+                let path = std::env::temp_dir().join(format!("papel-cli-one-based-{}-{}", std::process::id(), NEXT.fetch_add(1, Ordering::Relaxed)));
                 match std::fs::create_dir(&path) {
                     Ok(()) => return Self(path),
                     Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => continue,
@@ -147,7 +146,7 @@ mod one_based_arguments {
                 ] {
                     let out = Command::new(BIN).current_dir(&dir.0).args([command, input, "--out", destination, option, value]).output().unwrap();
                     assert_eq!(out.status.code(), Some(1), "{command} {input} {option} {value}");
-                    assert_eq!(out.stderr, format!("pdfcraft-cli: {diagnostic}\n").as_bytes());
+                    assert_eq!(out.stderr, format!("papel-cli: {diagnostic}\n").as_bytes());
                     assert!(out.stdout.is_empty());
                     assert_eq!(std::fs::read(dir.0.join("input.pdf")).unwrap(), source);
                     assert_eq!(std::fs::read(dir.0.join("output.pam")).unwrap(), b"keep destination");
@@ -186,7 +185,7 @@ mod one_based_arguments {
             .unwrap();
         assert!(out.status.success(), "{}", String::from_utf8_lossy(&out.stderr));
         assert!(out.stdout.is_empty() && out.stderr.is_empty());
-        let info = pdfcraft_render::inspect(std::sync::Arc::new(std::fs::read(dir.0.join("edited.pdf")).unwrap()), None).unwrap();
+        let info = papel_render::inspect(std::sync::Arc::new(std::fs::read(dir.0.join("edited.pdf")).unwrap()), None).unwrap();
         assert_eq!(info.pages.len(), 2);
         assert_eq!((info.pages[0].width, info.pages[0].height, info.pages[0].rotation), (612.0, 792.0, 0));
         assert_eq!((info.pages[1].width, info.pages[1].height, info.pages[1].rotation), (300.0, 200.0, 90));
@@ -210,7 +209,7 @@ fn a_value_an_option_cannot_hold_is_named_before_the_file_is_opened() {
     ] {
         let out = Command::new(BIN).current_dir(&dir).args(["edit", "missing.pdf", "--out", "out.pdf", option, value]).output().unwrap();
         assert_eq!(out.status.code(), Some(1), "{option} {value}");
-        assert_eq!(out.stderr, format!("pdfcraft-cli: {diagnostic}\n").as_bytes(), "{option} {value}");
+        assert_eq!(out.stderr, format!("papel-cli: {diagnostic}\n").as_bytes(), "{option} {value}");
         assert!(out.stdout.is_empty(), "{option} {value}");
         assert!(!dir.join("out.pdf").exists(), "{option} {value}: no output may be written");
     }
@@ -235,7 +234,7 @@ fn a_destination_past_the_end_fails_and_writes_nothing() {
     ] {
         let out = Command::new(BIN).args(["edit", input.to_str().unwrap(), "--out", output.to_str().unwrap(), option, value]).output().unwrap();
         assert_eq!(out.status.code(), Some(1), "{option} {value}");
-        assert_eq!(String::from_utf8_lossy(&out.stderr), format!("pdfcraft-cli: {diagnostic}\n"), "{option} {value}");
+        assert_eq!(String::from_utf8_lossy(&out.stderr), format!("papel-cli: {diagnostic}\n"), "{option} {value}");
         assert!(!output.exists(), "{option} {value}: no output may be written");
     }
 }
@@ -255,7 +254,7 @@ fn the_append_destination_and_counts_grown_by_earlier_edits_are_accepted() {
         all.extend(args);
         let out = Command::new(BIN).args(&all).output().unwrap();
         assert!(out.status.success(), "{name}: {}", String::from_utf8_lossy(&out.stderr));
-        let info = pdfcraft_render::inspect(std::sync::Arc::new(std::fs::read(&output).unwrap()), None).unwrap();
+        let info = papel_render::inspect(std::sync::Arc::new(std::fs::read(&output).unwrap()), None).unwrap();
         let sizes: Vec<_> = info.pages.iter().map(|p| (p.width, p.height)).collect();
         let expected: &[(f32, f32)] = match name {
             "insert.pdf" => &[(200.0, 300.0), (612.0, 792.0)],
@@ -299,7 +298,7 @@ fn fixture_without_page_tree() -> Vec<u8> {
 fn a_document_whose_page_tree_is_missing_edits_the_pages_the_reader_shows() {
     let input = tmp("no-page-tree", "in.pdf");
     std::fs::write(&input, fixture_without_page_tree()).unwrap();
-    let before = pdfcraft_render::inspect(std::sync::Arc::new(fixture_without_page_tree()), None).unwrap();
+    let before = papel_render::inspect(std::sync::Arc::new(fixture_without_page_tree()), None).unwrap();
     assert_eq!(before.pages.iter().map(|p| (p.width, p.height)).collect::<Vec<_>>(), [(200.0, 300.0), (300.0, 200.0)]);
     for (name, args, expected) in [
         // Width and height are as displayed: the turned page reads 200 x 300.
@@ -311,7 +310,7 @@ fn a_document_whose_page_tree_is_missing_edits_the_pages_the_reader_shows() {
         all.extend(args);
         let out = Command::new(BIN).args(&all).output().unwrap();
         assert!(out.status.success(), "{name}: {}", String::from_utf8_lossy(&out.stderr));
-        let info = pdfcraft_render::inspect(std::sync::Arc::new(std::fs::read(&output).unwrap()), None).unwrap();
+        let info = papel_render::inspect(std::sync::Arc::new(std::fs::read(&output).unwrap()), None).unwrap();
         let pages: Vec<_> = info.pages.iter().map(|p| (p.width, p.height, p.rotation)).collect();
         assert_eq!(pages, expected, "{name}");
     }
@@ -352,13 +351,13 @@ fn fixture_whose_scan_disagrees() -> Vec<u8> {
 fn a_page_tree_is_not_rebuilt_when_the_reader_shows_other_pages() {
     let input = tmp("scan-disagrees", "in.pdf");
     std::fs::write(&input, fixture_whose_scan_disagrees()).unwrap();
-    let shown = pdfcraft_render::inspect(std::sync::Arc::new(fixture_whose_scan_disagrees()), None).unwrap();
+    let shown = papel_render::inspect(std::sync::Arc::new(fixture_whose_scan_disagrees()), None).unwrap();
     assert_eq!(shown.pages.len(), 3);
     assert!(shown.pages.iter().all(|p| p.width != 200.0), "the reader must not show the blank page");
     let output = tmp("scan-disagrees", "out.pdf");
     let out = Command::new(BIN).args(["edit", input.to_str().unwrap(), "--out", output.to_str().unwrap(), "--delete", "2"]).output().unwrap();
     assert_eq!(out.status.code(), Some(1));
-    assert_eq!(String::from_utf8_lossy(&out.stderr), "pdfcraft-cli: the document's page tree lists no pages: the file is damaged\n");
+    assert_eq!(String::from_utf8_lossy(&out.stderr), "papel-cli: the document's page tree lists no pages: the file is damaged\n");
     assert!(!output.exists(), "no page may be deleted");
 }
 

@@ -1,5 +1,5 @@
 [package]
-name = "pdfcraft-redact"
+name = "papel-redact"
 description = "Redaction (architecture §11.2): marks, apply (glyphs, images, vectors, XObjects, annotations, fields), verification"
 version.workspace = true
 edition.workspace = true
@@ -10,28 +10,28 @@ workspace = true
 
 [dependencies]
 aho-corasick = "1"
-pdfcraft-cos = { workspace = true }
-pdfcraft-content = { workspace = true }
-pdfcraft-fonts = { workspace = true }
+papel-cos = { workspace = true }
+papel-content = { workspace = true }
+papel-fonts = { workspace = true }
 # The usable-quad rule `/QuadPoints` readers share.
-pdfcraft-geom = { workspace = true }
-pdfcraft-model = { workspace = true }
-pdfcraft-forms = { workspace = true }
-pdfcraft-edit = { workspace = true }
-pdfcraft-annot = { workspace = true }
-pdfcraft-xfa = { workspace = true }
+papel-geom = { workspace = true }
+papel-model = { workspace = true }
+papel-forms = { workspace = true }
+papel-edit = { workspace = true }
+papel-annot = { workspace = true }
+papel-xfa = { workspace = true }
 # CCITT Group 4 and JBIG2 encoding for cleared one-bit images.
-pdfcraft-filters = { workspace = true }
+papel-filters = { workspace = true }
 regex = { workspace = true }
 thiserror = { workspace = true }
-# NFKC for the metadata check; already in the build through pdfcraft-crypt (stringprep).
+# NFKC for the metadata check; already in the build through papel-crypt (stringprep).
 unicode-normalization = "0.1"
-# Reads the PDF/A and PDF/UA identification by namespace; already in the build through pdfcraft-xfa.
+# Reads the PDF/A and PDF/UA identification by namespace; already in the build through papel-xfa.
 roxmltree = "0.21"
 sha2 = "0.11"
 
 [dev-dependencies]
-pdfcraft-testkit = { workspace = true }
+papel-testkit = { workspace = true }
 # The redacted page is rendered in `tests::a_page_whose_pruned_pattern_is_still_selected_renders`:
 # layer 3 from layer 4, a dev dependency only.
-pdfcraft-render = { workspace = true }
+papel-render = { workspace = true }

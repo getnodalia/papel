@@ -4,8 +4,8 @@
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 
 pub mod snap;
-use pdfcraft_annot::{Meta, NewAnnotation, Shape, Style};
-use pdfcraft_cos::{Dict, Document, ObjRef, Object, PdfString};
+use papel_annot::{Meta, NewAnnotation, Shape, Style};
+use papel_cos::{Dict, Document, ObjRef, Object, PdfString};
 use serde::Serialize;
 
 pub type Point = [f64; 2];
@@ -17,7 +17,7 @@ pub enum MeasureError {
     #[error("{0}")]
     Invalid(String),
     #[error(transparent)]
-    Annotation(#[from] pdfcraft_annot::AnnotError),
+    Annotation(#[from] papel_annot::AnnotError),
 }
 type Result<T> = std::result::Result<T, MeasureError>;
 fn invalid(s: &str) -> MeasureError {
@@ -377,8 +377,8 @@ fn text(doc: &Document, d: &Dict, k: &[u8]) -> String {
 fn nums(v: impl IntoIterator<Item = f64>) -> Object {
     Object::Array(v.into_iter().map(Object::Real).collect())
 }
-fn page(doc: &Document, index: usize) -> Result<pdfcraft_model::Page> {
-    pdfcraft_model::pages(doc).get(index).cloned().ok_or_else(|| invalid("measurement page does not exist"))
+fn page(doc: &Document, index: usize) -> Result<papel_model::Page> {
+    papel_model::pages(doc).get(index).cloned().ok_or_else(|| invalid("measurement page does not exist"))
 }
 fn annot(doc: &Document, page_index: usize, index: usize) -> Result<(ObjRef, Dict)> {
     let p = page(doc, page_index)?;
@@ -401,15 +401,13 @@ pub fn add(doc: &mut Document, new: &NewMeasurement, meta: &Meta) -> Result<usiz
         Kind::Distance => Shape::Line {
             from: new.points.first().copied().ok_or_else(|| invalid("missing start"))?,
             to: new.points.last().copied().ok_or_else(|| invalid("missing end"))?,
-            start: pdfcraft_annot::LineEnding::None,
-            end: pdfcraft_annot::LineEnding::OpenArrow,
+            start: papel_annot::LineEnding::None,
+            end: papel_annot::LineEnding::OpenArrow,
         },
-        Kind::Perimeter => {
-            Shape::PolyLine { vertices: new.points.clone(), start: pdfcraft_annot::LineEnding::None, end: pdfcraft_annot::LineEnding::None }
-        }
+        Kind::Perimeter => Shape::PolyLine { vertices: new.points.clone(), start: papel_annot::LineEnding::None, end: papel_annot::LineEnding::None },
         Kind::Area => Shape::Polygon { vertices: new.points.clone(), cloud: false },
     };
-    let index = pdfcraft_annot::add_annotation(
+    let index = papel_annot::add_annotation(
         doc,
         &NewAnnotation { page: new.page, shape, style: new.style.clone(), contents: info.label.clone(), author: new.author.clone() },
         meta,
@@ -435,7 +433,7 @@ pub fn add(doc: &mut Document, new: &NewMeasurement, meta: &Meta) -> Result<usiz
         }
     }
     doc.update_dict(r, |target| *target = d).map_err(|e| invalid(&e.to_string()))?;
-    pdfcraft_annot::set_appearance(doc, r)?;
+    papel_annot::set_appearance(doc, r)?;
     Ok(index)
 }
 #[derive(Clone, Debug, PartialEq, Serialize)]
@@ -525,7 +523,7 @@ pub fn list(doc: &Document) -> Listing {
     let mut work = 0usize;
     let mut seen = std::collections::HashSet::new();
     let mut scales = Scales::new();
-    for (page, p) in pdfcraft_model::pages(doc).iter().enumerate() {
+    for (page, p) in papel_model::pages(doc).iter().enumerate() {
         let Some(o) = p.dict.get(b"Annots") else { continue };
         let o = doc.resolve(o);
         let Some(arr) = o.as_array() else { continue };
@@ -692,7 +690,7 @@ pub fn view_to_user(doc: &Document, page_index: usize, at: Point) -> Result<Poin
     check_points(&[at])?;
     let page = page(doc, page_index)?;
     let (_, height) = page.display_size(doc);
-    let m = pdfcraft_content::Matrix(page.view_matrix(doc));
+    let m = papel_content::Matrix(page.view_matrix(doc));
     let (x, y) = m.apply(at[0], height - at[1]);
     check_points(&[[x, y]])?;
     Ok([x, y])
@@ -701,7 +699,7 @@ pub fn user_to_view(doc: &Document, page_index: usize, at: Point) -> Result<Poin
     check_points(&[at])?;
     let page = page(doc, page_index)?;
     let (_, height) = page.display_size(doc);
-    let m = pdfcraft_content::Matrix(page.view_matrix(doc)).invert().ok_or_else(|| invalid("invalid page transform"))?;
+    let m = papel_content::Matrix(page.view_matrix(doc)).invert().ok_or_else(|| invalid("invalid page transform"))?;
     let (x, y) = m.apply(at[0], at[1]);
     Ok([x, height - y])
 }
