@@ -424,8 +424,11 @@ fn primary_ui_fonts_cover_latin_and_cyrillic_catalogs() {
             "áčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽãõçâêôàÃÕÇÂÊÔÀñÑüÜäÄöÖőűßæøåÆØÅ„“¿¡«»…ґҐєЄіІїЇәғқңөұүһӘҒҚҢӨҰҮҺđĐạảấầẩẫậắằẳẵặếềểễệọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹ",
         );
         for line in catalog.lines().filter(|l| !l.starts_with('#')) {
-            if let Some(translation) = line.split('\t').nth(2) {
-                text.extend(translation.chars().filter(|c| !c.is_whitespace()));
+            let mut columns = line.split('\t');
+            let source = columns.nth(1).unwrap_or("");
+            if let Some(translation) = columns.next() {
+                // A symbol the English text uses too (a `▸` menu path) is drawn as the English is.
+                text.extend(translation.chars().filter(|c| !c.is_whitespace() && !source.contains(*c)));
             }
         }
         for name in ["Inter", "Inter-Medium", "Inter-SemiBold", "JetBrainsMono"] {
