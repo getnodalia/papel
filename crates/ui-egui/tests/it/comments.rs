@@ -4550,11 +4550,12 @@ fn hotbar_picker_searches_translated_tool_labels() {
     let mut h = harness(|app| {
         app.set_option("language", "fr").unwrap();
     });
-    h.get_by_label("Hotbar settings").click();
+    // The interface is in French, so the button and the search field are too.
+    h.get_by_label("Paramètres de la barre d'outils rapide").click();
     h.run_steps(3);
-    field(&h, "Search all tools…").click();
+    field(&h, "Rechercher dans tous les outils…").click();
     h.run_steps(2);
-    field(&h, "Search all tools…").type_text("Dessiner");
+    field(&h, "Rechercher dans tous les outils…").type_text("Dessiner");
     h.run_steps(3);
     h.get_by_role_and_label(Role::CheckBox, "Dessiner à main levée").click();
     h.run_steps(3);
