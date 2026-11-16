@@ -60,12 +60,12 @@ impl<'a> XObject<'a> {
 }
 
 pub(crate) struct FormXObject<'a> {
-    // PdfCraft patch: counted against the page's content budget while the form is alive.
+    // Papel patch: counted against the page's content budget while the form is alive.
     pub(crate) decoded: crate::context::DecodedContent<'a>,
     pub(crate) matrix: Affine,
     pub(crate) bbox: [f32; 4],
     is_transparency_group: bool,
-    // PdfCraft patch: the group's /I and /K (ISO 32000-2 §11.6.6, both false by default).
+    // Papel patch: the group's /I and /K (ISO 32000-2 §11.6.6, both false by default).
     is_isolated: bool,
     is_knockout: bool,
     pub(crate) dict: Dict<'a>,
@@ -76,9 +76,9 @@ impl<'a> FormXObject<'a> {
     pub(crate) fn new(stream: &Stream<'a>) -> Option<Self> {
         let dict = stream.dict();
 
-        // PdfCraft patch: see `context::MAX_PAGE_CONTENT`.
+        // Papel patch: see `context::MAX_PAGE_CONTENT`.
         let decoded = crate::context::decode_content(stream)?;
-        // PdfCraft patch: retain absence; present malformed dictionaries stay local-empty.
+        // Papel patch: retain absence; present malformed dictionaries stay local-empty.
         let resources = dict.contains_key(RESOURCES).then(|| dict.get::<Dict<'_>>(RESOURCES).unwrap_or_default());
 
         let matrix = Affine::new(
@@ -124,7 +124,7 @@ pub(crate) fn draw_form_xobject<'a, 'b>(
     context: &mut Context<'a>,
     device: &mut impl Device<'a>,
 ) {
-    // PdfCraft patch (89): a form already being drawn is not drawn inside itself. A name its
+    // Papel patch (89): a form already being drawn is not drawn inside itself. A name its
     // content uses can reach it again (through its own resources, or the page's, which a form
     // with resources of its own still falls back on), and every such level used to run until
     // the page's nested-paint budget was spent.
@@ -164,7 +164,7 @@ fn draw_form_xobject_once<'a, 'b>(
     context.pre_concat_affine(x_object.matrix);
     context.push_root_transform();
 
-    // PdfCraft patch: a transparency group that is neither isolated nor knockout composites
+    // Papel patch: a transparency group that is neither isolated nor knockout composites
     // its elements with the backdrop already on the page (§11.4.7), so when it is entered at
     // full opacity with no soft mask and Normal blending there is nothing for a layer of its
     // own to add, and drawing straight onto the page is the exact result. A layer here was
@@ -182,7 +182,7 @@ fn draw_form_xobject_once<'a, 'b>(
             && state.blend_mode == BlendMode::Normal
     };
     let neutral = !x_object.is_isolated && !x_object.is_knockout && entered_plainly;
-    // PdfCraft patch (39): a group drawn as an element of a knockout group replaces what that
+    // Papel patch (39): a group drawn as an element of a knockout group replaces what that
     // group drew under its shape, the union of its own elements' shapes (#2971). The shape is
     // cleared by drawing the group's content once in the device's erase mode; the group then
     // composites over the cleared area in a layer of its own (also when it would otherwise be
@@ -213,7 +213,7 @@ fn draw_form_xobject_once<'a, 'b>(
         context.restore_state(device);
         context.path_mut().truncate(0);
     }
-    // PdfCraft patch (67): a non-isolated knockout group entered the same way composites each
+    // Papel patch (67): a non-isolated knockout group entered the same way composites each
     // element with the backdrop already on the page, in the element's own blend mode (#4886). A
     // layer of its own starts transparent, where a blend mode has nothing to blend with, so the
     // group is drawn in passes, one per blend mode, each composited onto the page in its mode
@@ -244,7 +244,7 @@ fn draw_form_xobject_once<'a, 'b>(
 
         context.get_mut().graphics_state.non_stroke_alpha = 1.0;
         context.get_mut().graphics_state.stroke_alpha = 1.0;
-        // PdfCraft patch (39): its elements knock each other out (#2971).
+        // Papel patch (39): its elements knock each other out (#2971).
         if x_object.is_knockout {
             device.set_knockout();
         }
@@ -252,7 +252,7 @@ fn draw_form_xobject_once<'a, 'b>(
 
     let resources = Resources::for_form(x_object.resources.clone(), resources.clone());
 
-    // PdfCraft patch (70): an isolated group blending in DeviceCMYK starts from a backdrop of
+    // Papel patch (70): an isolated group blending in DeviceCMYK starts from a backdrop of
     // its own, so a device able to blend in CMYK computes its interior apart and composites the
     // result through the layer pushed above (see `cmyk_group`). Knockout groups are left out:
     // their elements composite with the group's initial backdrop, not with each other.
@@ -293,7 +293,7 @@ fn draw_form_xobject_once<'a, 'b>(
 }
 
 /// The contents of form `x_object`, in `context` as prepared for them (the form's `/Matrix`
-/// applied, its root transform pushed), clipped to its `/BBox`. PdfCraft patch (70): shared by
+/// applied, its root transform pushed), clipped to its `/BBox`. Papel patch (70): shared by
 /// [`draw_form_xobject`] and [`CmykGroup::interpret`].
 pub(crate) fn interpret_form_contents<'a>(
     resources: &Resources<'a>,
@@ -326,7 +326,7 @@ pub(crate) fn interpret_form_contents<'a>(
     device.pop_clip_path();
 }
 
-/// PdfCraft patch (67): draws a non-isolated knockout group entered at full opacity, without a
+/// Papel patch (67): draws a non-isolated knockout group entered at full opacity, without a
 /// soft mask and with Normal blending, once per blend mode its elements use. The Normal pass
 /// finds the other modes; there are at most as many passes as blend modes.
 fn draw_knockout_passes<'a>(
@@ -424,7 +424,7 @@ pub(crate) fn draw_image_xobject<'a, 'b>(
         soft_mask = None;
     }
 
-    // PdfCraft patch (39): an image without a mask covers its whole placement rectangle, so in
+    // Papel patch (39): an image without a mask covers its whole placement rectangle, so in
     // a knockout group it replaces what the group drew there (#2971). A stencil's or a masked
     // image's shape is its mask; those composite as before (exact where the mask is opaque or
     // transparent, which is what masks mostly are). Only an image the device draws clears: one
@@ -443,7 +443,7 @@ pub(crate) fn draw_image_xobject<'a, 'b>(
 
     device.set_soft_mask(None);
     device.set_blend_mode(BlendMode::default());
-    // PdfCraft patch (46): the group just pushed applies the fill opacity, so a stencil mask's
+    // Papel patch (46): the group just pushed applies the fill opacity, so a stencil mask's
     // paint (the fill colour) must not carry it again: at `ca 0.5` a mask was drawn at a
     // quarter of its opacity (#2975). The state is restored below.
     context.get_mut().graphics_state.non_stroke_alpha = 1.0;
@@ -491,13 +491,13 @@ pub(crate) struct ImageXObject<'a> {
     height: u32,
     color_space: Option<ColorSpace>,
     cache: Cache,
-    /// PdfCraft patch: decoded pixels shared across renders (see `decoded_raster`); `None`
+    /// Papel patch: decoded pixels shared across renders (see `decoded_raster`); `None`
     /// for an image that is never cached (an inline image).
     decoded_cache: Option<DecodedImageCache>,
     interpolate: bool,
     is_mask: bool,
     is_stencil_mask: bool,
-    /// PdfCraft patch (73): whether this is a picture's soft mask or `/Mask`, not an image drawn
+    /// Papel patch (73): whether this is a picture's soft mask or `/Mask`, not an image drawn
     /// on its own, by `Do` or inline, a stencil mask included. Only a picture's mask refused by a
     /// limit takes something out with it, and is reported so. A picture's mask is cached only
     /// averaged down (`shrunk_to`), which an image drawn on its own never is, so the two never
@@ -506,13 +506,13 @@ pub(crate) struct ImageXObject<'a> {
     stream: Stream<'a>,
     transfer_function: Option<ActiveTransferFunction>,
     warning_sink: WarningSinkFn,
-    /// PdfCraft patch (38): the cache key of the default colour space drawn in place of the
+    /// Papel patch (38): the cache key of the default colour space drawn in place of the
     /// image's device space, if one is.
     default_space: Option<u128>,
 }
 
 impl<'a> ImageXObject<'a> {
-    /// PdfCraft patch (38): an image in a device space is drawn in its default colour space
+    /// Papel patch (38): an image in a device space is drawn in its default colour space
     /// from `defaults`. Masks have none to replace, and `resolve_cs` (an inline image's named
     /// colour space) substitutes its own.
     pub(crate) fn new(
@@ -553,7 +553,7 @@ impl<'a> ImageXObject<'a> {
                 default_space = Some(key);
                 Some(space)
             } else {
-                // PdfCraft patch (80): an Indexed space given in place whose `hival` has no
+                // Papel patch (80): an Indexed space given in place whose `hival` has no
                 // reading cannot be built and falls back below, as upstream; it is reported.
                 malformed_indexed = cs_obj
                     .as_ref()
@@ -569,7 +569,7 @@ impl<'a> ImageXObject<'a> {
                     })
             }
         };
-        // PdfCraft patch (80): an Indexed space that ISO 32000-2 §8.6.6.3 rules out (a short
+        // Papel patch (80): an Indexed space that ISO 32000-2 §8.6.6.3 rules out (a short
         // lookup table, a `hival` past 255 or with a fraction) is drawn recovered (see
         // `Indexed::new`), and reported. The check asks the space that was built, so it reads
         // no lookup table of its own (an inline image naming a resource builds it once, through
@@ -577,7 +577,7 @@ impl<'a> ImageXObject<'a> {
         malformed_indexed |= image_cs
             .as_ref()
             .is_some_and(ColorSpace::is_recovered_indexed);
-        // PdfCraft patch (80): an Indexed space with no lookup table at all (missing, or not a
+        // Papel patch (80): an Indexed space with no lookup table at all (missing, or not a
         // string or a stream that decodes) leaves nothing to draw: the image is skipped, and
         // reported. Upstream drew it in DeviceGray.
         if image_cs
@@ -626,7 +626,7 @@ impl<'a> ImageXObject<'a> {
             return None;
         }
 
-        // PdfCraft patch: decode once per `DecodedImageKey`; tiles and scales share it.
+        // Papel patch: decode once per `DecodedImageKey`; tiles and scales share it.
         let Some(cache) = &self.decoded_cache else {
             return decode_mask(self, target_dimension);
         };
@@ -647,7 +647,7 @@ impl<'a> ImageXObject<'a> {
             return None;
         }
 
-        // PdfCraft patch: decode once per `DecodedImageKey`; tiles and scales share it.
+        // Papel patch: decode once per `DecodedImageKey`; tiles and scales share it.
         let Some(cache) = &self.decoded_cache else {
             return decode_raster(self, target_dimension);
         };
@@ -660,7 +660,7 @@ impl<'a> ImageXObject<'a> {
         )
     }
 
-    /// PdfCraft patch: the cache key of decoding this image (as a mask when `mask_output`) at
+    /// Papel patch: the cache key of decoding this image (as a mask when `mask_output`) at
     /// `target_dimension`: every input of the decode (see [`DecodedImageKey`]). `None` when one
     /// of them can't be keyed cheaply (a transfer function): such a decode isn't cached.
     pub(crate) fn decode_key(
@@ -683,9 +683,9 @@ impl<'a> ImageXObject<'a> {
             is_mask: self.is_mask,
             is_stencil_mask: self.is_stencil_mask,
             interpolate: self.interpolate,
-            // PdfCraft patch (38): the same image drawn in a default colour space or without one.
+            // Papel patch (38): the same image drawn in a default colour space or without one.
             default_space: self.default_space,
-            // PdfCraft patch (32): see `decode_reads_target`; patch (82): see `has_larger_mask`.
+            // Papel patch (32): see `decode_reads_target`; patch (82): see `has_larger_mask`.
             target: if self.decode_reads_target() {
                 target_dimension
             } else if self.has_larger_mask() {
@@ -698,7 +698,7 @@ impl<'a> ImageXObject<'a> {
         })
     }
 
-    /// PdfCraft patch (82): this soft mask (or `/Mask` image) for an image of `parent` samples
+    /// Papel patch (82): this soft mask (or `/Mask` image) for an image of `parent` samples
     /// drawn at `target_dimension` device pixels. A mask larger than its image and more than
     /// [`SOFT_MASK_SHRINK_FACTOR`] times larger than where it is drawn, on a side, is averaged down
     /// to that size, and the result is cached at that size: drawn
@@ -755,7 +755,7 @@ impl<'a> ImageXObject<'a> {
         })
     }
 
-    /// PdfCraft patch (32): whether decoding this image depends on the size it is drawn at.
+    /// Papel patch (32): whether decoding this image depends on the size it is drawn at.
     /// Only the JPX filter decodes at a reduced resolution for a target size, in the image
     /// itself or in the soft mask or mask decoded with it; every other filter decodes the whole
     /// image whatever the target. Keyed by the target, a scan was decoded again at every zoom
@@ -767,7 +767,7 @@ impl<'a> ImageXObject<'a> {
             || dict.get::<Stream<'_>>(MASK).is_some_and(|s| uses_jpx(&s))
     }
 
-    /// PdfCraft patch (82): whether this image has a soft mask (or `/Mask` image) larger than
+    /// Papel patch (82): whether this image has a soft mask (or `/Mask` image) larger than
     /// itself, which may be averaged down to the size the image is drawn at
     /// (`decoded_soft_mask`): the decoded raster holds it as its alpha, so it depends on that size,
     /// to the [`size_bucket`] it is averaged down to.
@@ -782,7 +782,7 @@ impl<'a> ImageXObject<'a> {
         dict.get::<Stream<'_>>(SMASK).is_some_and(|s| larger(&s)) || dict.get::<Stream<'_>>(MASK).is_some_and(|s| larger(&s))
     }
 
-    /// PdfCraft patch (91): this image, reporting its warnings to `sink`.
+    /// Papel patch (91): this image, reporting its warnings to `sink`.
     fn reporting_to(&self, sink: &WarningSinkFn) -> Self {
         Self {
             warning_sink: sink.clone(),
@@ -809,21 +809,21 @@ impl<'a> ImageXObject<'a> {
     }
 }
 
-/// PdfCraft patch: budget for [`DecodedImageCache`] entries per interpreter cache: decoded
+/// Papel patch: budget for [`DecodedImageCache`] entries per interpreter cache: decoded
 /// image pixels shared across tiles and scales. Past it the cache starts a fresh epoch.
 const MAX_DECODED_IMAGE_BYTES: usize = 64 << 20;
 
-/// PdfCraft patch (82): how many times larger than where it is drawn, on a side, a soft mask must be
+/// Papel patch (82): how many times larger than where it is drawn, on a side, a soft mask must be
 /// before it is averaged down to that size (`ImageXObject::decoded_soft_mask`). Below it the mask
 /// keeps its own resolution, which the renderer filters as it draws.
 const SOFT_MASK_SHRINK_FACTOR: u64 = 2;
 
-/// PdfCraft patch (82): the largest side of the intermediate mask that every smaller averaged-down
+/// Papel patch (82): the largest side of the intermediate mask that every smaller averaged-down
 /// size of one soft mask is made from (`ImageXObject::decoded_soft_mask`): 4096 × 4096 one-byte
 /// samples are 16 MiB, a quarter of the decoded-image budget, so it stays cached between draws.
 const SOFT_MASK_INTERMEDIATE: u32 = 4096;
 
-/// PdfCraft patch (82): the size a large soft mask is averaged down to for an image drawn at
+/// Papel patch (82): the size a large soft mask is averaged down to for an image drawn at
 /// `(w, h)` device pixels: each side rounded up to a power of two. Draws of one image a pixel or so
 /// apart (scaled by 0.36 and 0.36167, say) share one averaged mask and one cache entry, and a mask
 /// is never averaged below where it is drawn, so the renderer shrinks the rest at most twofold.
@@ -831,7 +831,7 @@ fn size_bucket((w, h): (u32, u32)) -> (u32, u32) {
     (w.checked_next_power_of_two().unwrap_or(u32::MAX), h.checked_next_power_of_two().unwrap_or(u32::MAX))
 }
 
-/// PdfCraft patch (82): `luma` averaged down to `to` (no larger than it on either side): each
+/// Papel patch (82): `luma` averaged down to `to` (no larger than it on either side): each
 /// target sample is the mean of the source samples whose centres fall in it. Source sample `x`
 /// of `sw`, centred at `x + ½`, falls in target sample `⌊(2x + 1)·tw / 2sw⌋`. The only buffers are
 /// the target's sums and counts, reserved fallibly; nothing is sized by the source's width.
@@ -867,7 +867,7 @@ fn shrink_luma(luma: LumaData, to: (u32, u32)) -> Option<LumaData> {
     Some(LumaData { data, width: to.0, height: to.1, ..luma })
 }
 
-/// PdfCraft patch (82): `luma` averaged down to `to`, but never to more samples than it has on a
+/// Papel patch (82): `luma` averaged down to `to`, but never to more samples than it has on a
 /// side (a truncated stream decodes fewer rows than its dictionary says), and returned as it is
 /// when that is its own size.
 fn shrink_luma_within(luma: LumaData, to: (u32, u32)) -> Option<LumaData> {
@@ -878,19 +878,19 @@ fn shrink_luma_within(luma: LumaData, to: (u32, u32)) -> Option<LumaData> {
     shrink_luma(luma, to)
 }
 
-/// PdfCraft patch: pixel bytes held by a decoded mask.
+/// Papel patch: pixel bytes held by a decoded mask.
 fn decoded_mask_size(mask: &DecodedMask) -> usize {
     mask.luma.width as usize * mask.luma.height as usize
 }
 
-/// PdfCraft patch (32): whether `stream` names the JPX filter, as a name or in an array, under
+/// Papel patch (32): whether `stream` names the JPX filter, as a name or in an array, under
 /// `/Filter` or its inline abbreviation `/F`. Errs towards `true`: a name the decoder would
 /// ignore still counts, which only keeps the target in the key as before.
 fn uses_jpx(stream: &Stream<'_>) -> bool {
     uses_filter(stream, JPX_DECODE)
 }
 
-/// PdfCraft patch (73): whether `stream` is JBIG2, so that what the page has left, which all of it
+/// Papel patch (73): whether `stream` is JBIG2, so that what the page has left, which all of it
 /// shares, says something about why this stream failed.
 fn uses_jbig2(stream: &Stream<'_>) -> bool {
     uses_filter(stream, JBIG2_DECODE)
@@ -907,7 +907,7 @@ fn uses_filter(stream: &Stream<'_>, filter: &[u8]) -> bool {
     })
 }
 
-/// PdfCraft patch: pixel bytes held by a decoded raster image and its mask.
+/// Papel patch: pixel bytes held by a decoded raster image and its mask.
 fn decoded_raster_size(raster: &DecodedRaster) -> usize {
     let image = match &raster.image {
         ImageData::Rgb(d) => d.width as usize * d.height as usize * 3,
@@ -946,10 +946,10 @@ fn decode_context<'a>(
     obj: &ImageXObject<'a>,
     target_dimension: Option<(u32, u32)>,
 ) -> Option<DecodeContext<'a>> {
-    // PdfCraft patch: images and masks over `MAX_IMAGE_PIXELS` are not decoded at all (the
+    // Papel patch: images and masks over `MAX_IMAGE_PIXELS` are not decoded at all (the
     // renderer skips them anyway): a fuzzed `/W 4294967295` stencil mask allocated gigabytes here.
     if !image_size_ok(obj.width, obj.height) {
-        // PdfCraft patch (73): a picture's JBIG2 mask of a size this bound refuses is one a limit
+        // Papel patch (73): a picture's JBIG2 mask of a size this bound refuses is one a limit
         // refused, as when the decoder refuses it (below), and its size is the stream's own.
         // `ImageXObject::new` refuses a size of 0, so this is past the bound.
         let limited = obj.masks_picture && uses_jbig2(&obj.stream);
@@ -977,14 +977,14 @@ fn decode_context<'a>(
         height: obj.height,
     };
 
-    // PdfCraft patch (73): what refused an image decoded before this one says nothing about it,
+    // Papel patch (73): what refused an image decoded before this one says nothing about it,
     // whether or not its filters reach JBIG2.
     hayro_syntax::clear_jbig2_limited();
     let decoded = obj
         .stream
         .decoded_image(&decode_params)
         .map_err(|_| {
-            // PdfCraft patch (73): left out for the page's allowance, it is content the page's
+            // Papel patch (73): left out for the page's allowance, it is content the page's
             // budget skipped, which is reported, and no failure of this image. So is a picture's
             // mask one of the decoder's limits refused, which takes the picture with it
             // (`decode_raster`).
@@ -1164,7 +1164,7 @@ fn decode_raster(
             ctx.bits_per_component,
         )?;
 
-        // PdfCraft patch (28): an image with few possible pixel values converts each of them once.
+        // Papel patch (28): an image with few possible pixel values converts each of them once.
         let mut rgb_data = if let Some(rgb) = rgb_via_lookup(
             &components,
             ctx.width,
@@ -1229,7 +1229,7 @@ fn decode_raster(
 
     let mut image = image_data?;
 
-    // PdfCraft patch (73): whether the mask, decoded below or kept failed by the decoded-image
+    // Papel patch (73): whether the mask, decoded below or kept failed by the decoded-image
     // cache, was left out for the page's allowance or a decoder's limit: only those report
     // `ContentTruncated` there (`decode_context`).
     let left_out = Arc::new(AtomicBool::new(false));
@@ -1268,7 +1268,7 @@ fn decode_raster(
         .flatten()
     };
 
-    // PdfCraft patch (73): a bad mask leaves the image as it is, but one left out for the page's
+    // Papel patch (73): a bad mask leaves the image as it is, but one left out for the page's
     // allowance, or refused by one of the decoder's limits, takes the image with it. Both are
     // reported, and only there is the file not to blame for what the mask would have hidden being
     // shown: a scan's colour layer drawn without its JBIG2 mask covers the page in noise (#6722).
@@ -1372,7 +1372,7 @@ fn resolve_alpha(
     {
         let obj = ImageXObject::new(&s_mask, |_| None, &obj.warning_sink, &obj.cache, obj.decoded_cache.as_ref(), true, None, None)?;
 
-        // PdfCraft patch (82): averaged down when far larger than where it is drawn, and cached.
+        // Papel patch (82): averaged down when far larger than where it is drawn, and cached.
         obj.decoded_soft_mask(target_dimension, (width, *height)).map(|decoded| decoded.luma)
     } else if let Some(color_key_mask) = dict.get::<SmallVec<[u16; 4]>>(MASK) {
         let mut mask_data = vec![];
@@ -1584,7 +1584,7 @@ fn apply_decode_array(
     Some(decoded_arr)
 }
 
-/// One sample mapped through its `/Decode` range (ISO 32000-2 §8.9.5.2). PdfCraft patch (28):
+/// One sample mapped through its `/Decode` range (ISO 32000-2 §8.9.5.2). Papel patch (28):
 /// shared by [`apply_decode_array`] and [`rgb_via_lookup`], so both decode alike.
 fn decode_sample(sample: u16, bits_per_component: u8, (d_min, d_max): (f32, f32)) -> f32 {
     interpolate(
@@ -1596,11 +1596,11 @@ fn decode_sample(sample: u16, bits_per_component: u8, (d_min, d_max): (f32, f32)
     )
 }
 
-/// PdfCraft patch (28): the most bits a pixel's samples may hold together for
+/// Papel patch (28): the most bits a pixel's samples may hold together for
 /// [`rgb_via_lookup`] (a table of 65,536 colours).
 const MAX_LOOKUP_BITS: usize = 16;
 
-/// PdfCraft patch (28): the RGB of an image whose pixels hold at most [`MAX_LOOKUP_BITS`] bits
+/// Papel patch (28): the RGB of an image whose pixels hold at most [`MAX_LOOKUP_BITS`] bits
 /// of samples, converted once per possible pixel value rather than once per pixel, at the
 /// height `fix_image_length` gives. `None` when the table would not pay off (the image has no
 /// more pixels than it has entries) or does not apply; the caller then converts every pixel.
@@ -1689,7 +1689,7 @@ fn rgb_via_lookup(
     })
 }
 
-/// PdfCraft patch (28): `input`, `n` decoded samples a pixel, converted into `output` (RGB) one
+/// Papel patch (28): `input`, `n` decoded samples a pixel, converted into `output` (RGB) one
 /// pixel at a time. A Separation or DeviceN tint transform may give more or fewer components
 /// than its alternate space takes (a Type 4 program's count is only warned about): converted as
 /// one batch, such a result shifts every pixel after it; converted alone, it affects only its
@@ -1703,7 +1703,7 @@ fn convert_each(cs: &ColorSpace, input: &[f32], n: usize, output: &mut [u8]) {
     }
 }
 
-/// PdfCraft patch: whether an image or mask of `width` × `height` may be decoded (at most
+/// Papel patch: whether an image or mask of `width` × `height` may be decoded (at most
 /// 2^28 pixels, the renderer's `MAX_IMAGE_PIXELS`).
 pub fn image_size_ok(width: u32, height: u32) -> bool {
     width > 0 && height > 0 && u64::from(width) * u64::from(height) <= 1 << 28

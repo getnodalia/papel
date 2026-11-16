@@ -5,7 +5,7 @@
 #[cfg(not(target_arch = "wasm32"))]
 use nodalia_update::egui::{Action, Updater};
 
-use crate::PdfCraftApp;
+use crate::PapelApp;
 
 /// Where every release is listed.
 pub const RELEASES_PAGE: &str = "https://github.com/getnodalia/papel/releases";
@@ -53,7 +53,7 @@ impl Default for Updates {
     }
 }
 
-impl PdfCraftApp {
+impl PapelApp {
     /// Whether the app asks for a newer release on its first frame (off until the desktop app turns it on).
     #[cfg(not(target_arch = "wasm32"))]
     pub fn set_startup_update_check(&mut self, on: bool) {
@@ -99,7 +99,7 @@ impl PdfCraftApp {
 
 /// Carries out what the update windows asked for.
 #[cfg(not(target_arch = "wasm32"))]
-fn act(app: &mut PdfCraftApp, ctx: &egui::Context, action: Action) {
+fn act(app: &mut PapelApp, ctx: &egui::Context, action: Action) {
     match action {
         Action::None => {}
         Action::OpenUrl(url) => app.open_url(&url),
@@ -117,7 +117,7 @@ fn act(app: &mut PdfCraftApp, ctx: &egui::Context, action: Action) {
 }
 
 /// The update windows: the offer, the answer to Help ▸ Check for updates, the download and install.
-pub(crate) fn dialog(app: &mut PdfCraftApp, ctx: &egui::Context) {
+pub(crate) fn dialog(app: &mut PapelApp, ctx: &egui::Context) {
     #[cfg(not(target_arch = "wasm32"))]
     {
         // An installation waits until no document holds unsaved work.
@@ -134,7 +134,7 @@ pub(crate) fn dialog(app: &mut PdfCraftApp, ctx: &egui::Context) {
 mod tests {
     use super::*;
     use nodalia_update::egui::Status;
-    use pdfcraft_engine::{Edit, FieldValue};
+    use papel_engine::{Edit, FieldValue};
 
     #[test]
     fn the_releases_are_this_apps_own() {
@@ -147,7 +147,7 @@ mod tests {
     /// app stays open.
     #[test]
     fn a_ready_update_waits_for_unsaved_work() {
-        let mut app = PdfCraftApp::new();
+        let mut app = PapelApp::new();
         app.open_bytes("source.pdf", None, include_bytes!("../../tests/data/form.pdf").to_vec()).unwrap();
         assert!(app.apply_edit(Edit::SetFieldValue { name: "name".into(), value: FieldValue::Text("Changed".into()) }));
         let release = nodalia_update::Release {

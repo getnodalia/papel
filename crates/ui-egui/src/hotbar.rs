@@ -1,10 +1,10 @@
 //! A movable, persistent set of shortcuts to the shared command registry and core document tools.
 use egui::{Color32, CornerRadius, Rect, Sense, Stroke, vec2};
-use pdfcraft_engine::Edit;
-use pdfcraft_engine::commands::{COMMANDS, command};
+use papel_engine::Edit;
+use papel_engine::commands::{COMMANDS, command};
 use serde::{Deserialize, Serialize};
 
-use crate::{PdfCraftApp, QuickTool, comments, icons, theme, theme::Tokens};
+use crate::{PapelApp, QuickTool, comments, icons, theme, theme::Tokens};
 
 /// Persistent state and UI state for the customizable document hotbar.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -183,13 +183,13 @@ fn popup_align_for(dock: Option<&str>, vertical: bool) -> egui::RectAlign {
 
 /// Whether `spec` matches the hotbar picker search query across the translated label, canonical
 /// English label, or command identifier (case-insensitively).
-fn matches_search(spec: &pdfcraft_engine::commands::CommandSpec, query: &str) -> bool {
+fn matches_search(spec: &papel_engine::commands::CommandSpec, query: &str) -> bool {
     let search = query.to_lowercase();
     tl!(spec.label).to_lowercase().contains(&search) || spec.label.to_lowercase().contains(&search) || spec.id.to_lowercase().contains(&search)
 }
 
 /// Render the configured custom tool shortcut buttons and their removal context menus.
-fn tool_buttons(ui: &mut egui::Ui, app: &PdfCraftApp, tools: &[String], cell: f32, run: &mut Option<&'static str>, remove: &mut Option<usize>) {
+fn tool_buttons(ui: &mut egui::Ui, app: &PapelApp, tools: &[String], cell: f32, run: &mut Option<&'static str>, remove: &mut Option<usize>) {
     for (index, id) in tools.iter().enumerate() {
         let Some(spec) = command(id) else { continue };
         let active = crate::comments::CommentTool::from_command(id).is_some_and(|tool| app.quick_tool == crate::QuickTool::Comment(tool));
@@ -207,7 +207,7 @@ fn tool_buttons(ui: &mut egui::Ui, app: &PdfCraftApp, tools: &[String], cell: f3
 }
 
 /// Render core quick tools: Select, Hand, Comment groups, Edit text, and Fill & Sign.
-fn core_tool_buttons(ui: &mut egui::Ui, app: &mut PdfCraftApp, cell: f32, popup_align: egui::RectAlign, t: &Tokens) {
+fn core_tool_buttons(ui: &mut egui::Ui, app: &mut PapelApp, cell: f32, popup_align: egui::RectAlign, t: &Tokens) {
     if icons::button(ui, "mouse-pointer-2", cell, app.quick_tool == QuickTool::Select, tl!("Select (V)")).clicked() {
         app.quick_tool = QuickTool::Select;
     }
@@ -360,7 +360,7 @@ fn controls_divider(ui: &mut egui::Ui, t: &Tokens, vertical: bool) {
     }
 }
 
-fn selected_fill_text(app: &PdfCraftApp) -> Option<(usize, usize)> {
+fn selected_fill_text(app: &PapelApp) -> Option<(usize, usize)> {
     let (index, id) = app.active_ids()?;
     let (page, annotation) = app.views.get(index)?.comments.selected?;
     let doc = app.session.get(id).filter(|doc| doc.allows_annotation())?;
@@ -374,10 +374,10 @@ fn selected_fill_text(app: &PdfCraftApp) -> Option<(usize, usize)> {
 /// Fill & Sign's Border controls for typed text: its width, colour and shape, for the selected
 /// text (`picked`), or for new text when none is selected. The label shows in a vertical bar, as the
 /// font size's does.
-fn fill_text_border_controls(ui: &mut egui::Ui, app: &mut PdfCraftApp, picked: Option<(usize, usize)>, vertical: bool) {
+fn fill_text_border_controls(ui: &mut egui::Ui, app: &mut PapelApp, picked: Option<(usize, usize)>, vertical: bool) {
     // The selected text's own border (Comment Properties may have changed it
     // since): the controls below show it and change only it. Without one they
-    // set what new text gets until PdfCraft quits; Make Current Properties
+    // set what new text gets until Papel quits; Make Current Properties
     // Default on typed text keeps it.
     let selected = picked.and_then(|(page, annotation)| {
         let p = app.active_ids().and_then(|(_, id)| app.session.get(id))?.comment_props(page, annotation)?;
@@ -421,7 +421,7 @@ fn fill_text_border_controls(ui: &mut egui::Ui, app: &mut PdfCraftApp, picked: O
             .selected_text(tl!(was.shape.name()))
             .width(96.0)
             .show_ui(ui, |ui| {
-                for shape in pdfcraft_engine::BorderShape::ALL {
+                for shape in papel_engine::BorderShape::ALL {
                     ui.selectable_value(&mut border.shape, shape, tl!(shape.name()));
                 }
             })
@@ -431,7 +431,7 @@ fn fill_text_border_controls(ui: &mut egui::Ui, app: &mut PdfCraftApp, picked: O
     // No border, no shape: an oval or a circle left without its line would
     // keep its box grown around a shape that isn't drawn.
     if border.width <= 0.0 {
-        border.shape = pdfcraft_engine::BorderShape::Rectangle;
+        border.shape = papel_engine::BorderShape::Rectangle;
     }
     match selected {
         Some((page, index, _)) => {
@@ -462,7 +462,7 @@ fn fill_text_border_controls(ui: &mut egui::Ui, app: &mut PdfCraftApp, picked: O
 }
 
 /// Extra controls rendered below/beside the buttons when a comment or fill tool is active.
-fn active_tool_controls(ui: &mut egui::Ui, app: &mut PdfCraftApp, t: &Tokens, vertical: bool) {
+fn active_tool_controls(ui: &mut egui::Ui, app: &mut PapelApp, t: &Tokens, vertical: bool) {
     let current_fill = match app.quick_tool {
         QuickTool::Fill(f) => Some(f),
         _ => None,
@@ -611,7 +611,7 @@ fn size_slider_adjusting(slider: &egui::Response, key_pressed: bool, keyboard: &
 }
 
 /// Draw the unified floating or side-docked toolbar, combining quick actions, core tools, and custom shortcuts.
-pub(crate) fn show(app: &mut PdfCraftApp, area: Rect, page_left: Option<f32>, ui: &mut egui::Ui) {
+pub(crate) fn show(app: &mut PapelApp, area: Rect, page_left: Option<f32>, ui: &mut egui::Ui) {
     let ctx = ui.ctx().clone();
     let mut bar = std::mem::take(&mut app.hotbar);
     bar.normalize();
@@ -963,7 +963,7 @@ mod tests {
     // Build a harness that draws the hotbar docked to `$side`, with its tools picker open.
     macro_rules! hotbar_harness {
         ($side:expr, $vertical:expr, $full_side:expr) => {{
-            let mut app = PdfCraftApp::new();
+            let mut app = PapelApp::new();
             app.hotbar.place($side).unwrap();
             app.hotbar.vertical = $vertical;
             app.hotbar.full_side = $full_side;
@@ -971,7 +971,7 @@ mod tests {
             app.hotbar.picker_open = true;
             let mut fonts = false;
             let mut harness = Harness::builder().with_size(vec2(1000.0, 900.0)).with_accessibility_check(false).build_ui_state(
-                move |ui, app: &mut PdfCraftApp| {
+                move |ui, app: &mut PapelApp| {
                     if !fonts {
                         ui.ctx().set_fonts(theme::font_definitions());
                         fonts = true;
@@ -1114,13 +1114,13 @@ mod tests {
 
     #[test]
     fn hotbar_preferences_round_trip() {
-        let mut app = PdfCraftApp::new();
+        let mut app = PapelApp::new();
         app.set_option("hotbar-tools", "comment.freehand_highlight,comment.ink").unwrap();
         app.set_option("hotbar-side", "left").unwrap();
         app.set_option("hotbar-size", "48").unwrap();
         app.set_option("hotbar-full-side", "true").unwrap();
         assert!(app.set_option("hotbar-size", "NaN").is_err());
-        let mut restored = PdfCraftApp::new();
+        let mut restored = PapelApp::new();
         restored.restore(&app.persist());
         assert_eq!(restored.hotbar.tools, app.hotbar.tools);
         assert_eq!(restored.hotbar.position, [0.0, 0.5]);
@@ -1132,7 +1132,7 @@ mod tests {
 
     #[test]
     fn hotbar_restore_filters_unknown_tools_and_offscreen_positions() {
-        let mut app = PdfCraftApp::new();
+        let mut app = PapelApp::new();
         app.restore(r#"{"hotbar":{"tools":["invalid","comment.ink","comment.ink"],"position":[-10,999]}}"#);
         assert_eq!(app.hotbar.tools, ["comment.ink"]);
         assert_eq!(app.hotbar.position, [0.0, 1.0]);
@@ -1140,7 +1140,7 @@ mod tests {
 
     #[test]
     fn hotbar_restore_moves_legacy_default_into_margin_and_keeps_chosen_spots() {
-        let mut app = PdfCraftApp::new();
+        let mut app = PapelApp::new();
         app.restore(r#"{"hotbar":{"tools":["comment.ink"],"position":[0.5,0.0],"vertical":false,"button_size":40.0,"dock":null}}"#);
         assert_eq!(app.hotbar.position, [0.0, 0.0]);
         assert!(app.hotbar.vertical);

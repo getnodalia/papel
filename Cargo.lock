@@ -4186,6 +4186,607 @@ dependencies = [
 ]
 
 [[package]]
+name = "papel"
+version = "0.1.0-dev"
+dependencies = [
+ "chrono",
+ "eframe",
+ "egui",
+ "fmv-macos-events",
+ "log",
+ "papel-engine",
+ "papel-platform",
+ "papel-ui-egui",
+ "pollster 1.0.1",
+ "raw-window-handle",
+ "serde_json",
+ "uds_windows",
+ "wayland-client",
+ "wayland-protocols",
+ "windows",
+ "winit",
+ "winresource",
+ "winsafe",
+]
+
+[[package]]
+name = "papel-a11y"
+version = "0.1.0-dev"
+dependencies = [
+ "papel-content",
+ "papel-cos",
+ "papel-fonts",
+ "papel-model",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "papel-annot"
+version = "0.1.0-dev"
+dependencies = [
+ "hayro-syntax",
+ "papel-cos",
+ "papel-fonts",
+ "papel-geom",
+ "papel-model",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "papel-audit"
+version = "0.1.0-dev"
+dependencies = [
+ "papel-content",
+ "papel-cos",
+ "papel-edit",
+ "papel-model",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "papel-automation"
+version = "0.1.0-dev"
+dependencies = [
+ "base64 0.23.1",
+ "flate2",
+ "image",
+ "papel-cos",
+ "papel-engine",
+ "papel-fonts",
+ "papel-model",
+ "papel-organize",
+ "papel-platform",
+ "papel-prc",
+ "papel-prc-render",
+ "papel-render",
+ "papel-xfa",
+ "png 0.18.1",
+ "rustix 1.1.6",
+ "serde_json",
+ "sha2 0.11.1",
+ "tempfile",
+]
+
+[[package]]
+name = "papel-cli"
+version = "0.1.0-dev"
+dependencies = [
+ "base64 0.23.1",
+ "papel-audit",
+ "papel-automation",
+ "papel-cos",
+ "papel-engine",
+ "papel-platform",
+ "papel-preflight",
+ "papel-render",
+ "png 0.18.1",
+ "rustix 1.1.6",
+ "serde_json",
+ "winresource",
+]
+
+[[package]]
+name = "papel-compare"
+version = "0.1.0-dev"
+
+[[package]]
+name = "papel-content"
+version = "0.1.0-dev"
+dependencies = [
+ "hayro-syntax",
+ "papel-cos",
+]
+
+[[package]]
+name = "papel-cos"
+version = "0.1.0-dev"
+dependencies = [
+ "chrono",
+ "hayro-syntax",
+ "js-sys",
+ "papel-crypt",
+ "papel-filters",
+ "papel-oracle",
+ "papel-testkit",
+ "proptest",
+ "serde_json",
+ "thiserror 2.0.21",
+ "wasm-bindgen",
+]
+
+[[package]]
+name = "papel-create"
+version = "0.1.0-dev"
+dependencies = [
+ "encoding_rs",
+ "hayro-ccitt",
+ "hayro-syntax",
+ "image",
+ "papel-cos",
+ "papel-filters",
+ "papel-fonts",
+ "papel-model",
+ "papel-xfa",
+ "png 0.18.1",
+ "thiserror 2.0.21",
+ "tiff",
+ "zune-jpeg",
+]
+
+[[package]]
+name = "papel-crypt"
+version = "0.1.0-dev"
+dependencies = [
+ "aes",
+ "md-5",
+ "proptest",
+ "sha2 0.11.1",
+ "stringprep",
+ "thiserror 2.0.21",
+ "zeroize",
+]
+
+[[package]]
+name = "papel-edit"
+version = "0.1.0-dev"
+dependencies = [
+ "hayro-syntax",
+ "icu_segmenter",
+ "kurbo 0.13.1",
+ "papel-annot",
+ "papel-content",
+ "papel-cos",
+ "papel-fonts",
+ "papel-model",
+ "papel-render",
+ "proptest",
+ "sha2 0.11.1",
+ "thiserror 2.0.21",
+ "unicode-bidi",
+]
+
+[[package]]
+name = "papel-engine"
+version = "0.1.0-dev"
+dependencies = [
+ "chrono",
+ "craft-docpath",
+ "getrandom 0.4.3",
+ "icu_properties",
+ "idna",
+ "image",
+ "papel-a11y",
+ "papel-annot",
+ "papel-audit",
+ "papel-compare",
+ "papel-content",
+ "papel-cos",
+ "papel-create",
+ "papel-edit",
+ "papel-export",
+ "papel-filters",
+ "papel-fonts",
+ "papel-forms",
+ "papel-geom",
+ "papel-js",
+ "papel-measure",
+ "papel-model",
+ "papel-ocr",
+ "papel-optimize",
+ "papel-organize",
+ "papel-preflight",
+ "papel-print",
+ "papel-redact",
+ "papel-render",
+ "papel-sign",
+ "papel-testkit",
+ "papel-xfa",
+ "papel-xfdf",
+ "png 0.18.1",
+ "thiserror 2.0.21",
+ "tiff",
+ "unicode-segmentation",
+ "url",
+]
+
+[[package]]
+name = "papel-export"
+version = "0.1.0-dev"
+dependencies = [
+ "flate2",
+]
+
+[[package]]
+name = "papel-filters"
+version = "0.1.0-dev"
+dependencies = [
+ "fax",
+ "flate2",
+ "hayro-ccitt",
+ "hayro-jbig2",
+ "proptest",
+ "thiserror 2.0.21",
+ "weezl 0.2.1",
+]
+
+[[package]]
+name = "papel-fonts"
+version = "0.1.0-dev"
+dependencies = [
+ "harfrust",
+ "papel-cos",
+ "skrifa 0.44.0",
+ "unicode-bidi",
+]
+
+[[package]]
+name = "papel-forms"
+version = "0.1.0-dev"
+dependencies = [
+ "hayro-syntax",
+ "papel-content",
+ "papel-cos",
+ "papel-fonts",
+ "papel-model",
+ "proptest",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "papel-geom"
+version = "0.1.0-dev"
+
+[[package]]
+name = "papel-js"
+version = "0.1.0-dev"
+dependencies = [
+ "boa_engine",
+ "chrono",
+]
+
+[[package]]
+name = "papel-measure"
+version = "0.1.0-dev"
+dependencies = [
+ "papel-annot",
+ "papel-content",
+ "papel-cos",
+ "papel-model",
+ "papel-testkit",
+ "serde",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "papel-model"
+version = "0.1.0-dev"
+dependencies = [
+ "papel-cos",
+]
+
+[[package]]
+name = "papel-ocr"
+version = "0.1.0-dev"
+dependencies = [
+ "ocrs",
+ "papel-fonts",
+ "png 0.18.1",
+ "rten",
+ "rten-imageproc",
+ "serde_json",
+ "sha2 0.11.1",
+ "tempfile",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "papel-ocr-worker"
+version = "0.1.0-dev"
+dependencies = [
+ "js-sys",
+ "papel-ocr",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "papel-optimize"
+version = "0.1.0-dev"
+dependencies = [
+ "image",
+ "papel-annot",
+ "papel-content",
+ "papel-cos",
+ "papel-filters",
+ "papel-model",
+ "papel-render",
+ "proptest",
+ "thiserror 2.0.21",
+ "thread-priority",
+ "zune-jpeg",
+]
+
+[[package]]
+name = "papel-oracle"
+version = "0.1.0-dev"
+
+[[package]]
+name = "papel-organize"
+version = "0.1.0-dev"
+dependencies = [
+ "hayro-syntax",
+ "papel-content",
+ "papel-cos",
+ "papel-oracle",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "papel-platform"
+version = "0.1.0-dev"
+dependencies = [
+ "async-channel",
+ "futures-lite",
+ "rustix 1.1.6",
+ "zbus",
+]
+
+[[package]]
+name = "papel-prc"
+version = "0.1.0-dev"
+dependencies = [
+ "flate2",
+ "proptest",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "papel-prc-render"
+version = "0.1.0-dev"
+dependencies = [
+ "flate2",
+ "papel-prc",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "papel-preflight"
+version = "0.1.0-dev"
+dependencies = [
+ "flate2",
+ "papel-content",
+ "papel-cos",
+ "papel-model",
+ "roxmltree 0.21.2",
+]
+
+[[package]]
+name = "papel-print"
+version = "0.1.0-dev"
+dependencies = [
+ "craft-print",
+ "log",
+ "papel-content",
+ "papel-cos",
+ "papel-model",
+ "papel-render",
+ "skrifa 0.44.0",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "papel-redact"
+version = "0.1.0-dev"
+dependencies = [
+ "aho-corasick",
+ "papel-annot",
+ "papel-content",
+ "papel-cos",
+ "papel-edit",
+ "papel-filters",
+ "papel-fonts",
+ "papel-forms",
+ "papel-geom",
+ "papel-model",
+ "papel-render",
+ "papel-testkit",
+ "papel-xfa",
+ "regex",
+ "roxmltree 0.21.2",
+ "sha2 0.11.1",
+ "thiserror 2.0.21",
+ "unicode-normalization",
+]
+
+[[package]]
+name = "papel-render"
+version = "0.1.0-dev"
+dependencies = [
+ "bytemuck",
+ "flate2",
+ "getrandom 0.4.3",
+ "hayro",
+ "hayro-syntax",
+ "kurbo 0.13.1",
+ "log",
+ "lopdf",
+ "papel-content",
+ "papel-cos",
+ "papel-fonts",
+ "papel-geom",
+ "papel-testkit",
+ "serde",
+ "skrifa 0.44.0",
+ "thiserror 2.0.21",
+ "unicode-bidi",
+ "url",
+]
+
+[[package]]
+name = "papel-sign"
+version = "0.1.0-dev"
+dependencies = [
+ "aes",
+ "aws-lc-rs",
+ "base64 0.23.1",
+ "bp256",
+ "bp384",
+ "cbc",
+ "chrono",
+ "crypto-bigint",
+ "des",
+ "ecdsa",
+ "ed25519-dalek",
+ "getrandom 0.4.3",
+ "hmac",
+ "p256",
+ "p384",
+ "p521",
+ "papel-annot",
+ "papel-content",
+ "papel-cos",
+ "papel-fonts",
+ "papel-model",
+ "papel-testkit",
+ "pbkdf2",
+ "rc2",
+ "ripemd",
+ "rsa",
+ "rustls-cng",
+ "security-framework",
+ "sha1 0.11.0",
+ "sha2 0.11.1",
+ "sha3",
+ "thiserror 2.0.21",
+ "zeroize",
+]
+
+[[package]]
+name = "papel-testkit"
+version = "0.1.0-dev"
+
+[[package]]
+name = "papel-ui-egui"
+version = "0.1.0-dev"
+dependencies = [
+ "arboard",
+ "base64 0.23.1",
+ "block2 0.6.2",
+ "bytemuck",
+ "chrono",
+ "craft-i18n",
+ "craft-keymap",
+ "craft-menu",
+ "craft-quit",
+ "craft-ui",
+ "eframe",
+ "egui",
+ "egui_extras",
+ "egui_kittest",
+ "flate2",
+ "fontconfig-parser",
+ "getrandom 0.4.3",
+ "image",
+ "js-sys",
+ "log",
+ "nodalia-update",
+ "objc2 0.6.5",
+ "objc2-app-kit 0.3.2",
+ "objc2-foundation 0.3.2",
+ "papel-content",
+ "papel-cos",
+ "papel-engine",
+ "papel-fonts",
+ "papel-model",
+ "papel-ocr",
+ "papel-platform",
+ "papel-render",
+ "papel-xfa",
+ "plist",
+ "png 0.18.1",
+ "pollster 1.0.1",
+ "proptest",
+ "rfd",
+ "rustix 1.1.6",
+ "serde",
+ "serde_json",
+ "skrifa 0.44.0",
+ "sys-locale",
+ "toml",
+ "unicode-bidi",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+ "web-time",
+ "winsafe",
+ "xattr",
+ "zeroize",
+]
+
+[[package]]
+name = "papel-web"
+version = "0.1.0-dev"
+dependencies = [
+ "craft-web-api",
+ "craft-web-host",
+ "eframe",
+ "egui",
+ "js-sys",
+ "papel-ui-egui",
+ "serde_json",
+ "wasm-bindgen-futures",
+ "web-sys",
+]
+
+[[package]]
+name = "papel-xfa"
+version = "0.1.0-dev"
+dependencies = [
+ "base64 0.23.1",
+ "image",
+ "papel-cos",
+ "papel-fonts",
+ "png 0.18.1",
+ "roxmltree 0.21.2",
+ "sha2 0.11.1",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "papel-xfdf"
+version = "0.1.0-dev"
+dependencies = [
+ "base64 0.23.1",
+ "papel-annot",
+ "papel-cos",
+ "papel-forms",
+ "papel-model",
+ "proptest",
+ "roxmltree 0.21.2",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "parking"
 version = "2.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4228,607 +4829,6 @@ checksum = "112d82ceb8c5bf524d9af484d4e4970c9fd5a0cc15ba14ad93dccd28873b0629"
 dependencies = [
  "digest 0.11.3",
  "hmac",
-]
-
-[[package]]
-name = "pdfcraft"
-version = "0.18.1"
-dependencies = [
- "chrono",
- "eframe",
- "egui",
- "fmv-macos-events",
- "log",
- "pdfcraft-engine",
- "pdfcraft-platform",
- "pdfcraft-ui-egui",
- "pollster 1.0.1",
- "raw-window-handle",
- "serde_json",
- "uds_windows",
- "wayland-client",
- "wayland-protocols",
- "windows",
- "winit",
- "winresource",
- "winsafe",
-]
-
-[[package]]
-name = "pdfcraft-a11y"
-version = "0.18.1"
-dependencies = [
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-fonts",
- "pdfcraft-model",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "pdfcraft-annot"
-version = "0.18.1"
-dependencies = [
- "hayro-syntax",
- "pdfcraft-cos",
- "pdfcraft-fonts",
- "pdfcraft-geom",
- "pdfcraft-model",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "pdfcraft-audit"
-version = "0.18.1"
-dependencies = [
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-edit",
- "pdfcraft-model",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "pdfcraft-automation"
-version = "0.18.1"
-dependencies = [
- "base64 0.23.1",
- "flate2",
- "image",
- "pdfcraft-cos",
- "pdfcraft-engine",
- "pdfcraft-fonts",
- "pdfcraft-model",
- "pdfcraft-organize",
- "pdfcraft-platform",
- "pdfcraft-prc",
- "pdfcraft-prc-render",
- "pdfcraft-render",
- "pdfcraft-xfa",
- "png 0.18.1",
- "rustix 1.1.6",
- "serde_json",
- "sha2 0.11.1",
- "tempfile",
-]
-
-[[package]]
-name = "pdfcraft-cli"
-version = "0.18.1"
-dependencies = [
- "base64 0.23.1",
- "pdfcraft-audit",
- "pdfcraft-automation",
- "pdfcraft-cos",
- "pdfcraft-engine",
- "pdfcraft-platform",
- "pdfcraft-preflight",
- "pdfcraft-render",
- "png 0.18.1",
- "rustix 1.1.6",
- "serde_json",
- "winresource",
-]
-
-[[package]]
-name = "pdfcraft-compare"
-version = "0.18.1"
-
-[[package]]
-name = "pdfcraft-content"
-version = "0.18.1"
-dependencies = [
- "hayro-syntax",
- "pdfcraft-cos",
-]
-
-[[package]]
-name = "pdfcraft-cos"
-version = "0.18.1"
-dependencies = [
- "chrono",
- "hayro-syntax",
- "js-sys",
- "pdfcraft-crypt",
- "pdfcraft-filters",
- "pdfcraft-oracle",
- "pdfcraft-testkit",
- "proptest",
- "serde_json",
- "thiserror 2.0.21",
- "wasm-bindgen",
-]
-
-[[package]]
-name = "pdfcraft-create"
-version = "0.18.1"
-dependencies = [
- "encoding_rs",
- "hayro-ccitt",
- "hayro-syntax",
- "image",
- "pdfcraft-cos",
- "pdfcraft-filters",
- "pdfcraft-fonts",
- "pdfcraft-model",
- "pdfcraft-xfa",
- "png 0.18.1",
- "thiserror 2.0.21",
- "tiff",
- "zune-jpeg",
-]
-
-[[package]]
-name = "pdfcraft-crypt"
-version = "0.18.1"
-dependencies = [
- "aes",
- "md-5",
- "proptest",
- "sha2 0.11.1",
- "stringprep",
- "thiserror 2.0.21",
- "zeroize",
-]
-
-[[package]]
-name = "pdfcraft-edit"
-version = "0.18.1"
-dependencies = [
- "hayro-syntax",
- "icu_segmenter",
- "kurbo 0.13.1",
- "pdfcraft-annot",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-fonts",
- "pdfcraft-model",
- "pdfcraft-render",
- "proptest",
- "sha2 0.11.1",
- "thiserror 2.0.21",
- "unicode-bidi",
-]
-
-[[package]]
-name = "pdfcraft-engine"
-version = "0.18.1"
-dependencies = [
- "chrono",
- "craft-docpath",
- "getrandom 0.4.3",
- "icu_properties",
- "idna",
- "image",
- "pdfcraft-a11y",
- "pdfcraft-annot",
- "pdfcraft-audit",
- "pdfcraft-compare",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-create",
- "pdfcraft-edit",
- "pdfcraft-export",
- "pdfcraft-filters",
- "pdfcraft-fonts",
- "pdfcraft-forms",
- "pdfcraft-geom",
- "pdfcraft-js",
- "pdfcraft-measure",
- "pdfcraft-model",
- "pdfcraft-ocr",
- "pdfcraft-optimize",
- "pdfcraft-organize",
- "pdfcraft-preflight",
- "pdfcraft-print",
- "pdfcraft-redact",
- "pdfcraft-render",
- "pdfcraft-sign",
- "pdfcraft-testkit",
- "pdfcraft-xfa",
- "pdfcraft-xfdf",
- "png 0.18.1",
- "thiserror 2.0.21",
- "tiff",
- "unicode-segmentation",
- "url",
-]
-
-[[package]]
-name = "pdfcraft-export"
-version = "0.18.1"
-dependencies = [
- "flate2",
-]
-
-[[package]]
-name = "pdfcraft-filters"
-version = "0.18.1"
-dependencies = [
- "fax",
- "flate2",
- "hayro-ccitt",
- "hayro-jbig2",
- "proptest",
- "thiserror 2.0.21",
- "weezl 0.2.1",
-]
-
-[[package]]
-name = "pdfcraft-fonts"
-version = "0.18.1"
-dependencies = [
- "harfrust",
- "pdfcraft-cos",
- "skrifa 0.44.0",
- "unicode-bidi",
-]
-
-[[package]]
-name = "pdfcraft-forms"
-version = "0.18.1"
-dependencies = [
- "hayro-syntax",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-fonts",
- "pdfcraft-model",
- "proptest",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "pdfcraft-geom"
-version = "0.18.1"
-
-[[package]]
-name = "pdfcraft-js"
-version = "0.18.1"
-dependencies = [
- "boa_engine",
- "chrono",
-]
-
-[[package]]
-name = "pdfcraft-measure"
-version = "0.18.1"
-dependencies = [
- "pdfcraft-annot",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-model",
- "pdfcraft-testkit",
- "serde",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "pdfcraft-model"
-version = "0.18.1"
-dependencies = [
- "pdfcraft-cos",
-]
-
-[[package]]
-name = "pdfcraft-ocr"
-version = "0.18.1"
-dependencies = [
- "ocrs",
- "pdfcraft-fonts",
- "png 0.18.1",
- "rten",
- "rten-imageproc",
- "serde_json",
- "sha2 0.11.1",
- "tempfile",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "pdfcraft-ocr-worker"
-version = "0.18.1"
-dependencies = [
- "js-sys",
- "pdfcraft-ocr",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
-name = "pdfcraft-optimize"
-version = "0.18.1"
-dependencies = [
- "image",
- "pdfcraft-annot",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-filters",
- "pdfcraft-model",
- "pdfcraft-render",
- "proptest",
- "thiserror 2.0.21",
- "thread-priority",
- "zune-jpeg",
-]
-
-[[package]]
-name = "pdfcraft-oracle"
-version = "0.18.1"
-
-[[package]]
-name = "pdfcraft-organize"
-version = "0.18.1"
-dependencies = [
- "hayro-syntax",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-oracle",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "pdfcraft-platform"
-version = "0.18.1"
-dependencies = [
- "async-channel",
- "futures-lite",
- "rustix 1.1.6",
- "zbus",
-]
-
-[[package]]
-name = "pdfcraft-prc"
-version = "0.18.1"
-dependencies = [
- "flate2",
- "proptest",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "pdfcraft-prc-render"
-version = "0.18.1"
-dependencies = [
- "flate2",
- "pdfcraft-prc",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "pdfcraft-preflight"
-version = "0.18.1"
-dependencies = [
- "flate2",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-model",
- "roxmltree 0.21.2",
-]
-
-[[package]]
-name = "pdfcraft-print"
-version = "0.18.1"
-dependencies = [
- "craft-print",
- "log",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-model",
- "pdfcraft-render",
- "skrifa 0.44.0",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "pdfcraft-redact"
-version = "0.18.1"
-dependencies = [
- "aho-corasick",
- "pdfcraft-annot",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-edit",
- "pdfcraft-filters",
- "pdfcraft-fonts",
- "pdfcraft-forms",
- "pdfcraft-geom",
- "pdfcraft-model",
- "pdfcraft-render",
- "pdfcraft-testkit",
- "pdfcraft-xfa",
- "regex",
- "roxmltree 0.21.2",
- "sha2 0.11.1",
- "thiserror 2.0.21",
- "unicode-normalization",
-]
-
-[[package]]
-name = "pdfcraft-render"
-version = "0.18.1"
-dependencies = [
- "bytemuck",
- "flate2",
- "getrandom 0.4.3",
- "hayro",
- "hayro-syntax",
- "kurbo 0.13.1",
- "log",
- "lopdf",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-fonts",
- "pdfcraft-geom",
- "pdfcraft-testkit",
- "serde",
- "skrifa 0.44.0",
- "thiserror 2.0.21",
- "unicode-bidi",
- "url",
-]
-
-[[package]]
-name = "pdfcraft-sign"
-version = "0.18.1"
-dependencies = [
- "aes",
- "aws-lc-rs",
- "base64 0.23.1",
- "bp256",
- "bp384",
- "cbc",
- "chrono",
- "crypto-bigint",
- "des",
- "ecdsa",
- "ed25519-dalek",
- "getrandom 0.4.3",
- "hmac",
- "p256",
- "p384",
- "p521",
- "pbkdf2",
- "pdfcraft-annot",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-fonts",
- "pdfcraft-model",
- "pdfcraft-testkit",
- "rc2",
- "ripemd",
- "rsa",
- "rustls-cng",
- "security-framework",
- "sha1 0.11.0",
- "sha2 0.11.1",
- "sha3",
- "thiserror 2.0.21",
- "zeroize",
-]
-
-[[package]]
-name = "pdfcraft-testkit"
-version = "0.18.1"
-
-[[package]]
-name = "pdfcraft-ui-egui"
-version = "0.18.1"
-dependencies = [
- "arboard",
- "base64 0.23.1",
- "block2 0.6.2",
- "bytemuck",
- "chrono",
- "craft-i18n",
- "craft-keymap",
- "craft-menu",
- "craft-quit",
- "craft-ui",
- "eframe",
- "egui",
- "egui_extras",
- "egui_kittest",
- "flate2",
- "fontconfig-parser",
- "getrandom 0.4.3",
- "image",
- "js-sys",
- "log",
- "nodalia-update",
- "objc2 0.6.5",
- "objc2-app-kit 0.3.2",
- "objc2-foundation 0.3.2",
- "pdfcraft-content",
- "pdfcraft-cos",
- "pdfcraft-engine",
- "pdfcraft-fonts",
- "pdfcraft-model",
- "pdfcraft-ocr",
- "pdfcraft-platform",
- "pdfcraft-render",
- "pdfcraft-xfa",
- "plist",
- "png 0.18.1",
- "pollster 1.0.1",
- "proptest",
- "rfd",
- "rustix 1.1.6",
- "serde",
- "serde_json",
- "skrifa 0.44.0",
- "sys-locale",
- "toml",
- "unicode-bidi",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
- "web-time",
- "winsafe",
- "xattr",
- "zeroize",
-]
-
-[[package]]
-name = "pdfcraft-web"
-version = "0.18.1"
-dependencies = [
- "craft-web-api",
- "craft-web-host",
- "eframe",
- "egui",
- "js-sys",
- "pdfcraft-ui-egui",
- "serde_json",
- "wasm-bindgen-futures",
- "web-sys",
-]
-
-[[package]]
-name = "pdfcraft-xfa"
-version = "0.18.1"
-dependencies = [
- "base64 0.23.1",
- "image",
- "pdfcraft-cos",
- "pdfcraft-fonts",
- "png 0.18.1",
- "roxmltree 0.21.2",
- "sha2 0.11.1",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "pdfcraft-xfdf"
-version = "0.18.1"
-dependencies = [
- "base64 0.23.1",
- "pdfcraft-annot",
- "pdfcraft-cos",
- "pdfcraft-forms",
- "pdfcraft-model",
- "proptest",
- "roxmltree 0.21.2",
- "thiserror 2.0.21",
 ]
 
 [[package]]
@@ -8481,8 +8481,8 @@ dependencies = [
  "anyhow",
  "chrono",
  "lopdf",
- "pdfcraft-cos",
- "pdfcraft-oracle",
+ "papel-cos",
+ "papel-oracle",
  "png 0.18.1",
  "serde",
  "serde_json",

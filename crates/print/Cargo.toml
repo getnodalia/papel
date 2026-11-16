@@ -1,5 +1,5 @@
 [package]
-name = "pdfcraft-print"
+name = "papel-print"
 description = "Printing: page selection, sizing (fit, actual, shrink, custom), multiple pages per sheet, booklets, posters, comments & forms; print-ready PDF and the system spooler"
 version.workspace = true
 edition.workspace = true
@@ -11,12 +11,12 @@ workspace = true
 [dependencies]
 craft-print = { workspace = true }
 log = { workspace = true }
-pdfcraft-cos = { workspace = true }
-pdfcraft-content = { workspace = true }
-pdfcraft-model = { workspace = true }
+papel-cos = { workspace = true }
+papel-content = { workspace = true }
+papel-model = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]
-pdfcraft-render = { workspace = true }
+papel-render = { workspace = true }
 # Reads the renamed programs back with a parser that isn't ours.
 skrifa = "0.44"

@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=Papel
+GenericName=PDF Editor
+Comment=Read, organize, combine, split and secure PDFs
+Exec=papel %U
+TryExec=papel
+Icon=dev.danielmiguelt.Papel
+Terminal=false
+StartupNotify=true
+StartupWMClass=dev.danielmiguelt.Papel
+Categories=Office;Viewer;
+Keywords=pdf;viewer;editor;annotate;sign;forms;merge;split;
+MimeType=application/pdf;

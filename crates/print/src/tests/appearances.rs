@@ -1,5 +1,5 @@
 use super::*;
-use pdfcraft_render::{PageRenderer, RenderConfig, RenderRequest, RenderedPage, RequestKind};
+use papel_render::{PageRenderer, RenderConfig, RenderRequest, RenderedPage, RequestKind};
 
 fn numbers(values: &[f64]) -> Object {
     Object::Array(values.iter().copied().map(Object::Real).collect())
@@ -8,7 +8,7 @@ fn numbers(values: &[f64]) -> Object {
 // Contributor-original artwork uses a named color resource, without fonts or external assets.
 fn widget_fixture(subtype: Option<Object>, matrix: Option<[f64; 6]>) -> (Document, ObjRef, ObjRef) {
     let mut doc = fixture(1);
-    let page = pdfcraft_model::pages(&doc)[0].obj;
+    let page = papel_model::pages(&doc)[0].obj;
     let mut colors = Dict::new();
     colors.set(b"Ink".to_vec(), Object::name("DeviceRGB"));
     let mut resources = Dict::new();
@@ -116,7 +116,7 @@ fn printable_link_appearance_survives_vector_print() {
             assert_eq!(pixel(&printed, 30, 70), color, "flags={flags}, content={content:?}");
             let mut raster_source = doc.clone();
             keep_printed(&mut raster_source, content);
-            let page = &pdfcraft_model::pages(&raster_source)[0];
+            let page = &papel_model::pages(&raster_source)[0];
             let annots = raster_source.resolve(page.dict.get(b"Annots").unwrap());
             assert_eq!(annots.as_array().unwrap().len(), usize::from(expected), "raster flags={flags}, content={content:?}");
             assert_eq!(saved(&doc), before, "source remains unchanged");
@@ -142,7 +142,7 @@ fn printable_link_appearance_survives_vector_print() {
 fn annotation_appearances_do_not_replace_page_xobjects() {
     for inherited in [false, true] {
         let (mut doc, ap, widget) = widget_fixture(Some(Object::name("Form")), None);
-        let page = pdfcraft_model::pages(&doc)[0].obj;
+        let page = papel_model::pages(&doc)[0].obj;
         let mut xobjects = Dict::new();
         for (name, color) in [("PCPrA0", "1 0 0"), ("PCPrA1", "0 0 1"), ("PCPrA3", "1 0 0")] {
             let dict = Dict::from_iter([
@@ -417,7 +417,7 @@ fn invalid_annotation_states_do_not_select_an_appearance() {
             "absent" => None,
             "null" => Some(Object::Null),
             "integer" => Some(Object::Int(1)),
-            "string" => Some(Object::String(pdfcraft_cos::PdfString::literal(b"Yes".to_vec()))),
+            "string" => Some(Object::String(papel_cos::PdfString::literal(b"Yes".to_vec()))),
             "missing-name" => Some(Object::name("Missing")),
             "unresolved" => Some(Object::Ref(ObjRef::new(999_999, 0))),
             "cyclic" => {
@@ -498,7 +498,7 @@ fn missing_subtype_appearance_survives_vector_print() {
     assert_eq!(pixel(&source, 30, 70), [0, 255, 0, 255], "source display");
     let output = impose(&doc, &print_settings(Content::Document)).unwrap();
     let reopened = Document::open(Arc::new(output.clone())).unwrap();
-    assert_eq!(pdfcraft_model::pages(&reopened).len(), 1);
+    assert_eq!(papel_model::pages(&reopened).len(), 1);
     let printed = render(output);
     assert_eq!(pixel(&printed, 5, 5), [255, 255, 255, 255], "outside the appearance");
     assert_eq!(pixel(&printed, 30, 70), [0, 255, 0, 255], "imposed missing-Subtype appearance");
@@ -509,7 +509,7 @@ fn missing_subtype_appearance_survives_vector_print() {
     assert_eq!(doc.get(ap), original);
     assert_eq!(saved(&doc), before);
     let source = Document::open(Arc::new(before)).unwrap();
-    let page = &pdfcraft_model::pages(&source)[0];
+    let page = &papel_model::pages(&source)[0];
     let annots = source.resolve(page.dict.get(b"Annots").unwrap());
     let widget = source.resolve(&annots.as_array().unwrap()[0]);
     let selected = appearance(&source, widget.as_dict().unwrap()).unwrap();
@@ -517,7 +517,7 @@ fn missing_subtype_appearance_survives_vector_print() {
     assert!(!stream.dict.contains(b"Subtype") && !stream.dict.contains(b"Type"));
     assert_eq!(stream.decoded().unwrap(), b"/Ink cs 0 1 0 scn 0 0 20 10 re f");
     assert_eq!(source.resolve(stream.dict.get(b"Resources").unwrap()), doc.resolve(original.as_dict().unwrap().get(b"Resources").unwrap()));
-    let sheet = &pdfcraft_model::pages(&reopened)[0];
+    let sheet = &papel_model::pages(&reopened)[0];
     let form = reopened.get(xobject(&reopened, &sheet.dict, b"P0"));
     let promoted = reopened.get(xobject(&reopened, form.as_dict().unwrap(), b"PCPrA0"));
     let Object::Stream(promoted) = &*promoted else { panic!("promoted AP stream") };
@@ -535,8 +535,8 @@ fn missing_subtype_appearance_survives_vector_print() {
     // The writer can spell integral Real values as integers. Compare their PDF values.
     let mut actual_bytes = Vec::new();
     let mut expected_bytes = Vec::new();
-    pdfcraft_cos::serialize(&Object::Dict(actual), &mut actual_bytes);
-    pdfcraft_cos::serialize(&Object::Dict(expected), &mut expected_bytes);
+    papel_cos::serialize(&Object::Dict(actual), &mut actual_bytes);
+    papel_cos::serialize(&Object::Dict(expected), &mut expected_bytes);
     assert_eq!(actual_bytes, expected_bytes);
 }
 
@@ -571,7 +571,7 @@ fn annotation_placement_preserves_small_transform_coefficients() {
                 assert!(source.rgba == control.rgba, "equivalent source, scale={scale}, matrix={scaled_matrix}, {subtype}");
                 let printed = impose(&doc, &print_settings(content)).unwrap();
                 let reopened = Document::open(Arc::new(printed.clone())).unwrap();
-                assert_eq!(pdfcraft_model::pages(&reopened).len(), 1);
+                assert_eq!(papel_model::pages(&reopened).len(), 1);
                 let printed = render(printed);
                 assert_eq!(pixel(&printed, 30, 70), [0, 255, 0, 255], "scale={scale}, matrix={scaled_matrix}, {subtype}");
                 if content != Content::FormFieldsOnly {
@@ -579,10 +579,10 @@ fn annotation_placement_preserves_small_transform_coefficients() {
                 }
                 // Check the serialized placement too: sub-pixel translation rounding may be
                 // invisible at 72 dpi while still moving the appearance's physical corners.
-                let page = &pdfcraft_model::pages(&reopened)[0];
+                let page = &papel_model::pages(&reopened)[0];
                 let page_form = reopened.get(xobject(&reopened, &page.dict, b"P0"));
                 let Object::Stream(page_form) = &*page_form else { panic!("page form") };
-                let parsed = pdfcraft_content::parse(&page_form.decoded().unwrap());
+                let parsed = papel_content::parse(&page_form.decoded().unwrap());
                 assert_eq!(parsed.skipped, 0);
                 let matrices: Vec<_> = parsed.ops.iter().filter(|op| op.is("cm")).collect();
                 assert_eq!(matrices.len(), 1);
@@ -602,7 +602,7 @@ fn annotation_placement_preserves_small_transform_coefficients() {
 #[test]
 fn unusable_appearance_geometry_keeps_page_artwork() {
     let (mut control, _, _) = widget_fixture(Some(Object::name("Form")), None);
-    let page = pdfcraft_model::pages(&control)[0].obj;
+    let page = papel_model::pages(&control)[0].obj;
     control
         .update_dict(page, |d| {
             d.remove(b"Annots");
@@ -637,14 +637,14 @@ fn promotion_preserves_streams_and_explicit_subtypes() {
     for subtype in [None, Some(Object::name("Form")), Some(Object::name("Image")), Some(Object::Null), Some(Object::Int(7))] {
         let (mut doc, ap, _) = widget_fixture(subtype.clone(), Some([2.0, 0.0, 0.0, 3.0, 5.0, 7.0]));
         let original = doc.get(ap);
-        let pages = pdfcraft_model::pages(&doc);
+        let pages = papel_model::pages(&doc);
         let form = page_form(&mut doc, &pages, 0, Content::Document, &mut std::collections::HashMap::new()).unwrap();
         assert_eq!(doc.get(ap), original, "original in the print clone");
         let promoted = xobject(&doc, doc.get(form).as_dict().unwrap(), b"PCPrA0");
         if subtype.is_some() {
             assert_eq!(promoted, ap, "an explicit subtype keeps its object");
             let printed = Document::open(Arc::new(impose(&doc, &print_settings(Content::Document)).unwrap())).unwrap();
-            let sheet = &pdfcraft_model::pages(&printed)[0];
+            let sheet = &papel_model::pages(&printed)[0];
             let page_form = printed.get(xobject(&printed, &sheet.dict, b"P0"));
             let printed_ap = printed.get(xobject(&printed, page_form.as_dict().unwrap(), b"PCPrA0"));
             assert_eq!(printed_ap.as_dict().unwrap().get(b"Subtype"), subtype.as_ref(), "explicit subtype survives serialization");
@@ -684,7 +684,7 @@ fn selected_shared_appearances_keep_placement_flags_and_content_modes() {
             copy.set(b"F".to_vec(), Object::Int(flags));
             widgets.push(Object::Ref(doc.add(Object::Dict(copy))));
         }
-        let page = pdfcraft_model::pages(&doc)[0].obj;
+        let page = papel_model::pages(&doc)[0].obj;
         doc.update_dict(page, |d| d.set(b"Annots".to_vec(), Object::Array(widgets))).unwrap();
         let before = saved(&doc);
         for (mode, content) in
@@ -692,8 +692,8 @@ fn selected_shared_appearances_keep_placement_flags_and_content_modes() {
         {
             let output = impose(&doc, &print_settings(content)).unwrap();
             let reopened = Document::open(Arc::new(output.clone())).unwrap();
-            assert_eq!(pdfcraft_model::pages(&reopened).len(), 1);
-            let sheet = &pdfcraft_model::pages(&reopened)[0];
+            assert_eq!(papel_model::pages(&reopened).len(), 1);
+            let sheet = &papel_model::pages(&reopened)[0];
             let form = reopened.get(xobject(&reopened, &sheet.dict, b"P0"));
             assert_eq!(
                 xobject(&reopened, form.as_dict().unwrap(), b"PCPrA0"),
@@ -738,7 +738,7 @@ fn shared_promotions_span_pages_without_merging_distinct_sources() {
         dict.set(b"Resources".to_vec(), Object::Ref(resources));
         appearances.push(doc.add(Object::Stream(Stream::from_raw(dict, payload.clone()))));
     }
-    let pages = pdfcraft_model::pages(&doc);
+    let pages = papel_model::pages(&doc);
     for (index, page) in pages.iter().enumerate() {
         let mut widgets = Vec::new();
         for (ap, rect) in [(appearances[0], [10.0, 20.0, 50.0, 40.0]), (appearances[0], [60.0, 20.0, 90.0, 40.0])]
@@ -772,7 +772,7 @@ fn shared_promotions_span_pages_without_merging_distinct_sources() {
     for _ in 0..2 {
         let output = impose(&doc, &settings).unwrap();
         let reopened = Document::open(Arc::new(output.clone())).unwrap();
-        let sheets = pdfcraft_model::pages(&reopened);
+        let sheets = papel_model::pages(&reopened);
         assert_eq!(sheets.len(), 2);
         let mut shared = Vec::new();
         let mut distinct = None;
@@ -840,7 +840,7 @@ fn no_rotate_fixture(rotation: Object, origin: [f64; 2], subtype: &str, flags: i
         d.set(b"Rect".to_vec(), numbers(&[x + 40.0, y + 40.0, x + 60.0, y + 50.0]));
     })
     .unwrap();
-    let page = pdfcraft_model::pages(&doc)[0].obj;
+    let page = papel_model::pages(&doc)[0].obj;
     doc.update_dict(page, |d| {
         d.set(b"MediaBox".to_vec(), numbers(&[x - 20.0, y - 20.0, x + 120.0, y + 120.0]));
         d.set(b"CropBox".to_vec(), numbers(&[x, y, x + 100.0, y + 100.0]));
@@ -954,7 +954,7 @@ fn no_rotate_keeps_appearance_matrix_and_shifted_inherited_page_geometry() {
                     )),
                 );
             }
-            let page = pdfcraft_model::pages(&doc)[0].obj;
+            let page = papel_model::pages(&doc)[0].obj;
             if inherited {
                 let parent = doc.get(page).as_dict().unwrap().reference(b"Parent").unwrap();
                 let rotation = Object::Ref(doc.add(Object::Int(rotation)));
@@ -990,7 +990,7 @@ fn no_rotate_keeps_appearance_matrix_and_shifted_inherited_page_geometry() {
 fn malformed_page_rotation_keeps_no_rotate_appearance_upright() {
     for rotation in [Object::Int(135), Object::Int(-45), Object::Real(90.5), Object::name("QuarterTurn")] {
         let (doc, _, _) = no_rotate_fixture(rotation.clone(), [-20.0, 30.0], "Widget", 20);
-        assert_eq!(pdfcraft_model::pages(&doc)[0].rotation(&doc), 0);
+        assert_eq!(papel_model::pages(&doc)[0].rotation(&doc), 0);
         let before = saved(&doc);
         let printed = render(impose(&doc, &print_settings(Content::Document)).unwrap());
         assert_upright_corners(&printed, (40, 50), 1);
@@ -1002,7 +1002,7 @@ fn malformed_page_rotation_keeps_no_rotate_appearance_upright() {
 #[test]
 fn no_rotate_keeps_user_units_and_sheet_scaling() {
     let (mut doc, _, annotation) = no_rotate_fixture(Object::Int(90), [-20.0, 30.0], "Widget", 28);
-    let page = pdfcraft_model::pages(&doc)[0].obj;
+    let page = papel_model::pages(&doc)[0].obj;
     doc.update_dict(page, |d| d.set(b"UserUnit".to_vec(), Object::Int(2))).unwrap();
     // Resolve the same flags as the existing print path; NoZoom does not cancel print scale.
     let flags = doc.add(Object::Int(28));
@@ -1027,7 +1027,7 @@ fn no_rotate_is_per_invocation_when_appearances_are_shared() {
     control.set(b"F".to_vec(), Object::Int(4));
     control.set(b"Rect".to_vec(), numbers(&[10.0, 10.0, 30.0, 20.0]));
     let control = doc.add(Object::Dict(control));
-    let page = pdfcraft_model::pages(&doc)[0].obj;
+    let page = papel_model::pages(&doc)[0].obj;
     doc.update_dict(page, |d| d.set(b"Annots".to_vec(), Object::Array(vec![Object::Ref(annotation), Object::Ref(control)]))).unwrap();
     let before = saved(&doc);
     let original = doc.get(ap);
@@ -1038,7 +1038,7 @@ fn no_rotate_is_per_invocation_when_appearances_are_shared() {
     for ((x, y), color) in [(17, 15), (17, 25), (12, 15), (12, 25)].into_iter().zip(CORNER_COLORS) {
         assert_eq!(pixel(&rendered, x, y), color, "unflagged use of the shared appearance");
     }
-    let sheet = &pdfcraft_model::pages(&reopened)[0];
+    let sheet = &papel_model::pages(&reopened)[0];
     let form = reopened.get(xobject(&reopened, &sheet.dict, b"P0"));
     assert_eq!(xobject(&reopened, form.as_dict().unwrap(), b"PCPrA0"), xobject(&reopened, form.as_dict().unwrap(), b"PCPrA1"));
     assert_eq!(doc.get(ap), original);

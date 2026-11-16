@@ -264,7 +264,7 @@ fn request_sharper(
 #[allow(clippy::too_many_arguments)]
 pub(super) fn organize_grid(
     view: &mut DocView,
-    doc: &pdfcraft_engine::Document,
+    doc: &papel_engine::Document,
     unobstructed: bool,
     keys: PageKeys,
     show_page_edge_shadows: bool,

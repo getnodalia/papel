@@ -98,7 +98,7 @@ jobs:
       - name: Check the DMG
         run: |
           set -euo pipefail
-          dmgs=("$DIST"/pdfcraft-*-macos-"$ARCH".dmg)
+          dmgs=("$DIST"/papel-*-macos-"$ARCH".dmg)
           if [[ ${#dmgs[@]} -ne 1 || ! -f "${dmgs[0]}" ]]; then
             echo "expected exactly one macOS DMG" >&2
             exit 1
@@ -117,12 +117,12 @@ jobs:
           echo "linked against SDK $sdk"
           test "${sdk%%.*}" -ge 26
           hdiutil detach /Volumes/check
-          (cd "$DIST" && shasum -a 256 pdfcraft-*-macos-* > SHA256SUMS-macos && cat SHA256SUMS-macos)
+          (cd "$DIST" && shasum -a 256 papel-*-macos-* > SHA256SUMS-macos && cat SHA256SUMS-macos)
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: pdfcraft-macos-${{ env.ARCH }}
-          path: dist/pdfcraft-*-macos-*
+          name: papel-macos-${{ env.ARCH }}
+          path: dist/papel-*-macos-*
           if-no-files-found: error
           retention-days: 14
 
@@ -131,4 +131,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.tag }}
-        run: gh release upload "$TAG" "$DIST"/pdfcraft-*-macos-* --clobber --repo "$GITHUB_REPOSITORY"
+        run: gh release upload "$TAG" "$DIST"/papel-*-macos-* --clobber --repo "$GITHUB_REPOSITORY"

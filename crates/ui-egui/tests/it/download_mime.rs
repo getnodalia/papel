@@ -1,7 +1,7 @@
 //! The type a web download is offered as follows the file's extension (it was `application/pdf`
 //! for every file).
 
-use pdfcraft_ui_egui::download_mime_type;
+use papel_ui_egui::download_mime_type;
 
 #[test]
 fn png_downloads_as_image_png() {

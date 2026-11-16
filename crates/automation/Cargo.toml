@@ -1,6 +1,6 @@
 [package]
-name = "pdfcraft-automation"
-description = "Agent control for PdfCraft: a headless tool set over the engine and an MCP server"
+name = "papel-automation"
+description = "Agent control for Papel: a headless tool set over the engine and an MCP server"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -9,13 +9,13 @@ license.workspace = true
 workspace = true
 
 [dependencies]
-pdfcraft-engine = { workspace = true }
-pdfcraft-cos = { workspace = true }
-pdfcraft-render = { workspace = true }
-pdfcraft-organize = { workspace = true }
-pdfcraft-platform = { workspace = true }
-pdfcraft-prc = { workspace = true }
-pdfcraft-prc-render = { workspace = true }
+papel-engine = { workspace = true }
+papel-cos = { workspace = true }
+papel-render = { workspace = true }
+papel-organize = { workspace = true }
+papel-platform = { workspace = true }
+papel-prc = { workspace = true }
+papel-prc-render = { workspace = true }
 serde_json = { workspace = true }
 sha2 = "0.11"
 tempfile = "3.27"
@@ -28,11 +28,11 @@ default = ["mcp"]
 mcp = ["dep:base64"]
 
 [dev-dependencies]
-pdfcraft-fonts = { workspace = true }
+papel-fonts = { workspace = true }
 png = "0.18"
 flate2.workspace = true
-pdfcraft-model = { workspace = true }
-pdfcraft-xfa = { workspace = true }
+papel-model = { workspace = true }
+papel-xfa = { workspace = true }
 image = { version = "0.25", default-features = false, features = ["jpeg"] }
 
 [target.'cfg(target_os = "macos")'.dev-dependencies]

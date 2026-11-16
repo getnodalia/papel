@@ -1,4 +1,4 @@
-# pdfcraft-xfdf
+# papel-xfdf
 
 Layer L4: comment and form data exchange (execution plan M5.6, M6.7).
 

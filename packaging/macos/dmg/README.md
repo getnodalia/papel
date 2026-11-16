@@ -14,10 +14,10 @@ scripting on CI, nothing extra installed in the signing job).
 
 ## The volume name has no version
 
-The mounted volume is called `PdfCraft`, not `PdfCraft <version>`. The layout points at the background
+The mounted volume is called `Papel`, not `Papel <version>`. The layout points at the background
 through an alias that includes the volume name, and Finder resolves it by that name: with a
 versioned name the window keeps its size and icon positions but shows no background (tested).
-The DMG file name (`pdfcraft-<version>-macos-<arch>.dmg`) still carries the version.
+The DMG file name (`papel-<version>-macos-<arch>.dmg`) still carries the version.
 
 ## Rules
 
@@ -41,4 +41,4 @@ alias holding only the volume name and `/.background/background.tiff`. If you ad
 outline it (`usvg` from resvg converts text to paths). The window is 660 × 432 with Finder's 32 pt
 title bar; the content area is 660 × 400.
 
-This follows Pluma's `packaging/macos/dmg/` (storytold/vectorcraft#493).
+This follows Pluma's `packaging/macos/dmg/` (getnodalia/pluma).

@@ -3,10 +3,10 @@
 //! printing, changes, copying, screen readers). Execution plan M8.1.
 
 use egui::{Align, Color32, Layout};
-use pdfcraft_engine::{Changes, Edit, Printing, Protection};
+use papel_engine::{Changes, Edit, Printing, Protection};
 
 use crate::theme::{self, Tokens};
-use crate::{PdfCraftApp, widgets};
+use crate::{PapelApp, widgets};
 
 /// The dialog's state while it is open.
 #[derive(Clone, Debug, PartialEq)]
@@ -46,7 +46,7 @@ impl ProtectDraft {
             Some("Type a password.")
         } else if self.password != self.confirm {
             Some("The passwords don't match.")
-        } else if self.protection.algorithm != pdfcraft_engine::Algorithm::Aes256 && !self.password.chars().all(|c| (' '..='~').contains(&c)) {
+        } else if self.protection.algorithm != papel_engine::Algorithm::Aes256 && !self.password.chars().all(|c| (' '..='~').contains(&c)) {
             Some("This compatibility level supports only plain ASCII passwords.")
         } else {
             None
@@ -105,8 +105,8 @@ fn radio(ui: &mut egui::Ui, t: &Tokens, on: bool, label: &str) -> egui::Response
 }
 
 /// Draw the dialog body; returns (apply, cancel).
-pub(crate) fn body(ui: &mut egui::Ui, app: &mut PdfCraftApp, t: &Tokens) -> (bool, bool) {
-    use pdfcraft_engine::Algorithm as A;
+pub(crate) fn body(ui: &mut egui::Ui, app: &mut PapelApp, t: &Tokens) -> (bool, bool) {
+    use papel_engine::Algorithm as A;
     let d = &mut app.protect_draft;
     ui.label(egui::RichText::new(tl!("Protect Using Password")).font(theme::semibold(18.0)));
     ui.add_space(4.0);
@@ -271,7 +271,7 @@ mod tests {
         use egui_kittest::{Harness, kittest::Queryable};
 
         let mut h = Harness::builder().with_size(egui::vec2(1200.0, 800.0)).build_eframe(|_| {
-            let mut app = PdfCraftApp::new();
+            let mut app = PapelApp::new();
             app.set_option("language", "en").unwrap();
             app.dialog = Some(crate::Dialog::Protect);
             app.protect_draft.password = "TopSecret123!".into();

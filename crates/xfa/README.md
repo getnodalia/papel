@@ -1,7 +1,7 @@
-# pdfcraft-xfa
+# papel-xfa
 
-XFA forms (XFA 3.3, the template and layout parts). Layer L3; depends on `pdfcraft-cos` and
-`pdfcraft-fonts` only.
+XFA forms (XFA 3.3, the template and layout parts). Layer L3; depends on `papel-cos` and
+`papel-fonts` only.
 
 A dynamic XFA form is a PDF shell around an XML template (`/AcroForm /XFA`): one placeholder page
 ("requires Adobe Reader") and `/NeedsRendering true`. Viewers without an XFA engine show the
@@ -127,18 +127,18 @@ be measured exponentially often in their nesting. A measurement budget backs thi
 ## API sketch
 
 ```rust
-if pdfcraft_xfa::is_dynamic(&doc) {
-    let report = pdfcraft_xfa::render_into(&mut doc)?;   // pages, fields, warnings
-    for f in pdfcraft_forms::fields(&doc) { pdfcraft_forms::redraw_field(&mut doc, &f.name)?; }
+if papel_xfa::is_dynamic(&doc) {
+    let report = papel_xfa::render_into(&mut doc)?;   // pages, fields, warnings
+    for f in papel_forms::fields(&doc) { papel_forms::redraw_field(&mut doc, &f.name)?; }
 }
-let form = pdfcraft_xfa::layout_xml(template_xml)?;       // pages of items, for tests
+let form = papel_xfa::layout_xml(template_xml)?;       // pages of items, for tests
 ```
 
 ## Deliberately not done (yet)
 
 - **Data binding** is the default one only: explicit `bind ref` expressions, global binding and
   data descriptions are not followed (a data description is kept as written, not checked).
-- **Scripting.** JavaScript (boa) and FormCalc (a native interpreter, `pdfcraft_js::formcalc`)
+- **Scripting.** JavaScript (boa) and FormCalc (a native interpreter, `papel_js::formcalc`)
   share one object model, one set of effects and one set of budgets. FormCalc covers the
   language and the common built-ins (arithmetic, logical, string, date/time, financial, unit);
   not locale-aware pictures beyond simple number and date ones, or `Get`/`Post`/`Put` (refused).

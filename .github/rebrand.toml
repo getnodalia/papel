@@ -1,0 +1,407 @@
+# What `scripts/rebrand.py` renames: upstream's PdfCraft becomes Papel, in file contents and in
+# paths. The weekly upstream sync applies the same rules to upstream's tree before merging it, so
+# a rule added here applies to everything upstream sends from then on.
+#
+# Replacements are literal and case-sensitive, applied in order: put the longer, more specific
+# ones first. Keep spans are found before any replacement, so a replacement never reaches inside
+# one.
+
+# Left as they are wherever they appear (in file contents and in paths).
+keep = [
+    # Links to upstream's issues, pull requests and commits, and to other people's repositories:
+    # history, not branding. Links to upstream's tree and repository page are renamed below.
+    "(https?://)?github\\.com/storytold/[\\w.-]+/(issues|pull|commit|discussions)/[^\\s)\\]\"'<>`]*",
+    "https?://(github\\.com|raw\\.githubusercontent\\.com)/(?!storytold/(pdfcraft|craft-fonts|craft-i18n|craft-libs|egui|winit)\\b|getnodalia|danielmigueltejedor)[^\\s)\\]\"'<>`]*",
+    # A Cargo [patch] names the source it overrides, which other crates still point at.
+    "\\[patch\\.\"https://github\\.com/storytold/[^\"]+\"\\]",
+    # Upstream's issues named without a link (`storytold/pdfcraft#123`).
+    "storytold/[\\w.-]+#\\d+",
+    # Upstream's repository in the sync workflow and in the record of what came from it.
+    "(?<=UPSTREAM_REPO: )storytold/pdfcraft",
+    # The translation catalog this app reads in the shared translations is named after upstream.
+    "pdfcraft\\.tsv",
+    # Credit for work done upstream.
+    "PdfCraft contributors",
+    "ArtCraft Team",
+]
+
+# Files left alone entirely.
+skip = [
+    ".github/rebrand.toml",
+    "scripts/rebrand.py",
+    # Licence notices keep upstream's copyright line, which the licences require.
+    "NOTICE",
+    "LICENSE-*",
+    "licenses/*",
+    # The record of what came from upstream, and upstream's own README kept for reference.
+    "docs/upstream.md",
+    "NODALIA_MIGRATION.md",
+    "docs/upstream-readme.md",
+    # Binary Finder layout of the disk image: rebuilt by its own script.
+    "*.DS_Store",
+    # Upstream's brand artwork: never modified (its licence forbids it); Papel does not use it.
+    "docs/brand/*",
+]
+
+# Run after renaming: shorter names change how rustfmt wraps lines and sorts imports.
+after = [["cargo", "fmt", "--all"]]
+
+# Lines that keep this app's value when upstream's tree is rebranded (the sync passes --pin-from).
+[[pin]]
+file = "Cargo.toml"
+pattern = '^version = "[^"]*"'
+
+# The workspace's own crates carry the version too (they could be published); this app's numbering
+# is not upstream's, so each keeps this app's value.
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-geom = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-filters = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-cos = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-crypt = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-organize = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-measure = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-annot = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-audit = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-fonts = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-model = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-content = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-redact = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-print = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-xfdf = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-sign = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-optimize = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-a11y = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-oracle = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-testkit = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-ocr = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-js = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-compare = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-preflight = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-export = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-edit = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-create = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-forms = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-xfa = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-render = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-engine = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-platform = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-ui-egui = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-automation = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-prc = \{ path = "[^"]*", version = "[^"]*"'
+
+[[pin]]
+file = "Cargo.toml"
+pattern = '^papel-prc-render = \{ path = "[^"]*", version = "[^"]*"'
+
+
+# Identity: app id, publisher, installer identities (a product of its own, never PdfCraft's).
+[[replace]]
+from = "ai.storyteller.pdfcraft"
+to = "dev.danielmiguelt.Papel"
+
+[[replace]]
+from = "PdfCraft maintainers <pdfcraft@storyteller.ai>"
+to = "Nodalia <https://github.com/getnodalia/papel/issues>"
+
+[[replace]]
+from = "<developer id=\"ai.storyteller\">"
+to = "<developer id=\"dev.danielmiguelt\">"
+
+[[replace]]
+from = "Learning Machines LLC"
+to = "Nodalia"
+
+[[replace]]
+from = "EA00C367-7270-4C50-9D8B-A7A5C88AD27F"
+to = "96D1F25F-8732-4E1C-A0A0-C130CFE52FE6"
+
+[[replace]]
+from = "E724C1C6-091F-4E21-A685-80D089FDBE21"
+to = "4A175FAD-1C1F-427C-8068-9A0C105D5B22"
+
+[[replace]]
+from = "DC028192-C233-4F99-9A77-ED458C60DF26"
+to = "7A5273AD-7428-4FB9-9664-57B64ADBC176"
+
+[[replace]]
+from = "F6948627-32AB-4D78-8865-0FDF417CE442"
+to = "B69DE2D2-EE62-4BFB-A252-F96DCC845FEA"
+
+[[replace]]
+from = "439F084F-657D-4AC2-A4CC-F099C518D71F"
+to = "1B249916-6009-476D-BEBB-1141967BC40C"
+
+[[replace]]
+from = "1B783BF3-12DF-4588-AF80-E2CEA8BC1E5A"
+to = "9392B8B7-C9EC-482D-AC67-8EF82E98529A"
+
+# The shared libraries, fonts and translations: Nodalia keeps them in getnodalia/foundation, on
+# vendor branches.
+[[replace]]
+from = "github.com/storytold/craft-fonts/blob/main/"
+to = "github.com/getnodalia/foundation/blob/vendor/craft-fonts/main/"
+
+[[replace]]
+from = "github.com/storytold/craft-i18n/blob/main/"
+to = "github.com/getnodalia/foundation/blob/vendor/craft-i18n/main/"
+
+[[replace]]
+from = "github.com/storytold/craft-libs/tree/main/"
+to = "github.com/getnodalia/foundation/tree/vendor/craft-libs/main/"
+
+[[replace]]
+from = "github.com/storytold/craft-libs/blob/main/"
+to = "github.com/getnodalia/foundation/blob/vendor/craft-libs/main/"
+
+[[replace]]
+from = "github.com/storytold/egui/blob/"
+to = "github.com/getnodalia/foundation/blob/"
+
+[[replace]]
+from = "github.com/storytold/craft-fonts"
+to = "github.com/getnodalia/foundation/tree/vendor/craft-fonts/main"
+
+[[replace]]
+from = "github.com/storytold/craft-i18n"
+to = "github.com/getnodalia/foundation/tree/vendor/craft-i18n/main"
+
+[[replace]]
+from = "github.com/storytold/craft-libs"
+to = "github.com/getnodalia/foundation/tree/vendor/craft-libs/main"
+
+[[replace]]
+from = "github.com/storytold/egui"
+to = "github.com/getnodalia/foundation/tree/vendor/egui/main"
+
+[[replace]]
+from = "github.com/storytold/winit"
+to = "github.com/getnodalia/foundation/tree/vendor/winit/master"
+
+[[replace]]
+from = "storytold/craft-fonts"
+to = "getnodalia/foundation (vendor/craft-fonts)"
+
+[[replace]]
+from = "storytold/craft-i18n"
+to = "getnodalia/foundation (vendor/craft-i18n)"
+
+[[replace]]
+from = "storytold/craft-libs"
+to = "getnodalia/foundation (vendor/craft-libs)"
+
+[[replace]]
+from = "storytold/winprint.rs"
+to = "getnodalia/foundation (vendor/winprint.rs)"
+
+# Where the app lives: its repository, releases, container images and web page.
+[[replace]]
+from = "github.com/storytold/{"
+to = "github.com/getnodalia/{"
+
+[[replace]]
+from = "gh-releases-zsync|storytold|"
+to = "gh-releases-zsync|getnodalia|"
+
+[[replace]]
+from = "GITHUB_ACTOR:-storytold}"
+to = "GITHUB_ACTOR:-getnodalia}"
+
+[[replace]]
+from = "ghcr.io/storytold/pdfcraft"
+to = "ghcr.io/getnodalia/papel"
+
+[[replace]]
+from = "storytold/pdfcraft"
+to = "getnodalia/papel"
+
+[[replace]]
+from = "https://discord.gg/artcraft"
+to = "https://github.com/getnodalia/papel/issues"
+
+[[replace]]
+from = "discord.gg/artcraft"
+to = "github.com/getnodalia/papel/issues"
+
+[[replace]]
+from = "getartcraft.com/apps/pdfcraft"
+to = "getnodalia.com/papel"
+
+[[replace]]
+from = "getartcraft.com"
+to = "getnodalia.com"
+
+# The sibling apps upstream names, by the names they have here.
+[[replace]]
+from = "PhotoCraft"
+to = "Lienzo"
+
+[[replace]]
+from = "WordCraft"
+to = "Letra"
+
+[[replace]]
+from = "DeckCraft"
+to = "Lámina"
+
+[[replace]]
+from = "GridCraft"
+to = "Celdas"
+
+[[replace]]
+from = "DesignCraft"
+to = "Pliego"
+
+[[replace]]
+from = "VectorCraft"
+to = "Pluma"
+
+[[replace]]
+from = "LightCraft"
+to = "Luz"
+
+[[replace]]
+from = "FilmCraft"
+to = "Toma"
+
+[[replace]]
+from = "EffectCraft"
+to = "Pulso"
+
+# The family the app belongs to: install folders, the About box.
+[[replace]]
+from = "ArtCraft"
+to = "Nodalia"
+
+# Upstream's mentions of its own family of apps.
+[[replace]]
+from = "other Craft apps"
+to = "other Nodalia apps"
+
+[[replace]]
+from = "from the Craft app that shares its ID"
+to = "from another app"
+
+[[replace]]
+from = "keeps the Craft icon name"
+to = "keeps the app's icon name"
+
+# The name, in every casing upstream uses.
+[[replace]]
+from = "PDFCraft"
+to = "Papel"
+
+[[replace]]
+from = "PdfCraft"
+to = "Papel"
+
+[[replace]]
+from = "Pdfcraft"
+to = "Papel"
+
+[[replace]]
+from = "pdfcraft"
+to = "papel"
+
+[[replace]]
+from = "PDFCRAFT"
+to = "PAPEL"

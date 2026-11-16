@@ -1,9 +1,9 @@
-//! pdfcraft-ui-egui — the first PdfCraft shell (L7).
+//! papel-ui-egui — the first Papel shell (L7).
 //!
 //! Layout grammar follows plan/acrobat/02-ui-ux.md §1: tab strip, mode bar, left tool panel,
 //! floating quick-action bar, document area, right panel + right rail with page navigation.
 //! Everything here is presentation: documents, rendering and the tool catalogue live in
-//! `pdfcraft-engine`.
+//! `papel-engine`.
 
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 // The settings object in `persist` is one `json!` literal past the default limit of 128.
@@ -12,7 +12,7 @@
 /// Where this app's releases live, for the in-app updates (`updates_ui`).
 #[cfg(not(target_arch = "wasm32"))]
 pub const UPDATE_APP: nodalia_update::App =
-    nodalia_update::App { name: "Papel", repo: "getnodalia/papel", bundle: "PdfCraft.app", version: env!("CARGO_PKG_VERSION"), edition: None };
+    nodalia_update::App { name: "Papel", repo: "getnodalia/papel", bundle: "Papel.app", version: env!("CARGO_PKG_VERSION"), edition: None };
 
 use crate::control::Host as _;
 
@@ -65,7 +65,7 @@ pub mod theme;
 pub mod viewer_prefs;
 mod widgets;
 
-use pdfcraft_engine::{DocId, Session};
+use papel_engine::{DocId, Session};
 
 pub use canvas::{DocView, RasterMemory};
 #[doc(hidden)]
@@ -209,7 +209,7 @@ use workflows::web_print;
 
 /// Files dropped on a document's page grid or its Pages panel.
 struct GridDrop {
-    doc: pdfcraft_engine::DocId,
+    doc: papel_engine::DocId,
     /// Dropped on the Pages panel (its gap decides where they go), not the page grid.
     panel: bool,
     files: Vec<GridFile>,
@@ -267,7 +267,7 @@ struct PendingOpen {
     path: Option<String>,
     stamp: Option<file_watch::Stamp>,
     activate: bool,
-    after_open: Option<pdfcraft_render::RemoteDestination>,
+    after_open: Option<papel_render::RemoteDestination>,
     recovered: Option<RecoveryMeta>,
     then: Option<&'static str>,
     display_override: Option<(canvas::PageLayout, bool)>,
@@ -280,7 +280,7 @@ struct PendingOpen {
 #[cfg(not(target_arch = "wasm32"))]
 struct DeferredOpen {
     path: String,
-    after_open: Option<pdfcraft_render::RemoteDestination>,
+    after_open: Option<papel_render::RemoteDestination>,
     then: Option<&'static str>,
     display_override: Option<(canvas::PageLayout, bool)>,
 }
@@ -295,10 +295,10 @@ pub type HtmlClipboard = Box<dyn FnMut(&str, &str) -> bool>;
 struct PendingDestination {
     doc: DocId,
     name: String,
-    receiver: std::sync::mpsc::Receiver<Option<(usize, pdfcraft_render::DestView)>>,
+    receiver: std::sync::mpsc::Receiver<Option<(usize, papel_render::DestView)>>,
 }
 
-pub struct PdfCraftApp {
+pub struct PapelApp {
     /// Split view (`panes`); which pane shows each tab is its view's.
     pub panes: panes::Panes,
     /// Tools side and pane widths; which panes are open is `left_open` and `right`.
@@ -367,12 +367,12 @@ pub struct PdfCraftApp {
     pub theme_preference: ThemePreference,
     /// The reading-colours preference (Preferences ▸ Reading colours): applied to every open
     /// document, and documents open with it (Acrobat's Replace Document Colors).
-    pub reading_colors: pdfcraft_render::ReadingColors,
+    pub reading_colors: papel_render::ReadingColors,
     /// App-wide page decoration only; never part of a PDF edit or render request.
     pub show_page_edge_shadows: bool,
     /// The Linux portal is enabled only by the native host, and starts on the first System choice.
     #[cfg(target_os = "linux")]
-    desktop_theme: Option<pdfcraft_platform::desktop_theme::DesktopTheme>,
+    desktop_theme: Option<papel_platform::desktop_theme::DesktopTheme>,
     #[cfg(target_os = "linux")]
     desktop_theme_enabled: bool,
     /// How far a mouse-wheel notch scrolls.
@@ -400,26 +400,26 @@ pub struct PdfCraftApp {
     pub ask_to_lock_signatures: bool,
     /// Documents with a Fill & Sign signature placed since their last save, asked about on
     /// saving (#2149). Not part of the recovery data: a recovered document isn't asked.
-    pub(crate) placed_signatures: std::collections::HashSet<pdfcraft_engine::DocId>,
+    pub(crate) placed_signatures: std::collections::HashSet<papel_engine::DocId>,
     /// A save waiting behind [`Dialog::LockSignatures`], and its Don't ask again box.
     pub(crate) pending_lock: Option<editing::PendingLock>,
     /// The document whose lock question was just answered: the save that follows the answer
     /// doesn't ask again. The placed-signature mark itself stays until that save succeeds, so a
     /// save that fails or is cancelled asks again next time.
-    pub(crate) lock_answered: Option<pdfcraft_engine::DocId>,
+    pub(crate) lock_answered: Option<papel_engine::DocId>,
     pub(crate) lock_remember: bool,
     /// Point size for new Fill & Sign text and dates, kept across launches.
     pub fill_text_size: f64,
     pub fill_tool: fill_sign::FillTool,
     /// Colour for new Fill & Sign text and dates, kept across launches.
     pub fill_text_color: [f64; 3],
-    /// Border around new Fill & Sign text and dates, in points (0: none), until PdfCraft quits:
+    /// Border around new Fill & Sign text and dates, in points (0: none), until Papel quits:
     /// each launch starts from [`Self::fill_text_default`].
     pub fill_text_border: f64,
     /// That border's own colour (`None`: the text's).
-    pub fill_text_border_color: Option<pdfcraft_engine::Rgb>,
+    pub fill_text_border_color: Option<papel_engine::Rgb>,
     /// That border's shape (an oval or a circle goes around the text).
-    pub fill_text_border_shape: pdfcraft_engine::BorderShape,
+    pub fill_text_border_shape: papel_engine::BorderShape,
     /// The border new Fill & Sign text starts each launch with, kept across launches: what Make
     /// Current Properties Default last took from typed text (none at first).
     pub fill_text_default: fill_sign::TextBorder,
@@ -451,15 +451,15 @@ pub struct PdfCraftApp {
     pub recent: Vec<RecentFile>,
     /// How many recent files to keep, 0 for no list (Preferences ▸ Documents and view, #5572).
     pub recent_limit: usize,
-    /// Preferences: reopen the files that were open when PdfCraft last closed (#442).
+    /// Preferences: reopen the files that were open when Papel last closed (#442).
     pub reopen_last_session: bool,
     /// Restore last view settings when reopening documents (Preferences ▸ Documents and view;
     /// #1767): the page, zoom and page display a file was last shown with. On by default.
     pub restore_last_view: bool,
     /// How files were last shown, most recent first (see `last_view`).
     pub last_views: Vec<last_view::LastView>,
-    /// The files open when PdfCraft last closed, read from the settings for
-    /// [`PdfCraftApp::reopen_last_files`].
+    /// The files open when Papel last closed, read from the settings for
+    /// [`PapelApp::reopen_last_files`].
     pub last_session: last_session::LastSession,
     /// Quitting closes unsaved tabs one by one: what was open when the quit began.
     quit_session: Option<last_session::LastSession>,
@@ -514,10 +514,10 @@ pub struct PdfCraftApp {
     pub toast: Option<(String, f64)>,
     /// The form script message the toast shows now, if it shows one: drawn with its title and
     /// icon (#4293).
-    pub toast_script: Option<pdfcraft_engine::js::Message>,
+    pub toast_script: Option<papel_engine::js::Message>,
     /// Form script messages waiting for the toast, in the order the scripts showed them: each
     /// takes the toast when the one before it is gone, so every one is seen (#4294).
-    pub script_messages: std::collections::VecDeque<pdfcraft_engine::js::Message>,
+    pub script_messages: std::collections::VecDeque<papel_engine::js::Message>,
     /// Form script messages the waiting queue had no room for, since the toast last said how many.
     pub script_messages_dropped: u64,
     /// The left-out count the toast is saying now ([`Self::next_script_message`]): put back to be
@@ -574,7 +574,7 @@ pub struct PdfCraftApp {
     /// Attachment description being edited: (document, name-tree key, description).
     pub attachment_description_draft: Option<(DocId, u64, String, String, String, bool)>,
     /// Document Properties ▸ Initial View (and reading options) being edited.
-    pub view_draft: Option<(DocId, pdfcraft_engine::InitialView)>,
+    pub view_draft: Option<(DocId, papel_engine::InitialView)>,
     /// Document Properties ▸ Custom being edited.
     pub custom_draft: Option<(DocId, CustomDraft)>,
     /// Files picked asynchronously for combine / insert (web).
@@ -592,7 +592,7 @@ pub struct PdfCraftApp {
     pub extract_draft: ExtractDraft,
     pub rotate_draft: RotateDraft,
     /// Summarize Comments: sort order.
-    pub summary_sort: pdfcraft_engine::SummarySort,
+    pub summary_sort: papel_engine::SummarySort,
     /// The signing dialogs' state.
     pub sign_draft: Option<SignDraft>,
     /// A dynamic form's preSign step, run when signing a field began: the document and its undo
@@ -631,7 +631,7 @@ pub struct PdfCraftApp {
     panic_next: Option<frame_guard::FramePart>,
     /// Action Wizard: the user's actions, the dialog state, the running action and (tests) the
     /// files to use instead of a picker.
-    pub custom_actions: Vec<pdfcraft_engine::actions::Action>,
+    pub custom_actions: Vec<papel_engine::actions::Action>,
     pub wizard: actions_ui::Wizard,
     pub action_run: Option<std::sync::Arc<std::sync::Mutex<actions_ui::RunProgress>>>,
     pub action_files_override: Option<Vec<String>>,
@@ -648,13 +648,13 @@ pub struct PdfCraftApp {
     pub a11y: a11y_ui::A11yState,
     pub(crate) tags_state: tags_ui::State,
     /// Rules skipped by hand, for the document they were skipped in.
-    pub a11y_skipped: std::collections::HashSet<(DocId, pdfcraft_engine::a11y::Rule)>,
+    pub a11y_skipped: std::collections::HashSet<(DocId, papel_engine::a11y::Rule)>,
     pub alt_draft: a11y_ui::AltDraft,
     /// List the OS key store's signing identities among the digital IDs (the desktop app).
     pub os_key_store_ids: bool,
     pub cert_viewer: Option<sign_ui::CertViewer>,
     /// The last space audit.
-    pub space_audit: Vec<pdfcraft_engine::optimize::SpaceUse>,
+    pub space_audit: Vec<papel_engine::optimize::SpaceUse>,
     /// The document and edit generation `space_audit` was measured from.
     pub(crate) space_audit_of: Option<(DocId, u64)>,
     /// Combine files: the files staged so far.
@@ -668,7 +668,7 @@ pub struct PdfCraftApp {
     /// Combine files as thumbnails or as the table (kept in the settings).
     pub combine_view: combine_ui::CombineView,
     /// How large the Combine grid draws its cards (1.0 = the usual; kept in the settings). Set
-    /// with [`PdfCraftApp::set_combine_zoom`].
+    /// with [`PapelApp::set_combine_zoom`].
     pub combine_zoom: f32,
     /// How large Organize pages draws its grid, for every document (1.0 = the usual; kept in
     /// the settings).
@@ -694,14 +694,14 @@ pub struct PdfCraftApp {
     /// Copied comments (XFDF), to paste into this or another document (M14).
     pub comment_clipboard: Option<CommentClip>,
     /// Objects copied together in Edit a PDF, to paste into this or another document (#5989).
-    pub object_clipboard: Option<pdfcraft_engine::ObjectClipboard>,
+    pub object_clipboard: Option<papel_engine::ObjectClipboard>,
     /// What copying them put on the system clipboard (see [`app::ObjectClipMark`]).
     pub(crate) object_clip_mark: app::ObjectClipMark,
     /// Files dropped on the page grid, waiting for the pointer to say which gap they go to.
     grid_drop: Option<GridDrop>,
     /// The last snapshot (width, height, RGBA); `system_clipboard` also puts it on the
     /// system clipboard (tests turn that off).
-    pub last_snapshot: Option<(u32, u32, pdfcraft_render::Pixels)>,
+    pub last_snapshot: Option<(u32, u32, papel_render::Pixels)>,
     /// What `last_snapshot` was taken of: (document, page, rectangle in page view points).
     last_snapshot_of: Option<(DocId, usize, [f32; 4])>,
     /// The last image copied with Copy Image (width, height, straight RGBA), also put on the
@@ -776,7 +776,7 @@ pub struct PdfCraftApp {
     pub bookmark_rename: Option<(Vec<usize>, String)>,
     /// Bookmarks copied or cut in the Bookmarks panel, with their subtrees, ready to paste into
     /// any document. Destinations are page indices.
-    pub bookmark_clipboard: Option<Vec<pdfcraft_engine::OutlineNode>>,
+    pub bookmark_clipboard: Option<Vec<papel_engine::OutlineNode>>,
     /// Number pages dialog settings (1-based pages).
     pub number_draft: NumberDraft,
     pub(crate) word_count_draft: word_count_ui::Draft,
@@ -826,7 +826,7 @@ pub struct PdfCraftApp {
     pub print_draft: PrintDraft,
     pub link_draft: Option<LinkDraft>,
     /// The style new text gets (Edit a PDF ▸ Format text).
-    pub text_style: pdfcraft_engine::AddedText,
+    pub text_style: papel_engine::AddedText,
     /// The Replace Pages dialog's state.
     pub replace_draft: Option<files::ReplaceDraft>,
     /// The last web link the app asked the system to open (tests and automation).

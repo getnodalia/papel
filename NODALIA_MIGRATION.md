@@ -1,7 +1,7 @@
 # Nodalia migration: Papel
 
 Category: secondary app.
-Status: Base Nodalia preparada, as of 2026-11-13. Evidence: the pull request that adds this file.
+Status: renamed to Papel throughout, as of 2026-11-15. Evidence: the pull request that adds `scripts/rebrand.py`.
 
 ## Current state
 
@@ -19,17 +19,15 @@ interface follows Foundation's [NDL standard](https://github.com/getnodalia/foun
 | Dependency | Where | Replacement | Blocked on |
 |---|---|---|---|
 | `storytold/craft-common-actions` | `.github/workflows/windows-arm64.yml` | Foundation reusable workflows (release, refresh-contributors, windows-arm64) | writing and testing them |
-| `storytold/craft-fonts` | `.github/pull_request_template.md`, `xtask/src/assets.rs` | getnodalia/foundation `vendor/craft-fonts/main` | repointing |
-| `storytold/craft-i18n` | `Cargo.toml`, `crates/ui-egui/build.rs` | getnodalia/foundation `vendor/craft-i18n/main` | repointing |
-| `storytold/craft-libs` | `packaging/web/README.md` | to decide | — |
-| `storytold/pdfcraft` | `.github/workflows/upstream-sync.yml`, `Cargo.toml`, `packaging/linux/ai.storyteller.pdfcraft.metainfo.xml.in`, `packaging/linux/flatpak-oci.sh`, `packaging/linux/package.sh`, `packaging/windows/sign.ps1` | none: intended upstream sync | — |
-| `storytold/vectorcraft` | `packaging/macos/dmg/README.md` | to decide | — |
-| `storytold/winprint.rs` | `Cargo.toml` | to decide | — |
+| `storytold/pdfcraft` | `.github/workflows/upstream-sync.yml` | none: the intended weekly upstream sync, renamed by `scripts/rebrand.py` | — |
+| `storytold/winprint.rs` | `Cargo.toml` `[patch]` | getnodalia/foundation's vendor branches already serve it; the `[patch]` names the source it overrides | — |
 
 ## Technical debt
 
-- Internal names inherited from upstream (crate, binary and package names) remain where saved
-  settings, files and the upstream sync depend on them.
+- Every name is Papel's, internal ones included (crates `papel-*`, binaries `papel` and
+  `papel-cli`, app id `dev.danielmiguelt.Papel`, `PAPEL_*` environment variables). Upstream's tree
+  arrives renamed by `scripts/rebrand.py` (`docs/upstream.md`). The shared translation catalog keeps
+  its name, `pdfcraft.tsv`.
 
 ## Reusable Nodalia components
 
@@ -62,6 +60,4 @@ menu exported over D-Bus on Linux.
 
 Papel releases through `release-auto.yml` like every Nodalia app (Foundation's `release-tag` and
 `release-publish`, with `release-linux.yml`, `release-macos.yml` and `release-windows.yml`). The
-packages are still named `pdfcraft-X.Y.Z-…`: rename them (packaging scripts, the release workflows,
-`app=` in `scripts/check-release-notes.sh`) before the first release. Until then the notes check
-refuses any notes, since they would have to name `pdfcraft` files.
+packages are named `papel-X.Y.Z-…`.

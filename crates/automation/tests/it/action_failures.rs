@@ -3,9 +3,9 @@
 
 use std::sync::Arc;
 
-use pdfcraft_automation::{Automation, Content};
-use pdfcraft_engine::Session;
-use pdfcraft_engine::actions::{Action, Step, run_on};
+use papel_automation::{Automation, Content};
+use papel_engine::Session;
+use papel_engine::actions::{Action, Step, run_on};
 use serde_json::json;
 
 fn pdf() -> Vec<u8> {

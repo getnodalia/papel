@@ -371,13 +371,7 @@ impl Thumbs {
 
 /// A rendered thumbnail as a texture, and its size in bytes. A raster that doesn't add up, or is
 /// larger than a thumbnail can be (or than the GPU accepts), is refused, never uploaded.
-fn texture(
-    ctx: &egui::Context,
-    slot: Slot,
-    size: [u32; 2],
-    pixels: pdfcraft_render::Pixels,
-    max_side: usize,
-) -> Result<(TextureHandle, usize), String> {
+fn texture(ctx: &egui::Context, slot: Slot, size: [u32; 2], pixels: papel_render::Pixels, max_side: usize) -> Result<(TextureHandle, usize), String> {
     let [w, h] = size.map(|v| v as usize);
     if w == 0 || h == 0 || w > max_side || h > max_side {
         return Err(format!("the thumbnail came back {w}×{h} pixels"));

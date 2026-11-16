@@ -3,8 +3,8 @@
 //! Each match is rewritten inside its own paragraph ([`crate::Document::text_blocks`]) through
 //! [`Edit::EditTextBlock`], so the paragraph keeps its fonts, sizes and colours and rewraps in its
 //! box. The paragraph's `editor_text` is matched with the find bar's own rules
-//! ([`pdfcraft_render::text::find_in_text`]) and the replacement takes the style of the run it
-//! lands in ([`pdfcraft_edit::TextBlock::replaced`]); every other run keeps its own.
+//! ([`papel_render::text::find_in_text`]) and the replacement takes the style of the run it
+//! lands in ([`papel_edit::TextBlock::replaced`]); every other run keeps its own.
 //!
 //! A longer replacement changes the paragraph only, measured with its own fonts' widths, and
 //! nothing is shrunk or hyphenated to fit. A paragraph of one row grows to the right, up to 36 pt
@@ -15,7 +15,7 @@
 //!
 //! A match is left alone, and counted, when it runs from one paragraph into the next, lies in
 //! invisible text over a scan, would need another font (the paragraph's own can't draw the new
-//! text, see [`pdfcraft_edit::LineEdit::substituted`]) or is not page text the paragraphs hold
+//! text, see [`papel_edit::LineEdit::substituted`]) or is not page text the paragraphs hold
 //! (a form field, a comment, text drawn inside a form XObject). Each paragraph is rewritten on a
 //! copy first, so the edit returned is exactly what will apply: [`Edit::Batch`] for Replace all,
 //! one undo step.
@@ -52,7 +52,7 @@ impl Which {
     /// are the pages' text, in page order. Replacing "the first match" is replacing this one: if
     /// no paragraph holds it, [`Document::plan_replace`] reports it as not editable and replaces
     /// nothing, rather than passing it for a later match that is.
-    pub fn first_in<'a>(texts: impl IntoIterator<Item = (usize, &'a pdfcraft_render::PageText)>, query: &Replace) -> Option<Which> {
+    pub fn first_in<'a>(texts: impl IntoIterator<Item = (usize, &'a papel_render::PageText)>, query: &Replace) -> Option<Which> {
         texts.into_iter().find_map(|(page, text)| {
             let found = text.find_opts_limited(&query.find, query.case_sensitive, query.whole_words, 1).into_iter().next()?;
             let centre = |g: usize| text.glyphs.get(g).map(|g| [(g.rect[0] + g.rect[2]) / 2.0, (g.rect[1] + g.rect[3]) / 2.0]);
@@ -177,7 +177,7 @@ impl Document {
         let mut edits = Vec::new();
         for page in pages {
             // A page whose text can't be read is reported, and the others still replaced.
-            let blocks = match pdfcraft_edit::text_blocks(&work, page) {
+            let blocks = match papel_edit::text_blocks(&work, page) {
                 Ok(blocks) => blocks,
                 Err(e) => {
                     refused(&mut out, found.and_then(|f| f.get(&page)).copied().unwrap_or(0), page, e.to_string());
@@ -212,9 +212,8 @@ impl Document {
                 let Some(block) = blocks.get(k) else { continue };
                 let count = ranges.len();
                 if rewrote {
-                    let same = pdfcraft_edit::text_blocks(&work, page)
-                        .ok()
-                        .is_some_and(|now| now.get(k).is_some_and(|b| b.editor_text == block.editor_text));
+                    let same =
+                        papel_edit::text_blocks(&work, page).ok().is_some_and(|now| now.get(k).is_some_and(|b| b.editor_text == block.editor_text));
                     if !same {
                         refused(&mut out, count, page, "the page's paragraphs moved after an earlier replacement".into());
                         continue;
@@ -233,10 +232,10 @@ impl Document {
                     out.replaced = out.replaced.saturating_add(count);
                     continue;
                 }
-                let style = pdfcraft_edit::BlockStyle { sources, ..Default::default() };
+                let style = papel_edit::BlockStyle { sources, ..Default::default() };
                 let mut trial = work.clone();
-                match guard(|| pdfcraft_edit::rewrite_block(&mut trial, page, k, Some(&text), &style)) {
-                    Ok(Ok(pdfcraft_edit::LineEdit { substituted: None })) => {
+                match guard(|| papel_edit::rewrite_block(&mut trial, page, k, Some(&text), &style)) {
+                    Ok(Ok(papel_edit::LineEdit { substituted: None })) => {
                         work = trial;
                         rewrote = true;
                         edits.push(Edit::EditTextBlock { page, block: k, text, style });
@@ -245,7 +244,7 @@ impl Document {
                             out.pages.push(page);
                         }
                     }
-                    Ok(Ok(pdfcraft_edit::LineEdit { substituted: Some(_) })) => out.skip(Skip::MissingGlyphs, count),
+                    Ok(Ok(papel_edit::LineEdit { substituted: Some(_) })) => out.skip(Skip::MissingGlyphs, count),
                     Ok(Err(e)) => refused(&mut out, count, page, e.to_string()),
                     Err(panic) => refused(&mut out, count, page, panic),
                 }
@@ -262,7 +261,7 @@ impl Document {
 }
 
 fn find(text: &str, query: &Replace, limit: usize) -> Vec<Range<usize>> {
-    pdfcraft_render::text::find_in_text(text, &query.find, query.case_sensitive, query.whole_words, limit)
+    papel_render::text::find_in_text(text, &query.find, query.case_sensitive, query.whole_words, limit)
 }
 
 fn refused(out: &mut Replacement, count: usize, page: usize, why: String) {
@@ -274,7 +273,7 @@ fn refused(out: &mut Replacement, count: usize, page: usize, why: String) {
 
 /// Matches that start in one paragraph and end in a later one: the page's paragraphs read one
 /// after another (a line break between two), as the find bar reads the page.
-fn spanning(blocks: &[pdfcraft_edit::TextBlock], query: &Replace) -> usize {
+fn spanning(blocks: &[papel_edit::TextBlock], query: &Replace) -> usize {
     let mut joined = String::new();
     let mut ends = Vec::with_capacity(blocks.len());
     for b in blocks {
@@ -293,9 +292,9 @@ fn spanning(blocks: &[pdfcraft_edit::TextBlock], query: &Replace) -> usize {
 /// whose box holds both, and its match nearest `start`.
 fn at(
     doc: &Document,
-    cos: &pdfcraft_cos::Document,
+    cos: &papel_cos::Document,
     page: usize,
-    blocks: &[pdfcraft_edit::TextBlock],
+    blocks: &[papel_edit::TextBlock],
     matches: &[Vec<Range<usize>>],
     start: [f32; 2],
     end: [f32; 2],
@@ -303,16 +302,16 @@ fn at(
     let info = doc.info.pages.get(page).ok_or(Skip::NotEditable)?;
     let view = |x: f64, y: f64| info.user_to_view(x as f32, y as f32);
     // A paragraph's box in view space, a little larger so a glyph's centre on its edge is inside.
-    let holds = |b: &pdfcraft_edit::TextBlock, p: [f32; 2]| {
+    let holds = |b: &papel_edit::TextBlock, p: [f32; 2]| {
         let corners = [view(b.rect[0], b.rect[1]), view(b.rect[2], b.rect[3]), view(b.rect[0], b.rect[3]), view(b.rect[2], b.rect[1])];
         let pad = (b.size as f32 * 0.3).clamp(1.0, 12.0);
         let (x0, x1) = corners.iter().fold((f32::MAX, f32::MIN), |(a, b), c| (a.min(c[0]), b.max(c[0])));
         let (y0, y1) = corners.iter().fold((f32::MAX, f32::MIN), |(a, b), c| (a.min(c[1]), b.max(c[1])));
         p[0] >= x0 - pad && p[0] <= x1 + pad && p[1] >= y0 - pad && p[1] <= y1 + pad
     };
-    let lines = pdfcraft_edit::text_lines(cos, page).unwrap_or_default();
+    let lines = papel_edit::text_lines(cos, page).unwrap_or_default();
     // Where a match's first character is drawn, estimated along its run.
-    let place = |b: &pdfcraft_edit::TextBlock, r: &Range<usize>| -> Option<[f32; 2]> {
+    let place = |b: &papel_edit::TextBlock, r: &Range<usize>| -> Option<[f32; 2]> {
         let (span, line) = b.spans.iter().find(|(s, _)| s.contains(&r.start)).or_else(|| b.spans.iter().find(|(s, _)| s.start >= r.start))?;
         let line = lines.get(*line)?;
         let run = b.editor_text.get(span.clone())?;

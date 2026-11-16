@@ -293,7 +293,7 @@ update the numbers.
   another purely because `pdftotext` makes it in one place and not the other. The corpus-wide
   first reading has not been taken yet.
 - **Evidence:** text extraction (word-F1 0.98 against `pdftotext`) and now rendering (above); qpdf
-  checks written output on every CI run since `PDFCRAFT_ORACLES_REQUIRED`. Acrobat captures must
+  checks written output on every CI run since `PAPEL_ORACLES_REQUIRED`. Acrobat captures must
   stay local in `plan/acrobat/` (clean-room, `AGENTS.md` §1.1).
 - **Still missing:** Acrobat itself as the reference rather than other open renderers; form
   calculation and signature validation; the interop suite that opens every kind of output we write

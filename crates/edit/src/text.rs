@@ -13,10 +13,10 @@
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
-use pdfcraft_content::{Matrix, Op, Pieces, parse, serialize_ops};
-use pdfcraft_cos::{DecodeBudget, Dict, Document, Object, PdfString, Stream};
-use pdfcraft_fonts::pdf::Metrics;
-use pdfcraft_fonts::{CraftFont, GlyphError, japanese_glyph_from};
+use papel_content::{Matrix, Op, Pieces, parse, serialize_ops};
+use papel_cos::{DecodeBudget, Dict, Document, Object, PdfString, Stream};
+use papel_fonts::pdf::Metrics;
+use papel_fonts::{CraftFont, GlyphError, japanese_glyph_from};
 
 use crate::EditError;
 
