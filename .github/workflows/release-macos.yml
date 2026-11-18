@@ -61,7 +61,7 @@ jobs:
         with:
           repository: getnodalia/foundation # kept at vendor/craft-i18n/main
           # The commit craft-i18n.rev pins.
-          ref: d0b3e7c502e5e598c8baeeef42cf7475b5a532ce
+          ref: a3a500bd683b98c458018f0bea392c994ea52c7a
           path: craft-i18n
           persist-credentials: false
 
