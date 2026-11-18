@@ -29,6 +29,15 @@
 **Papel** is the PDF document editor of [Nodalia](https://getnodalia.com): a native app written in Rust,
 with no account and no cloud. It runs on Linux, macOS and Windows.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/getnodalia/nodalia-web/main/assets/screens/papel/papel-dark.jpg" width="900" alt="A document open in Papel in the dark theme, with the all-tools panel and the bookmarks">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/getnodalia/nodalia-web/main/assets/screens/papel/papel-light.jpg" width="440" alt="The same document in the light theme">
+  <img src="https://raw.githubusercontent.com/getnodalia/nodalia-web/main/assets/screens/papel/papel-home-light.jpg" width="440" alt="Papel's start screen, with the recommended tools and the recent files">
+</p>
+
 > [!IMPORTANT]
 > **Papel is at an early stage.** There are no published builds yet, and the Nodalia interface is
 > not wired in.
