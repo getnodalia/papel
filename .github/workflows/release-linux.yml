@@ -42,6 +42,9 @@ jobs:
     env:
       CRAFT_FONTS_DIR: ${{ github.workspace }}/craft-fonts
       CRAFT_FONTS_REQUIRED: "1"
+      # The translations: without them the interface would be English only.
+      CRAFT_I18N_DIR: ${{ github.workspace }}/craft-i18n
+      CRAFT_I18N_REQUIRED: "1"
       DIST: ${{ github.workspace }}/dist
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -69,6 +72,15 @@ jobs:
           TAG: ${{ inputs.tag }}
         run: |
           test -s "docs/release-notes/$TAG.md" || { echo "::error::docs/release-notes/$TAG.md is missing or empty"; exit 1; }
+
+      - name: Check out craft-i18n
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: getnodalia/foundation # kept at vendor/craft-i18n/main
+          # The commit craft-i18n.rev pins.
+          ref: a3a500bd683b98c458018f0bea392c994ea52c7a
+          path: craft-i18n
+          persist-credentials: false
 
       - name: Check out craft-fonts
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

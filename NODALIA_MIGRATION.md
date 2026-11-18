@@ -18,7 +18,6 @@ interface follows Foundation's [NDL standard](https://github.com/getnodalia/foun
 
 | Dependency | Where | Replacement | Blocked on |
 |---|---|---|---|
-| `storytold/craft-common-actions` | `.github/workflows/windows-arm64.yml` | Foundation reusable workflows (release, refresh-contributors, windows-arm64) | writing and testing them |
 | `storytold/pdfcraft` | `.github/workflows/upstream-sync.yml` | none: the intended weekly upstream sync, renamed by `scripts/rebrand.py` | — |
 | `storytold/winprint.rs` | `Cargo.toml` `[patch]` | getnodalia/foundation's vendor branches already serve it; the `[patch]` names the source it overrides | — |
 
@@ -42,14 +41,12 @@ menu exported over D-Bus on Linux.
 
 ## Risks and priorities
 
-1. Releases still run the inherited release workflow.
-2. Windows ARM64 packaging still runs the inherited workflow.
+1. None in CI: releases run Papel's own `release-*.yml` through Foundation's `release-tag` and
+   `release-publish`, and Windows ARM64 runs Papel's own `windows-arm64.yml`.
 
 ## Recommended order
 
-1. A Foundation release workflow, tested with a dry run, then Papel's release on it.
-2. A Foundation Windows ARM64 workflow.
-3. NDL review of the interface.
+1. NDL review of the interface.
 
 ## What the first agent should do
 

@@ -1,6 +1,6 @@
-# Windows on ARM (#61): package the ARM64 release the way the release-*.yml workflows does (cross-compiled on an
-# x64 runner, unsigned here), then install that MSI on a Windows 11 ARM64 runner and run it, and
-# run the test suite natively on ARM64.
+# Windows on ARM (#61): package the ARM64 release the way release-windows.yml packages x64
+# (cross-compiled on an x64 runner, unsigned here), then start its CLI and install and remove its
+# MSI on a Windows 11 ARM64 runner, and run the test suite natively on ARM64.
 name: Windows ARM64
 
 on:
@@ -25,12 +25,128 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  # Same commits as ci.yml and the release-*.yml workflows; craft-i18n's is craft-i18n.rev.
+  FONTS_REF: b076417b5880bd4154bd22f00695b1d28c6bea83
+  I18N_REF: a3a500bd683b98c458018f0bea392c994ea52c7a
+
 jobs:
-  windows-arm64:
-    # Intentionally tracked at @main (not SHA-pinned) so org-wide CI improvements, security fixes, and build optimizations propagate without PR churn across all craftapp repos.
-    uses: storytold/craft-common-actions/.github/workflows/windows-arm64.yml@main
-    with:
-      app-name: papel
-      app-dir: Papel
-      install-relative-path: Programs/Nodalia/Papel
-      install-scope: perUser
+  package:
+    name: package (cross-compiled on x64)
+    runs-on: windows-2025
+    timeout-minutes: 120
+    env:
+      CRAFT_FONTS_DIR: ${{ github.workspace }}\craft-fonts
+      CRAFT_FONTS_REQUIRED: "1"
+      CRAFT_I18N_DIR: ${{ github.workspace }}\craft-i18n
+      CRAFT_I18N_REQUIRED: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check out craft-fonts
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: getnodalia/foundation # kept at vendor/craft-fonts/main
+          ref: ${{ env.FONTS_REF }}
+          path: craft-fonts
+          persist-credentials: false
+
+      - name: Check out craft-i18n
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: getnodalia/foundation # kept at vendor/craft-i18n/main
+          ref: ${{ env.I18N_REF }}
+          path: craft-i18n
+          persist-credentials: false
+
+      - uses: dtolnay/rust-toolchain@39008827e6b4319a349e9a42dfc90579dd25f1ca # stable
+        with:
+          targets: aarch64-pc-windows-msvc
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          key: windows-arm64-package
+
+      - name: WiX
+        shell: pwsh
+        run: |
+          dotnet tool install --global wix --version 5.0.2
+          wix extension add -g WixToolset.UI.wixext/5.0.2 WixToolset.Util.wixext/5.0.2
+
+      - name: Build and package (unsigned)
+        shell: pwsh
+        run: pwsh packaging/windows/package.ps1 -Arch arm64
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: papel-windows-arm64
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  install:
+    name: install and run (Windows 11 ARM64)
+    needs: package
+    runs-on: windows-11-arm
+    timeout-minutes: 30
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: papel-windows-arm64
+          path: dist
+      - name: Start the portable CLI, install and remove the MSI
+        shell: pwsh
+        run: |
+          Set-Location dist
+          $zip = Get-ChildItem -File papel-*-windows-arm64-portable.zip | Select-Object -First 1
+          $msi = Get-ChildItem -File papel-*-windows-arm64.msi | Select-Object -First 1
+          if (-not $zip -or -not $msi) { Get-ChildItem; throw "expected the ARM64 MSI and portable zip" }
+          Expand-Archive $zip.FullName -DestinationPath portable
+          $cli = Get-ChildItem -Recurse portable -Filter papel-cli.exe | Select-Object -First 1
+          $out = & $cli.FullName --version
+          Write-Output $out
+          if ($LASTEXITCODE -ne 0 -or -not ($out -match 'papel')) { throw "papel-cli --version failed on ARM64" }
+          $p = Start-Process msiexec.exe -ArgumentList '/i', "`"$($msi.FullName)`"", '/qn', '/l*v', 'install.log' -Wait -PassThru
+          if ($p.ExitCode -ne 0) { Get-Content install.log -Tail 60; throw "install failed: $($p.ExitCode)" }
+          $p = Start-Process msiexec.exe -ArgumentList '/x', "`"$($msi.FullName)`"", '/qn', '/l*v', 'uninstall.log' -Wait -PassThru
+          if ($p.ExitCode -ne 0) { Get-Content uninstall.log -Tail 60; throw "uninstall failed: $($p.ExitCode)" }
+
+  test:
+    name: tests (native ARM64)
+    runs-on: windows-11-arm
+    timeout-minutes: 150
+    env:
+      CRAFT_FONTS_DIR: ${{ github.workspace }}\craft-fonts
+      CRAFT_I18N_DIR: ${{ github.workspace }}\craft-i18n
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check out craft-fonts
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: getnodalia/foundation # kept at vendor/craft-fonts/main
+          ref: ${{ env.FONTS_REF }}
+          path: craft-fonts
+          persist-credentials: false
+
+      - name: Check out craft-i18n
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: getnodalia/foundation # kept at vendor/craft-i18n/main
+          ref: ${{ env.I18N_REF }}
+          path: craft-i18n
+          persist-credentials: false
+
+      - uses: dtolnay/rust-toolchain@39008827e6b4319a349e9a42dfc90579dd25f1ca # stable
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          key: windows-arm64-test
+
+      - name: Tests
+        shell: pwsh
+        run: cargo test --workspace --lib --bins --tests --locked

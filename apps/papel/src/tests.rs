@@ -750,6 +750,26 @@ fn the_flatpak_manifests_pin_the_craft_i18n_rev() {
     }
 }
 
+/// Every release workflow builds with the translations (Papel 0.1.0 shipped Linux and Windows
+/// packages in English only, because those two never checked them out). Each one checks out
+/// the commit `craft-i18n.rev` pins, names it in `CRAFT_I18N_DIR`, and makes a missing catalog
+/// fail the build rather than ship English silently.
+#[test]
+fn every_release_workflow_builds_with_the_pinned_translations() {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let rev = std::fs::read_to_string(root.join("craft-i18n.rev")).unwrap();
+    let rev = rev.trim();
+    for workflow in ["release-linux.yml", "release-macos.yml", "release-windows.yml"] {
+        let text = std::fs::read_to_string(root.join(".github/workflows").join(workflow)).unwrap();
+        let step = text.split("- name: Check out craft-i18n").nth(1).unwrap_or_else(|| panic!("{workflow}: checks out craft-i18n"));
+        let step = step.split("- name:").next().unwrap_or(step);
+        let pinned = step.lines().find_map(|l| l.trim().strip_prefix("ref:")).unwrap_or_else(|| panic!("{workflow}: pins a ref"));
+        assert_eq!(pinned.trim(), rev, "{workflow}: the commit craft-i18n.rev pins");
+        assert!(text.contains("CRAFT_I18N_DIR:"), "{workflow}: the build names the catalogs");
+        assert!(text.contains("CRAFT_I18N_REQUIRED: \"1\""), "{workflow}: a missing catalog fails the build");
+    }
+}
+
 // Regression test for #246: `eprintln!` panics when standard error is a broken pipe (a GUI
 // launch on Windows), and a panic inside the panic hook aborts the process. The start-up
 // path and the hook must write to standard error without it.

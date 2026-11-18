@@ -39,6 +39,7 @@ jobs:
     env:
       CRAFT_FONTS_DIR: ${{ github.workspace }}/craft-fonts
       CRAFT_I18N_DIR: ${{ github.workspace }}/craft-i18n
+      CRAFT_I18N_REQUIRED: "1"
       DIST: ${{ github.workspace }}/dist
       # Releases ship one DMG for both architectures; everything else builds Apple Silicon only.
       ARCH: ${{ inputs.tag && 'universal' || 'aarch64' }}
@@ -122,7 +123,9 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: papel-macos-${{ env.ARCH }}
-          path: dist/papel-*-macos-*
+          path: |
+            dist/papel-*-macos-*
+            dist/SHA256SUMS-macos
           if-no-files-found: error
           retention-days: 14
 
@@ -131,4 +134,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.tag }}
-        run: gh release upload "$TAG" "$DIST"/papel-*-macos-* --clobber --repo "$GITHUB_REPOSITORY"
+        run: gh release upload "$TAG" "$DIST"/papel-*-macos-* "$DIST"/SHA256SUMS-macos --clobber --repo "$GITHUB_REPOSITORY"
