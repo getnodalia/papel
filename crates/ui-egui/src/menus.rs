@@ -228,7 +228,7 @@ const SIGN: &[&str] = &[
 ];
 const WINDOW: &[&str] = &["view.next_tab", "view.previous_tab"];
 const HELP: &[&str] =
-    &["help.shortcuts", SEP, "help.app_page", "help.github", "help.website", "help.discord", SEP, "help.check_updates", SEP, "help.about"];
+    &["help.shortcuts", SEP, "help.app_page", "help.github", "help.website", "help.report_issue", SEP, "help.check_updates", SEP, "help.about"];
 
 /// A registry shortcut as a craft-keymap chord: `command` is ⌘ (Ctrl elsewhere) and `mac_ctrl`
 /// the Control key on macOS. `None` for a key craft-keymap doesn't name.
@@ -614,6 +614,19 @@ impl PapelApp {
         self.native_menu.is_some()
     }
 
+    /// Serve the menus to the desktop's top bar (Linux's global menu). `shown` says whether the
+    /// desktop shows them right now; while it doesn't, they stay in the window.
+    pub fn install_global_menu(&mut self, menu: craft_menu::NativeMenu, shown: std::sync::Arc<std::sync::atomic::AtomicBool>) {
+        self.native_menu = Some(menu);
+        self.native_menu_shown = Some(shown);
+    }
+
+    /// Whether the menus are drawn outside the window (the macOS menu bar, or a desktop's top bar
+    /// that took Linux's global menu), so the window leaves them out.
+    pub(crate) fn menus_outside_window(&self) -> bool {
+        self.native_menu.is_some() && self.native_menu_shown.as_ref().is_none_or(|s| s.load(std::sync::atomic::Ordering::Relaxed))
+    }
+
     /// The native menu's clicks since the last frame, run like in-window ones.
     pub(crate) fn native_menu_clicks(&mut self, ctx: &egui::Context) {
         let gate = self.menu_gate(ctx);
@@ -629,7 +642,7 @@ impl PapelApp {
         if self.native_menu.is_none() {
             return;
         }
-        let layout = craft_menu::mac_layout(&self.menu_bar(ctx), &layout_options());
+        let layout = craft_menu::layout(&self.menu_bar(ctx), Target::current(), &layout_options());
         let gate = self.menu_gate(ctx);
         if let Some(native) = self.native_menu.as_mut() {
             native.set_gate(gate);

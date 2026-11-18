@@ -49,7 +49,7 @@ fn rail_is_outermost_then_tools_then_the_side_panel_then_the_page() {
     // Tools on the left: the page between Tools and the side panel, the rail at the right edge.
     let h = harness(|app| app.set_option("panel", "bookmarks").unwrap());
     let (r, s, t) = (rail(&h), side(&h), tools(&h));
-    assert!(r.right() > WIDTH - 12.0, "{r:?}");
+    assert!(r.right() > WIDTH - 12.0 - papel_ui_egui::theme::ISLAND_GAP, "{r:?}");
     assert!(s.right() < r.left() && s.left() > WIDTH - 48.0 - 340.0, "{s:?} {r:?}");
     assert!(t.left() < 48.0, "{t:?}");
     // Tools on the right: rail, Tools, side panel, page.
@@ -58,7 +58,7 @@ fn rail_is_outermost_then_tools_then_the_side_panel_then_the_page() {
         app.set_option("panel", "bookmarks").unwrap();
     });
     let (r, s, t) = (rail(&h), side(&h), tools(&h));
-    assert!(r.right() > WIDTH - 12.0, "{r:?}");
+    assert!(r.right() > WIDTH - 12.0 - papel_ui_egui::theme::ISLAND_GAP, "{r:?}");
     assert!(t.right() < r.left() && t.left() > WIDTH - 48.0 - 280.0, "{t:?} {r:?}");
     assert!(s.right() < t.left() && s.left() > WIDTH - 48.0 - 280.0 - 340.0, "{s:?} {t:?}");
 }
@@ -217,7 +217,8 @@ fn scrollbar_and_panel_resize_handle_do_not_collide_on_either_dock_side() {
         .max_by(|a, b| a.max.x.total_cmp(&b.max.x))
         .expect("the page has a scrollbar");
     assert!(
-        (right_splitter_rect.center().x - page_bar.max.x).abs() < 6.0,
+        // The page and the pane are islands a window gap apart.
+        (right_splitter_rect.center().x - page_bar.max.x).abs() < 6.0 + papel_ui_egui::theme::ISLAND_GAP,
         "the page's scrollbar is beside the edge: {page_bar:?} {right_splitter_rect:?}"
     );
     let tools_bar = bars.iter().copied().find(|r| r.min.x > right_splitter_rect.center().x).expect("Tools panel scrollbar should exist");

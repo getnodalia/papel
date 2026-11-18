@@ -301,6 +301,7 @@ impl PapelApp {
             allow_quit: false,
             deferred_commands: Vec::new(),
             native_menu: None,
+            native_menu_shown: None,
             menu_input: Vec::new(),
             menu_pastes: 0,
             page_keys: Default::default(),
@@ -316,7 +317,6 @@ impl PapelApp {
             bookmark_rename: None,
             bookmark_clipboard: None,
             last_opened_url: None,
-            community_card_closed: false,
             pending_link: None,
             pending_full_screen: None,
             pending_window: None,
@@ -561,6 +561,13 @@ impl eframe::App for PapelApp {
         if self.frame_panicked {
             self.close_after_panic(ctx);
         }
+    }
+
+    /// The window's colour under everything, so no other colour shows at the window's edges or
+    /// between the islands while the window resizes.
+    fn clear_color(&self, visuals: &egui::Visuals) -> [f32; 4] {
+        let kind = if visuals.dark_mode { theme::ThemeKind::Dark } else { theme::ThemeKind::Light };
+        theme::Tokens::for_kind(kind).titlebar.to_normalized_gamma_f32()
     }
 
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
@@ -854,7 +861,7 @@ impl PapelApp {
         // A document can hide the toolbars, the menu and the panels around it in its tab (ISO
         // 32000-2 Table 147); the tab strip stays, and F8 brings the rest back (`viewer_prefs`).
         let hidden = self.hidden_interface();
-        if !hidden.mode_bar(self.native_menu.is_some()) {
+        if !hidden.mode_bar(self.menus_outside_window()) {
             chrome::mode_bar(self, ui);
         }
         // Another mode or the Home tab puts the OCR Verify screen away, as Exit does; Correct
@@ -883,16 +890,23 @@ impl PapelApp {
         if self.all_tools_full && self.all_tools_tab != self.shown_tab() {
             self.all_tools_full = false;
         }
-        if !hidden.window_ui {
-            side_panels::show(self, ui);
-        }
+        // Below the bars the window is a row of Nodalia islands: the navigation rail, the panes
+        // and the document area, each rounded, with the window's colour showing between them.
         let t = theme::Tokens::get(&ctx);
-        egui::CentralPanel::default().frame(egui::Frame::NONE.fill(t.pasteboard)).show(ui, |ui| {
-            if self.mode == Mode::AllTools && self.all_tools_full && !hidden.window_ui {
-                all_tools_ui::show(self, ui);
-            } else {
-                panes::page_area(self, ui);
+        let half = (theme::ISLAND_GAP / 2.0) as i8;
+        let outer = egui::Frame::NONE.fill(t.titlebar).inner_margin(egui::Margin { left: half, right: half, top: half, bottom: half });
+        egui::CentralPanel::default().frame(outer).show(ui, |ui| {
+            if !hidden.window_ui {
+                side_panels::show(self, ui);
             }
+            let island = egui::Frame::NONE.fill(t.pasteboard).corner_radius(theme::ISLAND_RADIUS).outer_margin(egui::Margin::same(half));
+            egui::CentralPanel::default().frame(island).show(ui, |ui| {
+                if self.mode == Mode::AllTools && self.all_tools_full && !hidden.window_ui {
+                    all_tools_ui::show(self, ui);
+                } else {
+                    panes::page_area(self, ui);
+                }
+            });
         });
         // FitWindow and CenterWindow, once the document just opened is laid out.
         self.window_preferences_frame(&ctx);

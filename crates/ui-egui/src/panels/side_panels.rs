@@ -13,12 +13,12 @@ use serde_json::{Value, json};
 
 use crate::{Mode, PapelApp};
 
-/// Default width of the Tools pane.
-pub const TOOLS_WIDTH: f32 = 272.0;
+/// Default width of the Tools pane: 272 pt of content, and the island's gap around it.
+pub const TOOLS_WIDTH: f32 = 272.0 + crate::theme::ISLAND_GAP;
 /// Default width of the side panel.
 pub const SIDE_WIDTH: f32 = 330.0;
 /// The Tools pane's own margins, left and right (14 pt each, and a pt of border), around what a panel lays out.
-const TOOLS_GUTTERS: f32 = 30.0;
+const TOOLS_GUTTERS: f32 = 30.0 + crate::theme::ISLAND_GAP;
 /// No narrower than Format text's widest row, so nothing in it is cut off.
 const TOOLS_RANGE: RangeInclusive<f32> = (crate::format_text_ui::MIN_ROW + TOOLS_GUTTERS)..=520.0;
 const SIDE_RANGE: RangeInclusive<f32> = 260.0..=520.0;
@@ -340,6 +340,8 @@ impl PaneContent<Pane> for Content<'_> {
     }
 
     fn body(&mut self, ui: &mut egui::Ui, pane: &Pane) {
+        // The host hid the panels' separator lines (islands need none); the pane's own get theirs back.
+        ui.visuals_mut().widgets.noninteractive.bg_stroke = egui::Stroke::new(1.0, crate::theme::Tokens::get(ui.ctx()).divider);
         match pane {
             Pane::Tools => crate::panels::left_panel(self.app, ui),
             Pane::Side => {
@@ -437,13 +439,22 @@ pub fn show(app: &mut PapelApp, ui: &mut egui::Ui) {
     let panels = app.side_panels;
     // Columns: both panes may share the right edge, Tools outermost, as `open` lists them.
     let host = egui::Id::unique("papel-side-panels");
+    // Islands have no separator line: egui draws a panel's with the parent's stroke, so hide it.
+    let separator = ui.visuals().widgets.noninteractive.bg_stroke;
+    ui.visuals_mut().widgets.noninteractive.bg_stroke = egui::Stroke::new(separator.width, egui::Color32::TRANSPARENT);
     let output = PaneHost::new(host)
         .policy(SidePolicy::Columns)
         .f6(false)
         .labels(labels)
-        .frame(egui::Frame::NONE.fill(t.panel))
+        .frame(
+            egui::Frame::NONE
+                .fill(t.panel)
+                .corner_radius(crate::theme::ISLAND_RADIUS)
+                .outer_margin(egui::Margin::same((crate::theme::ISLAND_GAP / 2.0) as i8)),
+        )
         .body_margin(egui::Margin::ZERO)
         .show(ui, &open, |pane| Some(state_of(&panels, *pane)), &mut Content { app });
+    ui.visuals_mut().widgets.noninteractive.bg_stroke = separator;
 
     keep_resize_edges_off_scrollbars(ui, host, &open);
     for request in output.requests {

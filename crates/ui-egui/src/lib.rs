@@ -745,6 +745,9 @@ pub struct PapelApp {
     deferred_commands: Vec<(&'static str, Option<DocId>)>,
     /// The native menu bar (macOS), while it is installed; the in-window bar shows otherwise.
     pub(crate) native_menu: Option<craft_menu::NativeMenu>,
+    /// Whether the desktop's top bar shows the native menu right now (Linux's global menu, which
+    /// a desktop can take and give back); `None` when the native menu is always shown (macOS).
+    pub(crate) native_menu_shown: Option<std::sync::Arc<std::sync::atomic::AtomicBool>>,
     /// Input a menu click stands for (⌘C, Delete…), waiting to join a pass's input (see
     /// `release_menu_input`).
     pub(crate) menu_input: Vec<egui::Event>,
@@ -831,8 +834,6 @@ pub struct PapelApp {
     pub replace_draft: Option<files::ReplaceDraft>,
     /// The last web link the app asked the system to open (tests and automation).
     pub last_opened_url: Option<String>,
-    /// The home screen's community card was closed; it comes back next launch (not remembered).
-    pub community_card_closed: bool,
     /// A document asked to open this address; the user hasn't answered yet (#90, #91).
     pub pending_link: Option<PendingLink>,
     /// A document just opened asks to be shown in Full Screen mode (`/PageMode /FullScreen`):

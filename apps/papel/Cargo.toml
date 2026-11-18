@@ -44,6 +44,12 @@ fmv-macos-events = "=0.1.0"
 # drawn on that one (src/compositor_gpu.rs). Both are already in the tree through winit.
 wayland-client = "0.31"
 wayland-protocols = { version = "0.32", features = ["client"] }
+# The desktop's global menu (src/linux_menu.rs): Papel's menus served over D-Bus as
+# `com.canonical.dbusmenu` for the top bar. MIT, already in the build through accesskit. Pinned
+# exactly: review the diff before bumping.
+zbus = "=5.19.0"
+craft-menu = { workspace = true }
+serde = { workspace = true }
 
 [target.'cfg(all(unix, not(target_os = "macos")))'.dependencies]
 # Whether the window is on Wayland, where it can't bring itself forward (src/single_instance.rs).

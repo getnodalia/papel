@@ -6,7 +6,7 @@ use egui::{Align, Color32, CornerRadius, Layout, Rect, Sense, Stroke, vec2};
 use crate::canvas::{DocView, Fit, PageLayout};
 use crate::panes::{Place, TabDrop};
 use crate::tab_context::Action;
-use crate::theme::{self, ThemePreference, Tokens};
+use crate::theme::{self, Tokens};
 use crate::{Dialog, Mode, PapelApp, PropsTab, RightPanel, icons, widgets, window_controls};
 
 /// Height of the tab strip when it doubles as the macOS title bar (#789). AppKit draws the traffic
@@ -39,6 +39,7 @@ pub fn tab_strip(app: &mut PapelApp, ui: &mut egui::Ui) {
     let left = if mac { MAC_CONTENT_LEFT as i8 } else { 8 };
     let (tab_h, button) = if mac { (MAC_TITLE_BAR - 2.0, 24.0) } else { (TAB_HEIGHT, STRIP_BUTTON) };
     egui::Panel::top("tab_strip")
+        .show_separator_line(false)
         .exact_size(if mac { MAC_TITLE_BAR } else { TAB_STRIP })
         .frame(egui::Frame::NONE.fill(t.titlebar).inner_margin(egui::Margin { left, right: 10, top: 0, bottom: 0 }))
         .show(ui, |ui| {
@@ -72,11 +73,8 @@ pub fn tab_strip(app: &mut PapelApp, ui: &mut egui::Ui) {
                     app.active = None;
                     app.combine_tab.focused = false;
                 }
-                // Reserve the three icon buttons, Discord and their gaps outside the scrolling tabs.
-                let controls_width = ui.fonts_mut(|f| f.layout_no_wrap("Discord".into(), theme::medium(13.0), t.text).size().x)
-                    + 3.0 * button
-                    + 54.0
-                    + window_controls::width(&controls.right);
+                // Reserve the menu button and its gap outside the scrolling tabs.
+                let controls_width = button + 12.0 + window_controls::width(&controls.right);
                 // Open stays in sight after the tabs: its icon, text and padding, and the gaps around it.
                 let open_width = ui.fonts_mut(|f| f.layout_no_wrap(tl!("Open").into(), theme::medium(13.0), t.text).size().x) + 38.0 + 12.0;
                 let mut tabs_width = (ui.available_width() - controls_width - open_width).max(0.0);
@@ -253,42 +251,26 @@ pub fn tab_strip(app: &mut PapelApp, ui: &mut egui::Ui) {
                         });
                         ui.add_space(window_controls::SIDE_GAP - 4.0);
                     }
-                    if icons::button(ui, "settings", button, false, tl!("Preferences")).clicked() {
-                        app.execute("app.preferences");
-                    }
-                    let (icon, label) = match app.theme_preference {
-                        ThemePreference::System => ("monitor", tl!("Use system setting")),
-                        ThemePreference::Light => ("sun", tl!("Light gray")),
-                        ThemePreference::Dark => ("moon", tl!("Dark gray")),
-                    };
-                    let tip = format!("{}: {label}", tl!("Display theme"));
-                    let response = icons::button(ui, icon, button, false, &tip);
-                    // A click cycles System, Light, Dark; a right-click opens the menu.
-                    if response.clicked() {
-                        app.execute(match app.theme_preference {
-                            ThemePreference::System => "view.theme.light",
-                            ThemePreference::Light => "view.theme.dark",
-                            ThemePreference::Dark => "view.theme.system",
-                        });
-                    }
-                    egui::Popup::context_menu(&response).id(response.id.with("theme_menu")).show(|ui| appearance_menu(app, ui));
-                    if icons::button(ui, "circle-help", button, false, tl!("Keyboard shortcuts")).clicked() {
-                        app.dialog = Some(Dialog::Shortcuts);
-                    }
-                    // One click to the community, from anywhere in the app.
-                    if widgets::ghost_button_sized(ui, "messages-square", "Discord", tab_h).on_hover_text(papel_engine::links::DISCORD).clicked() {
-                        app.execute("help.discord");
-                    }
+                    let menu = icons::button(ui, "menu", button, false, tl!("Main menu"));
+                    egui::Popup::menu(&menu).id(menu.id.with("app_menu")).show(|ui| app_menu(app, ui));
                 });
             });
         });
 }
 
-/// The right-click menu on the title bar's theme button.
-fn appearance_menu(app: &mut PapelApp, ui: &mut egui::Ui) {
-    if ui.button(tl!("Appearance settings…")).clicked() {
-        app.dialog = Some(Dialog::Preferences);
-        ui.close();
+/// The hamburger menu at the end of the tab strip: Nodalia's app menu.
+fn app_menu(app: &mut PapelApp, ui: &mut egui::Ui) {
+    ui.set_min_width(220.0);
+    for (id, label) in [
+        ("app.preferences", tl!("Preferences")),
+        ("help.shortcuts", tl!("Keyboard shortcuts")),
+        ("help.check_updates", tl!("Check for updates…")),
+        ("help.about", tl!("About Papel")),
+    ] {
+        if ui.button(label).clicked() {
+            app.execute(id);
+            ui.close();
+        }
     }
 }
 
@@ -591,13 +573,20 @@ pub fn mode_bar(app: &mut PapelApp, ui: &mut egui::Ui) {
     // The document in the active tab may hide the menu or the tools (`crate::viewer_prefs`).
     let hidden = app.hidden_interface();
     egui::Panel::top("mode_bar")
+        .show_separator_line(false)
         .exact_size(48.0)
-        .frame(egui::Frame::NONE.fill(t.chrome).inner_margin(egui::Margin::symmetric(10, 0)).stroke(Stroke::new(1.0, t.divider)))
+        .frame(
+            egui::Frame::NONE
+                .fill(t.chrome)
+                .corner_radius(theme::ISLAND_RADIUS)
+                .inner_margin(egui::Margin::symmetric(10, 0))
+                .outer_margin(egui::Margin { left: theme::ISLAND_GAP as i8, right: theme::ISLAND_GAP as i8, top: 0, bottom: 0 }),
+        )
         .show(ui, |ui| {
             ui.horizontal_centered(|ui| {
                 ui.spacing_mut().item_spacing.x = 2.0;
                 // The menus, unless the native macOS menu bar has them or the document hides them.
-                if app.native_menu.is_none() && !hidden.menubar {
+                if !app.menus_outside_window() && !hidden.menubar {
                     app.menu_bar_ui(ui);
                     ui.add_space(6.0);
                     ui.painter().vline(ui.cursor().left(), ui.max_rect().y_range().shrink(12.0), Stroke::new(1.0, t.divider));
@@ -737,10 +726,19 @@ pub fn right_rail(app: &mut PapelApp, ui: &mut egui::Ui) {
     items.push(item(RightPanel::Tags, "tag", "Tags", None));
     let view = &mut app.views[index];
     let mut page_display = None;
+    // An island has no separator line: egui draws a panel's with the parent's stroke.
+    let separator = ui.visuals().widgets.noninteractive.bg_stroke;
+    ui.visuals_mut().widgets.noninteractive.bg_stroke = Stroke::new(separator.width, Color32::TRANSPARENT);
     let rail = Rail::new(egui::Id::unique("rail"))
         .edge(app.side_panels.rail_edge())
-        .width(49.0)
-        .frame(egui::Frame::NONE.fill(t.chrome).inner_margin(egui::Margin::symmetric(1, 8)).stroke(Stroke::new(1.0, t.divider)))
+        .width(49.0 + theme::ISLAND_GAP)
+        .frame(
+            egui::Frame::NONE
+                .fill(t.chrome)
+                .corner_radius(theme::ISLAND_RADIUS)
+                .inner_margin(egui::Margin::symmetric(1, 8))
+                .outer_margin(egui::Margin::same((theme::ISLAND_GAP / 2.0) as i8)),
+        )
         .show(ui, &items, app.right.as_ref(), |ui| {
             // Page navigation cluster at the bottom, a panel of its own so that in a short
             // window the buttons above scroll instead of running into it (#3282).
@@ -871,6 +869,7 @@ pub fn right_rail(app: &mut PapelApp, ui: &mut egui::Ui) {
                 }
             });
         });
+    ui.visuals_mut().widgets.noninteractive.bg_stroke = separator;
     match rail.request {
         Some(RailRequest::Open(panel)) => app.choose_right_panel(Some(panel)),
         Some(RailRequest::Close(_)) => app.choose_right_panel(None),

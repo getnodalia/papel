@@ -29,9 +29,16 @@ fn assert_theme(h: &Harness<'static, PapelApp>, preference: ThemePreference, kin
     }
 }
 
-/// A click on the title bar's theme button cycles Light, Dark, System.
-fn click_toolbar(h: &mut Harness<'static, PapelApp>, label: &str) {
-    h.get_by_label(&format!("Display theme: {label}")).click();
+/// The title bar's theme button used to cycle System, Light and Dark; NDL keeps the choice in
+/// View ▸ Display theme and Preferences, so this takes the step the button took, from the menu.
+fn click_toolbar(h: &mut Harness<'static, PapelApp>, shown: &str) {
+    let next = match shown {
+        "Use system setting" => "Light gray",
+        "Light gray" => "Dark gray",
+        _ => "Use system setting",
+    };
+    open_view_menu(h);
+    h.get_by_label(next).click();
     h.run_steps(3);
 }
 
@@ -64,7 +71,7 @@ fn a_fresh_install_follows_the_system_theme() {
 }
 
 #[test]
-fn toolbar_and_view_menu_share_three_state_preferences() {
+fn view_menu_switches_between_three_state_preferences() {
     let mut h = harness();
     // Fresh, on a dark desktop: System, shown dark. One click on, explicit light wins even on a
     // dark desktop, including egui's popup style.
@@ -234,9 +241,7 @@ fn preferences_theme_cards_and_use_system_setting_stay_in_sync() {
         combo.value().unwrap_or_default()
     }
     let mut h = harness();
-    h.get_by_label("Display theme: Use system setting").click_secondary();
-    h.run_steps(4);
-    h.get_by_label("Appearance settings…").click();
+    assert!(h.state_mut().execute("app.preferences"));
     h.run_steps(10);
     // A fresh install follows the OS (#1248), which is dark here.
     assert_theme(&h, ThemePreference::System, ThemeKind::Dark);

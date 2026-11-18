@@ -10,8 +10,36 @@
   "packageRules": [
     {
       "description": "One weekly pull request for every non-major update, so CI runs once instead of once per dependency.",
-      "matchUpdateTypes": ["minor", "patch", "digest", "pin", "pinDigest"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+        "pin",
+        "pinDigest"
+      ],
       "groupName": "non-major dependencies"
+    },
+    {
+      "description": "Crates Papel patches from vendor/ (and the codecs tied to their APIs) move by hand with the vendored copy; a version bump here bypasses the patch and breaks the build.",
+      "matchManagers": [
+        "cargo"
+      ],
+      "matchPackageNames": [
+        "hayro",
+        "hayro-syntax",
+        "hayro-interpret",
+        "hayro-cmap",
+        "hayro-postscript",
+        "hayro-jbig2",
+        "hayro-ccitt",
+        "lopdf",
+        "fax",
+        "vello_common",
+        "vello_cpu",
+        "winit",
+        "egui-wgpu"
+      ],
+      "enabled": false
     }
   ]
 }

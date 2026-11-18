@@ -632,40 +632,40 @@ pub fn progress_notice(app: &PapelApp, ctx: &egui::Context) -> bool {
     cancel
 }
 
-/// The Nodalia wordmark (Storyteller's brand, docs/brand/; not open source), sized to `height`.
-pub fn artcraft_logo(ui: &mut egui::Ui, height: f32) -> Response {
-    let dark = ui.visuals().dark_mode;
-    let (uri, bytes): (&str, &'static [u8]) = if dark {
-        ("bytes://artcraft-logo-white.svg", include_bytes!("../../../docs/brand/artcraft-logo-white.svg"))
-    } else {
-        ("bytes://artcraft-logo.svg", include_bytes!("../../../docs/brand/artcraft-logo.svg"))
-    };
-    ui.add(egui::Image::from_bytes(uri, bytes).max_height(height).alt_text("Nodalia"))
+/// Papel's app icon (Aldus Manutius, `assets/app-icon/`), the picture the desktop shows for it.
+const APP_ICON_PNG: &[u8] = include_bytes!("../../../assets/app-icon/hicolor/256x256/apps/dev.danielmiguelt.Papel.png");
+
+/// Decode a PNG to straight RGBA, or `None` when it can't be read.
+fn decode_rgba(bytes: &[u8]) -> Option<egui::ColorImage> {
+    let mut decoder = png::Decoder::new(std::io::Cursor::new(bytes));
+    decoder.set_transformations(png::Transformations::normalize_to_color8());
+    let mut reader = decoder.read_info().ok()?;
+    let mut buf = vec![0; reader.output_buffer_size()?];
+    let info = reader.next_frame(&mut buf).ok()?;
+    let data = buf.get(..info.buffer_size())?;
+    let size = [usize::try_from(info.width).ok()?, usize::try_from(info.height).ok()?];
+    match info.color_type {
+        png::ColorType::Rgba => Some(egui::ColorImage::from_rgba_unmultiplied(size, data)),
+        png::ColorType::Rgb => Some(egui::ColorImage::from_rgb(size, data)),
+        _ => None,
+    }
 }
 
-/// The Nodalia mark (brand blue, works on light and dark), `size` points square.
-pub fn artcraft_mark(ui: &mut egui::Ui, size: f32) -> Response {
-    ui.add(
-        egui::Image::from_bytes("bytes://artcraft-mark.svg", include_bytes!("../../../docs/brand/artcraft-mark.svg"))
-            .fit_to_exact_size(vec2(size, size))
-            .alt_text("Nodalia"),
-    )
-}
-
-/// Buttons for every community link (`papel_engine::links`), Discord first and prominent.
-/// Returns the registry command of the one clicked.
-pub fn community_links(ui: &mut egui::Ui) -> Option<&'static str> {
-    let mut clicked = None;
-    ui.horizontal_wrapped(|ui| {
-        ui.spacing_mut().item_spacing = vec2(8.0, 8.0);
-        for (i, l) in papel_engine::links::LINKS.iter().enumerate() {
-            let resp = if i == 0 { icon_pill(ui, l.icon, tl!("Join our Discord"), true) } else { icon_pill(ui, l.icon, tl!(l.label), false) };
-            if resp.on_hover_text(l.url).clicked() {
-                clicked = Some(l.command);
-            }
-        }
+/// Papel's app icon, `size` points square. The texture is decoded once per context; if the
+/// picture can't be decoded the space stays empty rather than failing the dialog.
+pub fn app_icon(ui: &mut egui::Ui, size: f32) -> Response {
+    let (rect, resp) = ui.allocate_exact_size(vec2(size, size), Sense::hover());
+    let ctx = ui.ctx().clone();
+    let id = egui::Id::unique("papel_app_icon");
+    let texture = ctx.data(|d| d.get_temp::<Option<egui::TextureHandle>>(id)).unwrap_or_else(|| {
+        let t = decode_rgba(APP_ICON_PNG).map(|img| ctx.load_texture("papel_app_icon", img, egui::TextureOptions::LINEAR));
+        ctx.data_mut(|d| d.insert_temp(id, t.clone()));
+        t
     });
-    clicked
+    if let Some(t) = texture {
+        ui.painter().image(t.id(), rect, Rect::from_min_max(egui::pos2(0.0, 0.0), egui::pos2(1.0, 1.0)), Color32::WHITE);
+    }
+    resp
 }
 
 /// [`icon_pill`] with a ▾ part at its end that opens a menu of related choices. Returns the

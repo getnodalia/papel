@@ -155,7 +155,7 @@ fn hiding_the_window_controls_leaves_the_document_the_whole_width() {
     // The document also asks for the page thumbnails panel, which is hidden with the rest.
     let mut h = harness(|_| {}, &["/PageMode /UseThumbs /ViewerPreferences << /HideWindowUI true >>"]);
     let width = |h: &Harness<'static, PapelApp>| h.state().views[0].viewport_rect().width();
-    assert!(width(&h) > 1390.0, "{}", width(&h));
+    assert!(width(&h) > 1400.0 - 2.0 * papel_ui_egui::theme::ISLAND_GAP - 1.0, "{}", width(&h));
     h.key_press(egui::Key::F8);
     settle(&mut h);
     // The rail and the Pages panel are back beside the document.
