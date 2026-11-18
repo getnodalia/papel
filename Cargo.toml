@@ -5,7 +5,7 @@ exclude = ["vendor"]
 default-members = ["crates/*", "apps/papel", "apps/papel-cli", "xtask"]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
@@ -28,7 +28,7 @@ craft-print = { git = "https://github.com/getnodalia/foundation", version = "0.1
 # Whether a path stored in a document may be opened (GoToR link targets).
 craft-docpath = { version = "0.1.0", git = "https://github.com/getnodalia/foundation", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff" }
 # In-app updates from this app's GitHub releases, with the update windows for egui.
-nodalia-update = { git = "https://github.com/getnodalia/nodalia-design", rev = "78106607616f7db3eeaad90c8e0f1efac6f84684", version = "0.1.0-alpha.1", features = ["egui"] }
+nodalia-update = { git = "https://github.com/getnodalia/nodalia-design", rev = "f71ade677551928eb48467f4c67d96e42267e1f3", version = "0.1.0-alpha.1", features = ["egui"] }
 # The Nodalia Design Language: palette, icons, window controls and the office apps' shared parts.
 nodalia-theme = { git = "https://github.com/getnodalia/nodalia-design", rev = "78106607616f7db3eeaad90c8e0f1efac6f84684", version = "0.1.0-alpha.1", features = ["egui"] }
 # internal
