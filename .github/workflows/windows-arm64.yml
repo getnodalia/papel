@@ -40,6 +40,7 @@ jobs:
       CRAFT_FONTS_REQUIRED: "1"
       CRAFT_I18N_DIR: ${{ github.workspace }}\craft-i18n
       CRAFT_I18N_REQUIRED: "1"
+      DIST: ${{ github.workspace }}\dist
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

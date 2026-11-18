@@ -507,7 +507,19 @@ $n = [PapelProbe.Console]::GetConsoleProcessList($ids, 256)
         std::fs::OpenOptions::new().write(true).create_new(true).open(&file).unwrap();
         let sddl = sddl_of(&file).unwrap();
         assert!(!sddl.contains(";BU)") && !sddl.contains(";S-1-5-32-545)"), "Users must not inherit read access: {sddl}");
-        assert_eq!(foreign_access(&sddl, &me), None, "{sddl}");
+        // A new file's owner is the one its creator's token names, and for an elevated
+        // administrator a policy can make that the Administrators group (GitHub's Windows 11
+        // ARM64 image does). `write_control_file` sets the owner afterwards with
+        // `restrict_to_owner`; what must hold from the start is that nobody else's entry reaches
+        // the file, so the owner may be either.
+        let probe = dir.join("probe.txt");
+        std::fs::write(&probe, b"").unwrap();
+        let default_owner = sddl_of(&probe).unwrap();
+        let default_owner = section(&default_owner, "O:");
+        let owner = section(&sddl, "O:");
+        assert!(owner == Some(me.as_str()) || owner == default_owner, "owned by the user or the token's default owner: {sddl}");
+        let as_mine = owner.map_or_else(|| sddl.clone(), |o| sddl.replacen(&format!("O:{o}"), &format!("O:{me}"), 1));
+        assert_eq!(foreign_access(&as_mine, &me), None, "{sddl}");
         // The name is taken: the folder isn't reused.
         assert!(create_private_dir(&private, &user()).is_err());
         let _ = std::fs::remove_dir_all(&dir);
