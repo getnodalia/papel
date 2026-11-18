@@ -38,6 +38,8 @@ use papel_ui_egui::PapelApp;
 mod apple_events;
 mod compositor_gpu;
 mod decorations;
+#[cfg(target_os = "linux")]
+mod linux_menu;
 mod logging;
 #[cfg(target_os = "windows")]
 mod motion;
@@ -482,6 +484,9 @@ fn app_creator<'a>(
                 log::warn!("couldn't install the macOS menu bar; the menus stay in the window");
             }
         }
+        // The desktop's global menu, where its top bar shows the focused app's menus.
+        #[cfg(target_os = "linux")]
+        linux_menu::install(&cc.egui_ctx, &mut app, native_wayland(cc));
         if let Some(server) = instance {
             app.os_events = Some(server.connect(&cc.egui_ctx, native_wayland(cc)));
         }

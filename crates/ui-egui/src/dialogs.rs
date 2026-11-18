@@ -1673,31 +1673,29 @@ fn dialog_about(ui: &mut egui::Ui, req: &mut Pending) -> bool {
         1 => crate::credits::contributors_ui(ui),
         2 => crate::credits::models_ui(ui),
         _ => {
-            ui.horizontal(|ui| {
-                widgets::artcraft_mark(ui, 40.0);
-                ui.vertical(|ui| {
-                    ui.label(egui::RichText::new("Papel").font(theme::semibold(20.0)));
-                    ui.label(crate::i18n::fmt(tl!("Version {v}"), &[("v", &papel_engine::build_info::version())]));
-                });
+            // Laid out as in every Nodalia office app: the icon, the name and version, "Part of
+            // Nodalia", the links and the licence. Upstream authors are credited in NOTICE.
+            ui.vertical_centered(|ui| {
+                ui.add_space(6.0);
+                widgets::app_icon(ui, 96.0);
+                ui.add_space(8.0);
+                ui.label(egui::RichText::new("Papel").font(theme::semibold(22.0)));
+                ui.label(
+                    egui::RichText::new(crate::i18n::fmt(tl!("Version {v}"), &[("v", &papel_engine::build_info::version())])).color(t.text_muted),
+                );
+                ui.label(egui::RichText::new(tl!("Part of Nodalia")).color(t.text_muted));
+                ui.add_space(10.0);
+                ui.label(tl!("Read, sign, edit and organize PDFs, in pure Rust."));
+                ui.add_space(10.0);
+                for l in papel_engine::links::LINKS {
+                    if ui.link(tl!(l.label)).on_hover_text(l.url).clicked() {
+                        req.link_command = Some(l.command);
+                    }
+                }
+                ui.add_space(10.0);
+                ui.label(egui::RichText::new(tl!("Licence: MIT OR Apache-2.0")).color(t.text_muted));
+                ui.label(egui::RichText::new(tl!("Includes work by other open-source authors (see NOTICE).")).small().color(t.text_faint));
             });
-            ui.add_space(6.0);
-            ui.label(tl!("A clean-room, open-source PDF application written in Rust. MIT OR Apache-2.0."));
-            ui.label(
-                egui::RichText::new(
-                    "Rendering: hayro (bootstrap) · UI: egui · Icons: Lucide (ISC) · Fonts: Inter, JetBrains Mono, Dancing Script (OFL)",
-                )
-                .color(t.text_muted)
-                .small(),
-            );
-            ui.add_space(12.0);
-            ui.horizontal(|ui| {
-                ui.label(egui::RichText::new(tl!("Part of")).color(t.text_muted));
-                widgets::artcraft_logo(ui, 16.0);
-            });
-            ui.add_space(6.0);
-            if let Some(cmd) = widgets::community_links(ui) {
-                req.link_command = Some(cmd);
-            }
         }
     }
     true

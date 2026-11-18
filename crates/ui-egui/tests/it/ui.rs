@@ -662,7 +662,7 @@ fn overflowing_tabs_can_be_reached_by_scrolling() {
     h.get_by_label("document-19.pdf").click();
     h.run_steps(3);
     assert_eq!(h.state().active, Some(19));
-    assert!(h.get_by_label_contains("Display theme:").rect().center().x < 1400.0);
+    assert!(h.get_by_label("Main menu").rect().center().x < 1400.0);
     let close = last.right_center() - egui::vec2(16.0, 0.0);
     h.event(egui::Event::PointerMoved(close));
     h.event(egui::Event::PointerButton { pos: close, button: egui::PointerButton::Primary, pressed: true, modifiers: egui::Modifiers::NONE });
@@ -695,8 +695,8 @@ fn tabs_shrink_to_fit_then_arrows_step_through_them_and_open_stays_in_sight() {
         }
     });
     let open = h.get_by_label("Open").rect();
-    let discord = h.get_by_label("Discord").rect();
-    assert!(open.right() <= discord.left(), "Open {open:?} must not run under Discord {discord:?}");
+    let discord = h.get_by_label("Main menu").rect();
+    assert!(open.right() <= discord.left(), "Open {open:?} must not run under the main menu {discord:?}");
     let mut previous_right = f32::MIN;
     for i in 0..5 {
         let tab = h.get_by_label(&name(i)).rect();
@@ -720,15 +720,15 @@ fn tabs_shrink_to_fit_then_arrows_step_through_them_and_open_stays_in_sight() {
     assert_eq!(enabled(&h, "Scroll tabs right"), Some(true), "and then there is more to the right");
     let open = h.get_by_label("Open").rect();
     let right = h.get_by_label("Scroll tabs right").rect();
-    assert!(right.right() <= open.left() + 0.5 && open.right() <= h.get_by_label("Discord").rect().left());
-    // Twenty: Open stays in sight left of Discord.
+    assert!(right.right() <= open.left() + 0.5 && open.right() <= h.get_by_label("Main menu").rect().left());
+    // Twenty: Open stays in sight left of the main menu.
     for i in 0..13 {
         h.state_mut().open_bytes(&format!("more-{i:02}.pdf"), None, FIXTURE.to_vec()).unwrap();
     }
     h.run_steps(4);
     let open = h.get_by_label("Open").rect();
-    let discord = h.get_by_label("Discord").rect();
-    assert!(open.left() > 0.0 && open.right() <= discord.left(), "Open {open:?} stays in sight left of Discord {discord:?}");
+    let discord = h.get_by_label("Main menu").rect();
+    assert!(open.left() > 0.0 && open.right() <= discord.left(), "Open {open:?} stays in sight left of the main menu {discord:?}");
 }
 
 /// macOS (#789): with the integrated title bar, the strip is the 28 pt band AppKit centres the
@@ -741,7 +741,7 @@ fn the_integrated_title_bar_is_the_traffic_light_band() {
         app.open_bytes("band.pdf", None, FIXTURE.to_vec()).unwrap();
     });
     let band = 28.0;
-    for label in ["Home", "band.pdf", "Open", "Discord", "Keyboard shortcuts"] {
+    for label in ["Home", "band.pdf", "Open", "Main menu", "Keyboard shortcuts"] {
         let r = h.get_by_label(label).rect();
         assert!(r.top() >= 0.0 && r.bottom() <= band, "{label}: {r:?} inside the {band} pt title bar");
         assert!(r.height() >= 24.0, "{label}: {r:?} stays clickable");
@@ -785,7 +785,7 @@ fn narrow_tab_strips_accept_vertical_wheel_scrolling() {
         h.get_by(|n| n.role() == egui::accesskit::Role::Tab && n.label().as_deref() == Some("narrow-11.pdf")).click();
         h.run_steps(4);
         assert_eq!(h.state().active, Some(11));
-        assert!(h.get_by_label_contains("Display theme:").rect().right() <= width);
+        assert!(h.get_by_label("Main menu").rect().right() <= width);
         if let Ok(dir) = std::env::var("PAPEL_TAB_SHOTS") {
             let _gpu = crate::gpu();
             crate::support::settle(&mut h);
@@ -1831,8 +1831,9 @@ fn the_drop_line_shows_in_front_of_the_first_tab() {
     let _gpu = crate::gpu();
     let mut h = three_tab_harness();
     let first = h.get_by_role_and_label(Role::Tab, "first.pdf").rect();
-    // Pixels in the strip just left of the first tab that are strongly blue (the accent line).
+    // Pixels in the strip just left of the first tab in the accent colour (the drop line).
     let blue_left_of = |h: &mut Harness<'static, PapelApp>, rect: egui::Rect| {
+        let accent = papel_ui_egui::theme::Tokens::get(&h.ctx).accent;
         let image = h.render().unwrap();
         let scale = image.width() as f32 / h.ctx.content_rect().width();
         let x0 = ((rect.left() - 3.0) * scale).max(0.0) as u32;
@@ -1842,7 +1843,8 @@ fn the_drop_line_shows_in_front_of_the_first_tab() {
         for y in y0..y1.min(image.height()) {
             for x in x0..x1.min(image.width()) {
                 let p = image.get_pixel(x, y).0;
-                if p[2] > 150 && p[0] < 90 && p[1] < 140 {
+                let near = |a: u8, b: u8| a.abs_diff(b) <= 24;
+                if near(p[0], accent.r()) && near(p[1], accent.g()) && near(p[2], accent.b()) {
                     n += 1;
                 }
             }
@@ -1960,8 +1962,8 @@ fn short_window_rail_buttons_scroll_clear_of_page_navigation() {
         });
         crate::support::settle(&mut h);
         let in_rail = |r: egui::Rect| match side {
-            ToolsSide::Left => r.right() <= 48.0,
-            ToolsSide::Right => r.left() >= width - 48.0,
+            ToolsSide::Left => r.right() <= 48.0 + papel_ui_egui::theme::ISLAND_GAP,
+            ToolsSide::Right => r.left() >= width - 48.0 - papel_ui_egui::theme::ISLAND_GAP,
         };
         let rail = |h: &Harness<'static, PapelApp>, label: &str| {
             h.query_all_by_label(label).map(|n| n.rect()).find(|r| in_rail(*r)).unwrap_or_else(|| panic!("{label} in the rail"))

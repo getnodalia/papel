@@ -1,13 +1,11 @@
-//! Window buttons and resize edges for desktops that leave the window frame to the app.
+//! Window buttons and resize edges where the app draws its own window frame.
 //!
-//! GNOME on Wayland has no server-side decorations (the compositor offers no
-//! `zxdg_decoration_manager_v1`), so winit drew its own imitation frame. Instead the app turns the
-//! frame off and the tab strip becomes the header bar, as in GNOME's own apps: it carries the
-//! minimize, maximize and close buttons in the desktop's order (GNOME's `button-layout`), and
-//! thin zones along the window's edges resize it. Desktops with server-side decorations (KDE,
-//! Sway, Hyprland, X11) keep their own frame and never get here.
+//! On Linux and the BSDs Papel draws the Nodalia Design Language's window: the tab strip is the
+//! header bar, Nodalia's round minimize, maximize and close buttons sit at its end, and thin
+//! zones along the window's edges resize it. Preferences › Use system title bar gives the desktop
+//! its own frame back. macOS and Windows always keep the system's.
 
-use crate::theme::Tokens;
+use crate::theme::{self, Tokens};
 use egui::viewport::ResizeDirection;
 use egui::{Align2, Color32, CursorIcon, Pos2, Rect, Sense, Stroke, Vec2};
 
@@ -65,92 +63,39 @@ impl Layout {
     }
 }
 
-/// The round button's diameter, as in Adwaita.
-pub const BUTTON: f32 = 24.0;
-/// Between two window buttons.
-pub const GAP: f32 = 6.0;
+/// The round button's diameter, as in the Nodalia Design Language.
+pub const BUTTON: f32 = nodalia_theme::component::WINDOW_CONTROL_SIZE;
 /// Between the window buttons and the rest of the strip.
 pub const SIDE_GAP: f32 = 10.0;
 
 /// The width `buttons` take in the strip, including the gap to the rest of it.
 pub fn width(buttons: &[Button]) -> f32 {
-    match buttons.len() {
-        0 => 0.0,
-        n => n as f32 * BUTTON + (n - 1) as f32 * GAP + SIDE_GAP,
-    }
+    if buttons.is_empty() { 0.0 } else { nodalia_theme::window_controls::WIDTH + SIDE_GAP }
 }
 
-/// Draw the window buttons for one end of the strip, in reading order, inside a horizontal
-/// layout running left to right; the caller adds [`SIDE_GAP`] where the strip continues.
+/// Draw Nodalia's three window buttons (minimize, maximize or restore, close) for one end of the
+/// strip, inside a horizontal layout running left to right; the caller adds [`SIDE_GAP`] where
+/// the strip continues. An end with no buttons draws nothing.
 pub fn buttons(ui: &mut egui::Ui, buttons: &[Button]) {
+    if buttons.is_empty() {
+        return;
+    }
     let t = Tokens::get(ui.ctx());
-    let maximized = ui.ctx().input(|i| i.viewport().maximized.unwrap_or(false));
-    for (n, &button) in buttons.iter().enumerate() {
-        if n > 0 {
-            ui.add_space(GAP);
-        }
-        let label = match button {
-            Button::Minimize => tl!("Minimize"),
-            Button::Maximize if maximized => tl!("Restore"),
-            Button::Maximize => tl!("Maximize"),
-            Button::Close => tl!("Close"),
-        };
-        let (rect, response) = ui.allocate_exact_size(Vec2::splat(BUTTON), Sense::click());
-        response.widget_info(|| egui::WidgetInfo::labeled(egui::Role::Button, true, label));
-        let response = response.on_hover_text(label);
-        if ui.is_rect_visible(rect) {
-            paint(ui.painter(), rect, button, maximized, &t, &response);
-        }
-        if response.clicked() {
-            let command = match button {
-                Button::Minimize => egui::ViewportCommand::Minimized(true),
-                Button::Maximize => egui::ViewportCommand::Maximized(!maximized),
-                // The same path as the desktop's close: unsaved documents still ask first.
-                Button::Close => egui::ViewportCommand::Close,
-            };
-            ui.ctx().send_viewport_cmd(command);
-        }
-    }
-}
-
-/// Adwaita's look: a round wash of the text colour, stronger on hover and press, and a 16-point
-/// symbolic glyph drawn with lines (no icon files).
-fn paint(painter: &egui::Painter, rect: Rect, button: Button, maximized: bool, t: &Tokens, response: &egui::Response) {
-    let alpha = if response.is_pointer_button_down_on() {
-        0.28
-    } else if response.hovered() {
-        0.16
-    } else {
-        0.10
+    let (focused, maximized) = ui.input(|i| (i.viewport().focused.unwrap_or(true), i.viewport().maximized.unwrap_or(false)));
+    let (rect, _) = ui.allocate_exact_size(Vec2::new(nodalia_theme::window_controls::WIDTH, BUTTON), Sense::hover());
+    let labels =
+        nodalia_theme::window_controls::Labels { minimize: tl!("Minimize"), maximize: tl!("Maximize"), restore: tl!("Restore"), close: tl!("Close") };
+    let action = nodalia_theme::window_controls::show(ui, rect, &theme::palette(t.kind), theme::mode(t.kind), focused, maximized, labels);
+    use nodalia_theme::window_controls::Action;
+    let command = match action {
+        Some(Action::Minimize) => egui::ViewportCommand::Minimized(true),
+        Some(Action::Maximize) => egui::ViewportCommand::Maximized(true),
+        Some(Action::Restore) => egui::ViewportCommand::Maximized(false),
+        // The same path as the desktop's close: unsaved documents still ask first.
+        Some(Action::Close) => egui::ViewportCommand::Close,
+        None => return,
     };
-    painter.circle_filled(rect.center(), BUTTON / 2.0, t.text.gamma_multiply(alpha));
-    if response.has_focus() {
-        painter.circle_stroke(rect.center(), BUTTON / 2.0 - 0.5, Stroke::new(1.0, t.accent));
-    }
-    let stroke = Stroke::new(1.25, t.text);
-    // The glyph's 16-point square, its corners on pixel centres so lines stay crisp.
-    let c = rect.center();
-    let at = |x: f32, y: f32| Pos2::new((c.x - 8.0 + x).round() + 0.5, (c.y - 8.0 + y).round() + 0.5);
-    match button {
-        Button::Minimize => {
-            painter.line_segment([at(4.0, 11.0), at(11.0, 11.0)], stroke);
-        }
-        Button::Maximize if maximized => {
-            // Restore: a smaller window in front of another.
-            painter.rect_stroke(Rect::from_two_pos(at(4.0, 6.0), at(10.0, 12.0)), 1.0, stroke, egui::StrokeKind::Middle);
-            painter.line_segment([at(6.0, 6.0), at(6.0, 4.0)], stroke);
-            painter.line_segment([at(6.0, 4.0), at(12.0, 4.0)], stroke);
-            painter.line_segment([at(12.0, 4.0), at(12.0, 10.0)], stroke);
-            painter.line_segment([at(12.0, 10.0), at(10.0, 10.0)], stroke);
-        }
-        Button::Maximize => {
-            painter.rect_stroke(Rect::from_two_pos(at(4.0, 4.0), at(11.0, 11.0)), 1.0, stroke, egui::StrokeKind::Middle);
-        }
-        Button::Close => {
-            painter.line_segment([at(4.0, 4.0), at(11.0, 11.0)], stroke);
-            painter.line_segment([at(11.0, 4.0), at(4.0, 11.0)], stroke);
-        }
-    }
+    ui.ctx().send_viewport_cmd(command);
 }
 
 /// How far into the window an edge resizes it.
@@ -313,8 +258,9 @@ mod tests {
     #[test]
     fn widths_cover_the_buttons_and_their_gaps() {
         assert_eq!(super::width(&[]), 0.0);
-        assert_eq!(super::width(&[Button::Close]), super::BUTTON + super::SIDE_GAP);
-        assert_eq!(super::width(&Layout::default().right), 3.0 * super::BUTTON + 2.0 * super::GAP + super::SIDE_GAP);
+        // NDL draws all three buttons whichever the desktop lists.
+        assert_eq!(super::width(&[Button::Close]), nodalia_theme::window_controls::WIDTH + super::SIDE_GAP);
+        assert_eq!(super::width(&Layout::default().right), nodalia_theme::window_controls::WIDTH + super::SIDE_GAP);
     }
 
     #[test]

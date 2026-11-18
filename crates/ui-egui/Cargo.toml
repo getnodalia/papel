@@ -11,6 +11,7 @@ workspace = true
 
 [dependencies]
 craft-ui = { workspace = true }
+nodalia-theme = { workspace = true }
 # The menus: native on macOS, an egui bar elsewhere, from one definition (menus.rs).
 craft-menu = { workspace = true }
 craft-keymap = { workspace = true }

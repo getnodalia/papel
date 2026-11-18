@@ -1,5 +1,5 @@
-//! Design tokens and egui style (plan/acrobat/02-ui-ux.md §1: neutral chrome, white panels,
-//! one blue accent; Dark Gray keeps pages white). Every custom widget reads `Tokens::get`.
+//! Design tokens (the Nodalia Design Language, light and dark, with Papel's accent) and egui
+//! style. Pages stay white in both modes. Every custom widget reads `Tokens::get`.
 
 use std::sync::Arc;
 
@@ -68,57 +68,63 @@ pub struct Tokens {
     pub radius: u8,
 }
 
+/// Papel's accent in the Nodalia palette.
+pub const ACCENT: nodalia_theme::Accent = nodalia_theme::Accent::Papel;
+/// An island's corner radius: the panels, the document area and the Home page.
+pub const ISLAND_RADIUS: u8 = nodalia_theme::component::PANEL_RADIUS as u8;
+/// The corner radius of controls (buttons, fields, menus).
+pub const CONTROL_RADIUS: u8 = nodalia_theme::component::CONTROL_RADIUS as u8;
+/// The window-colour gap between two islands, and between an island and the window's edge.
+pub const ISLAND_GAP: f32 = nodalia_theme::component::WINDOW_GAP;
+
+/// A Nodalia colour as egui's.
+pub fn ndl(c: nodalia_theme::Rgba) -> Color32 {
+    nodalia_theme::for_egui::color(c)
+}
+
+/// The Nodalia mode for these colours.
+pub fn mode(kind: ThemeKind) -> nodalia_theme::Mode {
+    match kind {
+        ThemeKind::Light => nodalia_theme::Mode::Light,
+        ThemeKind::Dark => nodalia_theme::Mode::Dark,
+    }
+}
+
+/// The Nodalia palette with Papel's accent.
+pub fn palette(kind: ThemeKind) -> nodalia_theme::Palette {
+    mode(kind).palette_with(ACCENT)
+}
+
 impl Tokens {
+    /// The Nodalia Design Language's tokens: every chrome colour comes from `nodalia-theme`. Pages
+    /// stay white in both modes; only their shadow follows the mode.
     pub fn for_kind(kind: ThemeKind) -> Self {
-        match kind {
-            ThemeKind::Light => Self {
-                kind,
-                titlebar: Color32::from_rgb(0xE9, 0xE9, 0xEB),
-                chrome: Color32::from_rgb(0xFF, 0xFF, 0xFF),
-                panel: Color32::from_rgb(0xFF, 0xFF, 0xFF),
-                pasteboard: Color32::from_rgb(0xF1, 0xF1, 0xF3),
-                card: Color32::from_rgb(0xFF, 0xFF, 0xFF),
-                border: Color32::from_rgb(0xDA, 0xDA, 0xDE),
-                divider: Color32::from_rgb(0xE8, 0xE8, 0xEB),
-                text: Color32::from_rgb(0x22, 0x22, 0x26),
-                text_muted: Color32::from_rgb(0x5E, 0x5E, 0x66),
-                text_faint: Color32::from_rgb(0x6B, 0x6B, 0x73),
-                icon: Color32::from_rgb(0x44, 0x44, 0x4B),
-                hover: Color32::from_rgb(0xF0, 0xF0, 0xF3),
-                pressed: Color32::from_rgb(0xE4, 0xE4, 0xE9),
-                selected: Color32::from_rgb(0xE6, 0xEE, 0xFD),
-                accent: Color32::from_rgb(0x1B, 0x63, 0xE0),
-                accent_text: Color32::from_rgb(0x17, 0x55, 0xC4),
-                accent_soft: Color32::from_rgb(0xE3, 0xEC, 0xFD),
-                field: Color32::from_rgb(0xFF, 0xFF, 0xFF),
-                badge_new: Color32::from_rgb(0x1B, 0x63, 0xE0),
-                page_shadow: Color32::from_black_alpha(34),
-                radius: 6,
-            },
-            ThemeKind::Dark => Self {
-                kind,
-                titlebar: Color32::from_rgb(0x1B, 0x1B, 0x1E),
-                chrome: Color32::from_rgb(0x26, 0x26, 0x2A),
-                panel: Color32::from_rgb(0x26, 0x26, 0x2A),
-                pasteboard: Color32::from_rgb(0x19, 0x19, 0x1C),
-                card: Color32::from_rgb(0x2E, 0x2E, 0x33),
-                border: Color32::from_rgb(0x3C, 0x3C, 0x43),
-                divider: Color32::from_rgb(0x33, 0x33, 0x39),
-                text: Color32::from_rgb(0xEC, 0xEC, 0xEF),
-                text_muted: Color32::from_rgb(0xAE, 0xAE, 0xB6),
-                text_faint: Color32::from_rgb(0x97, 0x97, 0x9E),
-                icon: Color32::from_rgb(0xD4, 0xD4, 0xDA),
-                hover: Color32::from_rgb(0x34, 0x34, 0x3A),
-                pressed: Color32::from_rgb(0x3E, 0x3E, 0x45),
-                selected: Color32::from_rgb(0x23, 0x3A, 0x63),
-                accent: Color32::from_rgb(0x4B, 0x8B, 0xF5),
-                accent_text: Color32::from_rgb(0x8C, 0xB6, 0xFA),
-                accent_soft: Color32::from_rgb(0x24, 0x36, 0x57),
-                field: Color32::from_rgb(0x1E, 0x1E, 0x22),
-                badge_new: Color32::from_rgb(0x3D, 0x7D, 0xEE),
-                page_shadow: Color32::from_black_alpha(120),
-                radius: 6,
-            },
+        let p = palette(kind);
+        let c = ndl;
+        let dark = kind == ThemeKind::Dark;
+        Self {
+            kind,
+            titlebar: c(p.surface_window),
+            chrome: c(p.surface_panel),
+            panel: c(p.surface_panel),
+            pasteboard: c(p.surface_sunken),
+            card: c(p.surface_raised),
+            border: c(p.border_default),
+            divider: c(p.border_subtle),
+            text: c(p.text_primary),
+            text_muted: c(p.text_secondary),
+            text_faint: c(p.text_tertiary),
+            icon: c(p.text_primary),
+            hover: c(p.control_bg_hover),
+            pressed: c(p.control_bg_pressed),
+            selected: c(p.accent_subtle),
+            accent: c(p.accent_default),
+            accent_text: c(p.accent_text),
+            accent_soft: c(p.accent_subtle),
+            field: c(p.control_field_bg),
+            badge_new: c(p.accent_default),
+            page_shadow: Color32::from_black_alpha(if dark { 120 } else { 34 }),
+            radius: CONTROL_RADIUS,
         }
     }
 
@@ -441,8 +447,8 @@ pub fn apply(ctx: &egui::Context, kind: ThemeKind) {
     v.selection.stroke = Stroke::new(1.0, t.accent);
     v.hyperlink_color = t.accent_text;
     v.override_text_color = Some(t.text);
-    v.window_corner_radius = CornerRadius::same(10);
-    v.menu_corner_radius = CornerRadius::same(8);
+    v.window_corner_radius = CornerRadius::same(ISLAND_RADIUS);
+    v.menu_corner_radius = CornerRadius::same(CONTROL_RADIUS);
     v.window_shadow = egui::Shadow { offset: [0, 8], blur: 28, spread: 0, color: Color32::from_black_alpha(if t.dark() { 110 } else { 38 }) };
     v.popup_shadow = egui::Shadow { offset: [0, 4], blur: 16, spread: 0, color: Color32::from_black_alpha(if t.dark() { 90 } else { 30 }) };
     for w in [&mut v.widgets.noninteractive, &mut v.widgets.inactive, &mut v.widgets.hovered, &mut v.widgets.active, &mut v.widgets.open] {

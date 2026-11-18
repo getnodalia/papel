@@ -1,7 +1,9 @@
-//! Vector icons: embedded Lucide SVGs, recoloured to white, rasterized by egui_extras at the exact
+//! Vector icons: the Nodalia Design Language's bold icons, with the embedded Lucide SVGs for the
+//! few NDL has no counterpart for. Both are drawn white, rasterized by egui_extras at the exact
 //! on-screen pixel size, and tinted per use (Lienzo lesson: never use Unicode glyphs as icons).
 
-use std::sync::OnceLock;
+use std::collections::HashMap;
+use std::sync::{Arc, OnceLock};
 
 use craft_ui::buttons::{ButtonVisuals, IconButton, IconButtonStyle};
 use craft_ui::icons::{SvgIconSet, SvgStyle};
@@ -16,13 +18,116 @@ fn white_icons() -> &'static SvgIconSet {
     MAP.get_or_init(|| SvgIconSet::new(ICONS, SvgStyle { current_color: "#ffffff", stroke_width: Some("1.75") }, "bytes://icons/", "square"))
 }
 
+/// The NDL icon drawn for a name Papel uses: its own NDL name, or the NDL counterpart of a Lucide
+/// name. `None` when only Lucide has it.
+pub fn ndl_name(name: &str) -> Option<&'static str> {
+    if let Some(icon) = nodalia_theme::icons::get(name) {
+        return Some(icon.name);
+    }
+    let ndl = match name {
+        "app-window" => "window",
+        "arrow-left-right" => "arrows-horizontal",
+        "arrow-up-down" => "arrows-vertical",
+        "book-open" => "book",
+        "check-circle-2" | "circle-check" | "badge-check" => "success",
+        "circle-help" => "help",
+        "circle-x" => "error",
+        "clipboard-paste" => "paste",
+        "clock-3" => "clock",
+        "cloud-upload" => "upload",
+        "code-xml" => "code",
+        "columns-2" => "columns",
+        "ellipsis" => "more-horizontal",
+        "ellipsis-vertical" => "more-vertical",
+        "file-down" => "export",
+        "file-input" => "import",
+        "file-plus" => "new",
+        "flip-horizontal-2" => "flip",
+        "flip-vertical-2" => "flip-vertical",
+        "folder-open" => "open",
+        "grid-3x3" => "grid",
+        "hand" => "pan",
+        "highlighter" => "highlight",
+        "house" => "home",
+        "languages" => "translate",
+        "layout-grid" => "grid-view",
+        "link-2" => "link",
+        "list-ordered" => "list-numbers",
+        "lock-open" => "unlock",
+        "maximize" => "fullscreen",
+        "minimize" => "fullscreen-exit",
+        "message-square" | "message-square-text" => "comment",
+        "message-square-plus" => "comment-add",
+        "messages-square" => "comments",
+        "mic" => "microphone",
+        "mouse-pointer-2" => "select",
+        "panel-left" => "sidebar",
+        "paperclip" => "attach",
+        "pen-tool" | "pen-line" => "pen",
+        "pentagon" => "polygon",
+        "pipette" => "eyedropper",
+        "presentation" => "present",
+        "printer" => "print",
+        "rectangle-horizontal" => "rectangle",
+        "redo-2" => "redo",
+        "rotate-cw" => "rotate",
+        "scissors" => "cut",
+        "settings-2" => "settings",
+        "share-2" => "share",
+        "sparkles" => "sparkle",
+        "sticky-note" => "note",
+        "swatch-book" => "swatches",
+        "text-cursor-input" => "text-box",
+        "trash" | "trash-2" => "delete",
+        "triangle-alert" => "warning",
+        "type" => "text",
+        "undo-2" => "undo",
+        "user-round" => "user",
+        "wand-sparkles" => "magic-wand",
+        "x" => "close",
+        "zoom-in" => "zoom",
+        _ => return None,
+    };
+    nodalia_theme::icons::get(ndl).map(|icon| icon.name)
+}
+
+/// The SVG documents built so far, by NDL icon name.
+type SvgCache = std::sync::Mutex<HashMap<&'static str, Arc<[u8]>>>;
+
+/// An NDL icon's bold style as a white SVG document, built once per icon.
+fn ndl_svg(name: &'static str) -> Option<Arc<[u8]>> {
+    static CACHE: OnceLock<SvgCache> = OnceLock::new();
+    let icon = nodalia_theme::icons::get(name)?;
+    let mut cache = CACHE.get_or_init(Default::default).lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let svg = cache.entry(icon.name).or_insert_with(|| {
+        let mut svg = format!(
+            "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#ffffff\" stroke-width=\"{}\" stroke-linecap=\"round\" stroke-linejoin=\"round\">",
+            nodalia_theme::icons::BOLD_STROKE
+        );
+        for element in icon.bold_body() {
+            svg.push_str(&element.replace("currentColor", "#ffffff"));
+        }
+        svg.push_str("</svg>");
+        Arc::from(svg.into_bytes())
+    });
+    Some(Arc::clone(svg))
+}
+
 pub fn exists(name: &str) -> bool {
-    white_icons().contains(name)
+    ndl_name(name).is_some() || white_icons().contains(name)
 }
 
 pub(crate) fn source(name: &str) -> egui::ImageSource<'static> {
-    // Papel caches an unknown name under the resolved fallback name.
-    white_icons().source(white_icons().canonical_name(name).unwrap_or("square"))
+    if let Some(ndl) = ndl_name(name)
+        && let Some(bytes) = ndl_svg(ndl)
+    {
+        return egui::ImageSource::Bytes { uri: format!("bytes://ndl-icons/{ndl}.svg").into(), bytes: egui::load::Bytes::Shared(bytes) };
+    }
+    match white_icons().canonical_name(name) {
+        Some(lucide) => white_icons().source(lucide),
+        // An unknown name draws NDL's square (cached under that name).
+        None => source("square"),
+    }
 }
 
 pub fn image(name: &str, size: f32, tint: Color32) -> egui::Image<'static> {
@@ -109,6 +214,11 @@ mod tests {
         assert_eq!(ICONS.len(), 191);
         assert!(exists("minimize-2"));
         for (name, original) in ICONS {
+            if let Some(ndl) = ndl_name(name) {
+                let egui::ImageSource::Bytes { uri, .. } = source(name) else { panic!("expected SVG bytes") };
+                assert_eq!(uri.as_ref(), format!("bytes://ndl-icons/{ndl}.svg"));
+                continue;
+            }
             let expected =
                 String::from_utf8_lossy(original).replace("currentColor", "#ffffff").replace("stroke-width=\"2\"", "stroke-width=\"1.75\"");
             let egui::ImageSource::Bytes { uri, bytes } = source(name) else { panic!("expected SVG bytes") };
@@ -117,7 +227,7 @@ mod tests {
         }
         let egui::ImageSource::Bytes { uri, bytes } = source("missing-icon") else { panic!("expected SVG bytes") };
         let egui::ImageSource::Bytes { bytes: fallback, .. } = source("square") else { panic!("expected SVG bytes") };
-        assert_eq!(uri.as_ref(), "bytes://icons/square.svg");
+        assert_eq!(uri.as_ref(), "bytes://ndl-icons/square.svg");
         assert_eq!(bytes.as_ref(), fallback.as_ref());
         assert!(!exists("missing-icon"));
     }

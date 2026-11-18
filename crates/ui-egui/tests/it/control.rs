@@ -1755,7 +1755,10 @@ fn ui_panel_opens_closes_and_sizes_panes_and_survives_restore() {
     ok(&mut reloaded, &client, "ui.set", json!({"key":"tools-side", "value":"right"}));
     ok(&mut reloaded, &client, "ui.command", json!({"id":"ui.dock.reset"}));
     let state = ok(&mut reloaded, &client, "ui.state", json!({}))["side_panels"].clone();
-    assert_eq!((state["tools_side"].clone(), state["tools_width"].clone(), state["side_width"].clone()), (json!("left"), json!(272.0), json!(330.0)));
+    assert_eq!(
+        (state["tools_side"].clone(), state["tools_width"].clone(), state["side_width"].clone()),
+        (json!("left"), json!(papel_ui_egui::side_panels::TOOLS_WIDTH), json!(330.0))
+    );
     assert_eq!(ok(&mut reloaded, &client, "ui.state", json!({}))["documents"][0]["pages"], 5);
 }
 

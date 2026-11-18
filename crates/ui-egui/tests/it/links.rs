@@ -1,5 +1,5 @@
-//! Community links: the Discord button is one click away everywhere; Help menu, About dialog and
-//! home screen open the Nodalia and Papel pages.
+//! Project links: the main menu is one click away in the top bar; the Help menu and the About
+//! dialog open the Papel and Nodalia pages and the issue tracker.
 
 use egui_kittest::Harness;
 use egui_kittest::kittest::Queryable;
@@ -18,55 +18,24 @@ fn harness(setup: impl FnOnce(&mut PapelApp) + 'static) -> Harness<'static, Pape
 }
 
 #[test]
-fn discord_button_in_the_top_bar_opens_discord() {
+fn main_menu_opens_about() {
     let mut h = harness(|_| {});
-    h.get_by_label("Discord").click();
+    h.get_by_label("Main menu").click();
     h.run_steps(2);
-    assert_eq!(h.state().last_opened_url.as_deref(), Some(links::DISCORD));
-    assert_eq!(links::DISCORD, "https://github.com/getnodalia/papel/issues");
+    h.get_by_label("About Papel").click();
+    h.run_steps(2);
+    assert_eq!(h.state().dialog, Some(Dialog::About));
 }
 
 #[test]
-fn home_screen_links() {
-    for (label, url) in [
-        ("Join our Discord", links::DISCORD),
-        ("Papel web page", "https://getnodalia.com/papel"),
-        ("Papel on GitHub", "https://github.com/getnodalia/papel"),
-        ("Nodalia website", "https://getnodalia.com"),
-    ] {
-        let mut h = harness(|_| {});
-        h.get_by_label("Join the Nodalia community");
-        h.get_by_label(label).click();
-        h.run_steps(2);
-        assert_eq!(h.state().last_opened_url.as_deref(), Some(url), "{label}");
-    }
-}
-
-#[test]
-fn home_community_card_closes_for_this_run() {
-    let mut h = harness(|_| {});
-    h.get_by_label("Join the Nodalia community");
-    h.get_by_label("Close").click();
+fn about_dialog_shows_the_app_and_links() {
+    let mut h = harness(|app| app.dialog = Some(Dialog::About));
+    h.run_steps(4);
+    h.get_by_label("Part of Nodalia");
+    h.get_by_label("Report a problem").click();
     h.run_steps(2);
-    assert!(h.state().community_card_closed);
-    assert!(h.query_by_label("Join the Nodalia community").is_none());
-    assert!(h.query_by_label("Join our Discord").is_none());
-    // Not remembered: a fresh app shows the card again.
-    assert!(!PapelApp::new().community_card_closed);
-}
-
-#[test]
-fn about_dialog_shows_the_brand_and_links() {
-    let pdf = b"%PDF-1.7\n1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 200 200] >> endobj\ntrailer << /Root 1 0 R >>\n%%EOF";
-    // With a document open, so the home screen's own links are not on screen.
-    let mut h = harness(move |app| {
-        app.open_bytes("one.pdf", None, pdf.to_vec()).unwrap();
-        app.dialog = Some(Dialog::About);
-    });
-    assert!(h.query_all_by_label("Nodalia").count() >= 2, "the mark and the wordmark (alt text)");
-    h.get_by_label("Join our Discord").click();
-    h.run_steps(2);
-    assert_eq!(h.state().last_opened_url.as_deref(), Some(links::DISCORD));
+    assert_eq!(h.state().last_opened_url.as_deref(), Some(links::ISSUES));
+    assert_eq!(links::ISSUES, "https://github.com/getnodalia/papel/issues");
 }
 
 #[test]
@@ -82,10 +51,7 @@ fn help_commands_open_each_link() {
 /// Runs frames until the node labelled `label` exists and has stopped moving, then returns it.
 ///
 /// The About dialog is a modal centred on its own size, and switching tabs changes that size, so
-/// for a few frames afterwards the modal grows and recentres and every control in it moves. A
-/// fixed number of frames is a guess at how long that takes: it was too few after the 0.5.0
-/// contributors refresh (78 names instead of 5) on some machines, the click on Table landed where
-/// the button had been, and the table never opened (#671).
+/// for a few frames afterwards the modal grows and recentres and every control in it moves.
 fn settled<'a>(h: &'a mut Harness<'static, PapelApp>, label: &'a str) -> egui_kittest::Node<'a> {
     let mut last = None;
     for _ in 0..60 {
@@ -103,7 +69,6 @@ fn settled<'a>(h: &'a mut Harness<'static, PapelApp>, label: &'a str) -> egui_ki
 fn about_dialog_has_contributors_and_models_tabs() {
     let mut h = harness(|app| app.dialog = Some(Dialog::About));
     settled(&mut h, "Contributors").click();
-    // The owner is always in the compiled-in credits (contributors/contributors.json), shown by username.
     settled(&mut h, "@echelon");
     settled(&mut h, "Table").click();
     settled(&mut h, "PRs");

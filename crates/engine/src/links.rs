@@ -1,4 +1,4 @@
-//! Where Papel and the Nodalia community live on the web. One table, so the Help menu, the
+//! Where Papel and Nodalia live on the web. One table, so the Help menu, the
 //! About dialog, the home screen, the CLI and the README agree.
 
 use icu_properties::props::Script;
@@ -7,7 +7,8 @@ use std::path::{Path, PathBuf};
 /// The app's name in Nodalia URLs (`getnodalia.com/{APP}`, `github.com/getnodalia/{APP}`).
 pub const APP: &str = "papel";
 
-pub const DISCORD: &str = "https://github.com/getnodalia/papel/issues";
+/// Where problems and ideas are reported.
+pub const ISSUES: &str = "https://github.com/getnodalia/papel/issues";
 pub const WEBSITE: &str = "https://getnodalia.com";
 pub const APP_PAGE: &str = "https://getnodalia.com/papel";
 pub const GITHUB: &str = "https://github.com/getnodalia/papel";
@@ -18,15 +19,15 @@ pub struct Link {
     pub command: &'static str,
     pub label: &'static str,
     pub url: &'static str,
-    /// Lucide icon name.
+    /// Icon name (NDL, or Lucide where NDL has none).
     pub icon: &'static str,
 }
 
-/// In the order they are shown. Discord comes first: it is where people get help fastest.
+/// In the order they are shown.
 pub const LINKS: &[Link] = &[
-    Link { command: "help.discord", label: "Join the Nodalia Discord", url: DISCORD, icon: "messages-square" },
     Link { command: "help.app_page", label: "Papel web page", url: APP_PAGE, icon: "globe" },
     Link { command: "help.github", label: "Papel on GitHub", url: GITHUB, icon: "code-xml" },
+    Link { command: "help.report_issue", label: "Report a problem", url: ISSUES, icon: "flag" },
     Link { command: "help.website", label: "Nodalia website", url: WEBSITE, icon: "external-link" },
 ];
 

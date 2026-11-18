@@ -190,7 +190,7 @@ fn stdout_line(line: std::fmt::Arguments<'_>) -> Result<(), CliError> {
 
 fn version() -> Result<(), CliError> {
     stdout_line(format_args!("papel-cli {}", papel_engine::build_info::version()))?;
-    stdout_line(format_args!("Discord: {}  (help and feedback)", papel_engine::links::DISCORD))?;
+    stdout_line(format_args!("Issues:  {}  (problems and ideas)", papel_engine::links::ISSUES))?;
     stdout_line(format_args!("Web:     {}", papel_engine::links::APP_PAGE))?;
     stdout_line(format_args!("Source:  {}", papel_engine::links::GITHUB))?;
     Ok(())

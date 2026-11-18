@@ -848,7 +848,8 @@ fn the_text_editor_aligns_a_narrow_box_to_its_own_edge() {
     let pixels = h.render().unwrap();
     let inside = ink(&pixels, r);
     let edge = ink(&pixels, egui::Rect::from_min_max(pos2(r.right() - r.width() * 0.25, r.min.y), r.max));
-    let past = ink(&pixels, egui::Rect::from_min_max(pos2(r.right() + 2.0, r.min.y), pos2(r.right() + 40.0, r.max.y)));
+    // Just past the box: the editor's Done and Cancel icons stand further out.
+    let past = ink(&pixels, egui::Rect::from_min_max(pos2(r.right() + 2.0, r.min.y), pos2(r.right() + 12.0, r.max.y)));
     assert!(
         inside > 20 && edge > 0 && past == 0,
         "the text is drawn in its box, up to its right edge ({inside} dark pixels in it, {edge} in its last quarter, {past} past it)"
@@ -896,7 +897,8 @@ fn the_text_editor_aligns_a_narrow_box_whose_lines_share_an_alignment() {
     let pixels = h.render().unwrap();
     let inside = ink(&pixels, r);
     let edge = ink(&pixels, egui::Rect::from_min_max(pos2(r.right() - r.width() * 0.25, r.min.y), r.max));
-    let past = ink(&pixels, egui::Rect::from_min_max(pos2(r.right() + 2.0, r.min.y), pos2(r.right() + 40.0, r.max.y)));
+    // Just past the box: the editor's Done and Cancel icons stand further out.
+    let past = ink(&pixels, egui::Rect::from_min_max(pos2(r.right() + 2.0, r.min.y), pos2(r.right() + 12.0, r.max.y)));
     assert!(
         inside > 20 && edge > 0 && past == 0,
         "the text is drawn in its box, up to its right edge ({inside} dark pixels in it, {edge} in its last quarter, {past} past it)"
@@ -1127,6 +1129,8 @@ fn added_picture_resizes_repeatedly_and_drags_back_from_out_of_bounds_without_sm
         _ => panic!(),
     };
     assert!(h.state_mut().apply_edit(papel_engine::Edit::UpdateContent { page: 0, index: 0, content: papel_engine::AddedContent::Image(img) }));
+    // Scrolled so the page's bottom edge is in view, with room above it for the drag.
+    h.state_mut().views[0].goto = Some((0, 0.3));
     crate::support::settle(&mut h);
     let from = item_on_screen(&h, [120.0, -30.0, 180.0, 30.0]);
     let grab = pos2(from.center().x, from.top() + 10.0);
@@ -1702,8 +1706,10 @@ fn image_context_menu_requires_visible_body_even_when_the_frame_crosses_the_page
 fn rail_page_and_zoom_fields_match_and_fit_the_rail() {
     let mut h = harness();
     h.run_steps(3);
-    // The rail is 49 pt wide at the window's right edge (1400 pt wide), inside a 1 pt border.
-    let (rail_left, rail_right) = (1400.0 - 49.0 + 1.0, 1400.0 - 1.0);
+    // The rail is a 49 pt island (1 pt inside its edge) a window gap in from the right edge of the
+    // 1400 pt window.
+    let gap = papel_ui_egui::theme::ISLAND_GAP;
+    let (rail_left, rail_right) = (1400.0 - gap - 49.0 + 1.0, 1400.0 - gap - 1.0);
     let rail = h.get_by_label("Bookmarks").rect();
     let (page, zoom) = (h.get_by_label("Current page").rect(), h.get_by_label("Zoom").rect());
     assert_eq!((page.width(), page.height()), (zoom.width(), zoom.height()), "{page:?} vs {zoom:?}");
