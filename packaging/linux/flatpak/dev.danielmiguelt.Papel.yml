@@ -132,6 +132,6 @@ modules:
       # The interface translations at the commit in craft-i18n.rev (a test keeps the two equal).
       - type: git
         url: https://github.com/getnodalia/foundation
-        commit: 0fe05b17f21827d6a911875090cbf6c4cef5428e
+        commit: a3a500bd683b98c458018f0bea392c994ea52c7a
         dest: craft-i18n
       - cargo-sources.json
