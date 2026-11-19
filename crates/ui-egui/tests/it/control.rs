@@ -1088,7 +1088,9 @@ fn ukrainian_preferences_and_search_keep_command_ids() {
         ok(&mut h, &c, "ui.key", json!({ "key": "Escape" }));
         h.state_mut().palette_query.clear();
     }
-    for (dialog, label) in [("properties", "Властивості документа"), ("protect", "Захистити паролем"), ("about", "Учасники")]
+    let uk = papel_ui_egui::i18n::Lang::from_code("uk").unwrap();
+    let about = papel_ui_egui::i18n::tr(uk, "About Papel");
+    for (dialog, label) in [("properties", "Властивості документа"), ("protect", "Захистити паролем"), ("about", about)]
     {
         ok(&mut h, &c, "ui.set", json!({ "key": "dialog", "value": dialog }));
         let found = ok(&mut h, &c, "ui.inspect", json!({ "query": label }));
