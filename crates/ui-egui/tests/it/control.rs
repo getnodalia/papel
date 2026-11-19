@@ -1089,7 +1089,7 @@ fn ukrainian_preferences_and_search_keep_command_ids() {
         h.state_mut().palette_query.clear();
     }
     let uk = papel_ui_egui::i18n::Lang::from_code("uk").unwrap();
-    let about = papel_ui_egui::i18n::tr(uk, "About Papel");
+    let about = papel_ui_egui::i18n::tr(uk, "Read, sign, edit and organize PDFs, in pure Rust.");
     for (dialog, label) in [("properties", "Властивості документа"), ("protect", "Захистити паролем"), ("about", about)]
     {
         ok(&mut h, &c, "ui.set", json!({ "key": "dialog", "value": dialog }));
