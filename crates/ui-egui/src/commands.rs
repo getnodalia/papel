@@ -252,6 +252,8 @@ impl PapelApp {
                 self.dialog = Some(Dialog::ActionWizard);
             }
             "create.blank" => self.create_blank(),
+            // The templates are on Home; the command takes the window there.
+            "create.template" => self.active = None,
             "create.file" => self.open_dialog(),
             "create.multiple" => self.create_multiple_dialog(),
             "create.multiple_separate" => self.create_multiple_separate_dialog(),

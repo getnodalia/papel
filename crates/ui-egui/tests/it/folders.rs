@@ -49,7 +49,7 @@ impl Drop for TempFolder {
 }
 
 fn harness(setup: impl FnOnce(&mut PapelApp) + 'static) -> Harness<'static, PapelApp> {
-    let mut h = Harness::builder().with_size(egui::vec2(1400.0, 1400.0)).build_eframe(move |_cc| {
+    let mut h = Harness::builder().with_size(egui::vec2(1400.0, 3000.0)).build_eframe(move |_cc| {
         let mut app = PapelApp::new();
         app.set_option("language", "en").unwrap();
         // List folders on the frame that asks, not on a worker thread.

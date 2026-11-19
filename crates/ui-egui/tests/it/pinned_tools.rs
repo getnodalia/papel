@@ -6,7 +6,7 @@ use egui_kittest::kittest::Queryable;
 use papel_ui_egui::{Dialog, LeftPanel, PapelApp};
 
 fn harness(setup: impl FnOnce(&mut PapelApp) + 'static) -> Harness<'static, PapelApp> {
-    let mut h = Harness::builder().with_size(egui::vec2(1400.0, 1000.0)).build_eframe(move |_cc| {
+    let mut h = Harness::builder().with_size(egui::vec2(1400.0, 2600.0)).build_eframe(move |_cc| {
         let mut app = PapelApp::new();
         app.set_option("language", "en").unwrap();
         app.run_inline = true;

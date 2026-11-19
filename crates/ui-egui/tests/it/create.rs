@@ -401,3 +401,42 @@ fn a_blank_page_is_on_the_system_regions_paper() {
         );
     }
 }
+
+#[test]
+fn a_template_from_home_opens_as_a_new_fillable_document() {
+    use egui_kittest::{Harness, kittest::Queryable};
+    let mut h = Harness::builder().with_size(egui::vec2(1400.0, 2400.0)).build_eframe(|_cc| {
+        let mut app = PapelApp::new();
+        app.set_option("language", "en").unwrap();
+        app
+    });
+    h.run_steps(6);
+    assert!(h.state().session.docs().is_empty());
+    h.get_by_label("Timesheet").click();
+    h.run_steps(4);
+    let docs = h.state().session.docs();
+    assert_eq!(docs.len(), 1, "the template should open as one new document");
+    assert_eq!(docs[0].name, "Timesheet.pdf");
+    assert_eq!(docs[0].info.pages.len(), 1);
+    assert!(h.state().active.is_some(), "the new document is shown");
+}
+
+#[test]
+fn the_template_command_goes_to_home_and_every_template_has_a_tile() {
+    use egui_kittest::{Harness, kittest::Queryable};
+    let mut h = Harness::builder().with_size(egui::vec2(760.0, 4800.0)).build_eframe(|_cc| {
+        let mut app = PapelApp::new();
+        app.set_option("language", "en").unwrap();
+        app.execute("create.blank");
+        app
+    });
+    h.run_steps(3);
+    assert!(h.state().active.is_some());
+    h.state_mut().execute("create.template");
+    h.run_steps(8);
+    assert!(h.state().active.is_none(), "the command takes the window to Home");
+    // A narrow window wraps the grid instead of cutting it: every template is on a tile.
+    for template in papel_engine::templates::list(papel_engine::templates::Lang::En) {
+        h.get_by_label(template.name);
+    }
+}

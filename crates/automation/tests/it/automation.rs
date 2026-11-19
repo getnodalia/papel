@@ -5375,6 +5375,36 @@ fn creating_and_reducing_through_tools() {
 }
 
 #[test]
+fn creating_from_a_template_gives_a_fillable_page_in_the_language_asked() {
+    let dir = workdir("create-template");
+    let mut a = auto(&dir);
+    let es = ok(&mut a, "doc_create", json!({ "from": "template", "template": "invoice", "language": "es-MX" }));
+    assert_eq!((es["pages"].as_u64(), es["dirty"].as_bool()), (Some(1), Some(true)));
+    let doc = es["doc"].as_u64().unwrap();
+    assert!(page_text(&mut a, doc)[0].to_lowercase().contains("factura"));
+    let fields = ok(&mut a, "form_fields", json!({ "doc": doc }));
+    let names: Vec<&str> = fields["fields"].as_array().unwrap().iter().filter_map(|f| f["name"].as_str()).collect();
+    assert!(names.contains(&"Total") && names.len() > 30, "{names:?}");
+    ok(&mut a, "form_fill", json!({ "doc": doc, "values": { "Total": "120,00" } }));
+
+    let en = ok(&mut a, "doc_create", json!({ "from": "template", "template": "certificate", "width": 595, "height": 842 }))["doc"].as_u64().unwrap();
+    assert!(page_text(&mut a, en)[0].contains("Certificate"));
+    ok(&mut a, "doc_save", json!({ "doc": en, "path": "certificate.pdf" }));
+    assert!(dir.join("certificate.pdf").exists());
+
+    // What can't be made says so, naming what can.
+    match a.call("doc_create", &json!({ "from": "template", "template": "nope" })) {
+        Err(ToolError::InvalidArgs(m)) => assert!(m.contains("invoice"), "{m}"),
+        other => panic!("expected a refusal, got {other:?}"),
+    }
+    assert!(matches!(a.call("doc_create", &json!({ "from": "template" })), Err(ToolError::InvalidArgs(_))));
+    assert!(matches!(
+        a.call("doc_create", &json!({ "from": "template", "template": "invoice", "width": 50, "height": 50 })),
+        Err(ToolError::InvalidArgs(_))
+    ));
+}
+
+#[test]
 fn creating_from_text_refuses_what_the_font_cannot_draw() {
     let dir = workdir("create-undrawable");
     std::fs::write(dir.join("kr.txt"), "ABC 제안서 시험").unwrap();
