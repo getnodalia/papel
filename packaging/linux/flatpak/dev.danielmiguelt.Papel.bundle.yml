@@ -55,7 +55,7 @@ finish-args:
 build-options:
   no-debuginfo: true
 modules:
-  # CUPS client tools for craft-print: the runtime has libcups but not lpstat/lp/lpoptions.
+  # CUPS client tools for nodalia-print: the runtime has libcups but not lpstat/lp/lpoptions.
   # Linked statically against this release's libcups, so a runtime update can't break them;
   # the socket path matches the host's, which --socket=cups mounts.
   - name: cups-client
@@ -102,12 +102,12 @@ modules:
   - name: papel
     buildsystem: simple
     # The release binaries were built with the interface translations at the commit in
-    # craft-i18n.rev (the craft-i18n source below); nothing here compiles, so this records which
+    # nodalia-i18n.rev (the nodalia-i18n source below); nothing here compiles, so this records which
     # translations the bundle carries and keeps it in step with the from-source manifest (a test
     # keeps both equal to the pin).
     build-options:
       env:
-        CRAFT_I18N_DIR: /run/build/papel/craft-i18n
+        NODALIA_I18N_DIR: /run/build/papel/nodalia-i18n
     build-commands:
       - install -Dm755 bin/papel /app/bin/papel
       - install -Dm755 bin/papel-cli /app/bin/papel-cli
@@ -119,12 +119,12 @@ modules:
       - install -Dm644 share/metainfo/dev.danielmiguelt.Papel.metainfo.xml /app/share/metainfo/dev.danielmiguelt.Papel.metainfo.xml
       # OCR models (with their licences), found at /app/bin/../share/papel/models.
       - mkdir -p /app/share/papel && cp -R share/papel/models /app/share/papel/
-      # Licences, including the embedded craft-fonts' OFL texts.
+      # Licences, including the embedded nodalia-fonts' OFL texts.
       - mkdir -p /app/share/icons /app/share/doc && cp -R share/icons/hicolor /app/share/icons/ && cp -R share/doc/papel /app/share/doc/
     sources:
       - type: dir
         path: stage
       - type: git
         url: https://github.com/getnodalia/foundation
-        commit: a3a500bd683b98c458018f0bea392c994ea52c7a
-        dest: craft-i18n
+        commit: 4df0177d9ad0772ecd34649956c6e81f467f240c
+        dest: nodalia-i18n

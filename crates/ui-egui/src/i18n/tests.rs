@@ -2,7 +2,7 @@ use super::*;
 
 const JA: fn() -> Lang = || Lang::from_code("ja").expect("ja registered");
 
-/// Skips a test that needs the embedded catalogs when none were embedded (`CRAFT_I18N_DIR`
+/// Skips a test that needs the embedded catalogs when none were embedded (`NODALIA_I18N_DIR`
 /// unset): the interface is then English only.
 macro_rules! needs_catalogs {
     () => {
@@ -29,7 +29,7 @@ fn rows(text: &str) -> Vec<(String, String, String)> {
 
 /// The embedded Papel catalog of `code` (not the shared one), `""` without one.
 fn app_catalog(code: &str) -> &'static str {
-    CRAFT_I18N.iter().find(|(c, ..)| *c == code).map_or("", |(_, _, app)| *app)
+    NODALIA_I18N.iter().find(|(c, ..)| *c == code).map_or("", |(_, _, app)| *app)
 }
 
 /// Every translation `code`'s embedded catalogs hold, each plural form on its own: the fonts must
@@ -227,7 +227,7 @@ fn preferences_resolve_with_fallback() {
     assert_eq!(normalize_pref("JA"), Some("ja"));
 }
 
-/// Papel offers exactly the languages in `LANGUAGES` when craft-i18n is embedded, and English
+/// Papel offers exactly the languages in `LANGUAGES` when nodalia-i18n is embedded, and English
 /// alone when it isn't: a missing catalog never fails, it shows English.
 #[test]
 fn the_languages_offered_are_the_embedded_ones_of_the_list() {
@@ -241,10 +241,10 @@ fn the_languages_offered_are_the_embedded_ones_of_the_list() {
         return;
     }
     let listed: Vec<&str> = LANGUAGES.iter().map(|l| l.code).collect();
-    assert_eq!(all, listed, "every language Papel lists has its catalog in craft-i18n");
+    assert_eq!(all, listed, "every language Papel lists has its catalog in nodalia-i18n");
     assert!(Lang::from_code("pseudo").is_none(), "the pseudo locale is never a setting");
-    // craft-i18n has catalogs Papel doesn't offer (yet); they are never offered here.
-    for code in CRAFT_I18N.iter().map(|(c, ..)| *c).filter(|c| !listed.contains(c)) {
+    // nodalia-i18n has catalogs Papel doesn't offer (yet); they are never offered here.
+    for code in NODALIA_I18N.iter().map(|(c, ..)| *c).filter(|c| !listed.contains(c)) {
         assert_eq!(Lang::from_code(code), None, "{code} is not one of Papel's languages");
     }
 }
@@ -396,13 +396,13 @@ fn signature_appearance_labels_keep_their_separator() {
     }
 }
 
-/// With craft-fonts, every Japanese translation has glyphs: with all interface faces (desktop)
+/// With nodalia-fonts, every Japanese translation has glyphs: with all interface faces (desktop)
 /// and with BIZ UDPGothic Regular alone (the web build's only Japanese face).
 #[test]
 fn japanese_labels_have_glyphs() {
     let craft = papel_fonts::ui_japanese_fonts();
     let Some(web) = craft.iter().find(|f| f.family == "BIZ UDPGothic" && f.style == "Regular") else {
-        eprintln!("skipping Japanese glyph checks: build with CRAFT_FONTS_DIR to run them");
+        eprintln!("skipping Japanese glyph checks: build with NODALIA_FONTS_DIR to run them");
         return;
     };
     needs_catalogs!();
@@ -410,7 +410,7 @@ fn japanese_labels_have_glyphs() {
     let web_name = web.name();
     let mut web_only = crate::theme::font_definitions();
     for family in web_only.families.values_mut() {
-        family.retain(|name| !papel_fonts::CRAFT_FONTS.iter().any(|face| face.name() == *name) || *name == web_name);
+        family.retain(|name| !papel_fonts::NODALIA_FONTS.iter().any(|face| face.name() == *name) || *name == web_name);
     }
     use egui::epaint::text::{Fonts, TextOptions};
     for (build, defs) in [("desktop", crate::theme::font_definitions()), ("web", web_only)] {
@@ -435,7 +435,7 @@ fn history_labels_keep_captured_names() {
 }
 
 /// An `@id` row that drops the English label's trailing `…` or changes its `{placeholders}` is not
-/// used, by the menus or by `tr_id`: the label's translation shows instead. craft-i18n checks
+/// used, by the menus or by `tr_id`: the label's translation shows instead. nodalia-i18n checks
 /// neither for `@id` rows, whose source is the command id.
 #[test]
 fn an_id_row_that_changes_the_label_s_shape_is_not_used() {
@@ -519,7 +519,7 @@ fn plurals_and_placeholders() {
     assert_eq!(trn(JA(), 7, "{n} test item", "{n} test items"), "7 test items");
 }
 
-/// Papel's plural rules before craft-i18n (form index by count), kept to show the crate's
+/// Papel's plural rules before nodalia-i18n (form index by count), kept to show the crate's
 /// CLDR categories pick the same form of the same rows.
 fn papel_plural_rule(code: &str) -> fn(u64) -> usize {
     fn one_other(n: u64) -> usize {
@@ -611,7 +611,7 @@ fn plural_counts() -> impl Iterator<Item = u64> {
     (0..=200).chain([1000, 1001, 1002, 1003, 1011, 1012, 1021, 1100, 1_000_000, 1_000_001, 2_000_000, 123_456_789, u64::MAX - 13, u64::MAX])
 }
 
-/// craft-i18n picks plural forms by CLDR category, Papel by its own rules: for every language
+/// nodalia-i18n picks plural forms by CLDR category, Papel by its own rules: for every language
 /// the two choose the same form wherever they list as many forms. Where CLDR lists more (Hindi
 /// and Turkish have two where Papel had one), the catalog repeats the form, so the text is the
 /// same; the embedded rows are checked for that and any that differ are reported.
@@ -786,14 +786,14 @@ fn contextual_labels_fall_back_to_the_plain_translation() {
     assert_eq!(tr_ctx(es, "no such context", "Type"), tr(es, "Type"));
 }
 
-/// With a craft-fonts Telugu face, every Telugu translation has glyphs: with all interface
-/// faces (desktop) and with the Telugu face as the only craft-fonts face (the web build keeps
+/// With a nodalia-fonts Telugu face, every Telugu translation has glyphs: with all interface
+/// faces (desktop) and with the Telugu face as the only nodalia-fonts face (the web build keeps
 /// it; Telugu labels must not need a Japanese or Arabic face).
 #[test]
 fn telugu_labels_have_glyphs() {
     let telugu: Vec<String> = papel_fonts::ui_telugu_fonts().iter().map(|f| f.name()).collect();
     if telugu.is_empty() {
-        eprintln!("skipping Telugu glyph checks: build with CRAFT_FONTS_DIR and a Telugu face to run them");
+        eprintln!("skipping Telugu glyph checks: build with NODALIA_FONTS_DIR and a Telugu face to run them");
         return;
     }
     needs_catalogs!();
@@ -801,7 +801,7 @@ fn telugu_labels_have_glyphs() {
     let labels: String = translations("te").chars().chain(te.name().chars()).filter(|c| !c.is_control()).collect();
     let mut telugu_only = crate::theme::font_definitions();
     for family in telugu_only.families.values_mut() {
-        family.retain(|name| !papel_fonts::CRAFT_FONTS.iter().any(|face| face.name() == *name) || telugu.contains(name));
+        family.retain(|name| !papel_fonts::NODALIA_FONTS.iter().any(|face| face.name() == *name) || telugu.contains(name));
     }
     use egui::epaint::text::{Fonts, TextOptions};
     for (build, defs) in [("all faces", crate::theme::font_definitions()), ("Telugu face only", telugu_only)] {
@@ -843,7 +843,7 @@ fn turkish_is_registered_and_persists() {
 }
 
 /// The code joins some labels with a space at either end, so these catalogs (Papel's rows in
-/// craft-i18n) keep exactly the source's, and write … rather than three dots.
+/// nodalia-i18n) keep exactly the source's, and write … rather than three dots.
 #[test]
 fn catalog_rows_keep_the_source_spacing_and_ellipsis() {
     needs_catalogs!();
@@ -1367,14 +1367,14 @@ fn plural_fixture(code: &'static str, forms: usize) -> impl Fn(u64) -> usize {
     }
 }
 
-/// With a craft-fonts Arabic face, every Arabic translation has glyphs: with all interface
-/// faces (desktop) and with the Arabic face as the only craft-fonts face (the web build keeps
+/// With a nodalia-fonts Arabic face, every Arabic translation has glyphs: with all interface
+/// faces (desktop) and with the Arabic face as the only nodalia-fonts face (the web build keeps
 /// it; Arabic labels must not need a Japanese face).
 #[test]
 fn arabic_labels_have_glyphs() {
     let faces: Vec<String> = papel_fonts::ui_arabic_fonts().iter().map(|f| f.name()).collect();
     if faces.is_empty() {
-        eprintln!("skipping Arabic glyph checks: build with CRAFT_FONTS_DIR and an Arabic face to run them");
+        eprintln!("skipping Arabic glyph checks: build with NODALIA_FONTS_DIR and an Arabic face to run them");
         return;
     }
     needs_catalogs!();
@@ -1382,7 +1382,7 @@ fn arabic_labels_have_glyphs() {
     let labels: String = translations("ar").chars().chain(ar.name().chars()).filter(|c| !c.is_control()).collect();
     let mut arabic_only = crate::theme::font_definitions();
     for family in arabic_only.families.values_mut() {
-        family.retain(|name| !papel_fonts::CRAFT_FONTS.iter().any(|face| face.name() == *name) || faces.contains(name));
+        family.retain(|name| !papel_fonts::NODALIA_FONTS.iter().any(|face| face.name() == *name) || faces.contains(name));
     }
     use egui::epaint::text::{Fonts, TextOptions};
     for (build, defs) in [("all faces", crate::theme::font_definitions()), ("Arabic face only", arabic_only)] {
@@ -1394,7 +1394,7 @@ fn arabic_labels_have_glyphs() {
     }
 }
 
-/// The language list is well-formed. Problems in the embedded catalogs are not failed: craft-i18n
+/// The language list is well-formed. Problems in the embedded catalogs are not failed: nodalia-i18n
 /// checks its rows, a row Papel can't use shows in English, and `translation_gaps_report`
 /// lists the `@id` rows Papel doesn't use ([`unused_id_rows`]).
 #[test]
@@ -1484,7 +1484,7 @@ fn english_keys() -> std::collections::BTreeSet<(String, String)> {
     crate::credits::MODEL_COLUMNS.iter().for_each(|s| add(s));
     // (context, source) keys; `@id` rows only reword a command label, which is in `plain`.
     let mut keys: BTreeSet<(String, String)> = plain.into_iter().map(|s| (String::new(), s)).collect();
-    for (_, _, app) in CRAFT_I18N {
+    for (_, _, app) in NODALIA_I18N {
         keys.extend(rows(app).into_iter().filter(|(context, ..)| context != "@id").map(|(context, source, _)| (context, source)));
     }
     keys
@@ -1493,7 +1493,7 @@ fn english_keys() -> std::collections::BTreeSet<(String, String)> {
 /// The translation gaps report (`cargo xtask i18n-report`, a step of `cargo xtask ci`): for
 /// each language, how many English strings it has no translation for, and the first few, and how
 /// many are kept in English (a row whose translation is the English itself). It never fails: a
-/// missing string shows in English, and translators fill it in craft-i18n. Without embedded
+/// missing string shows in English, and translators fill it in nodalia-i18n. Without embedded
 /// catalogs it says so.
 ///
 /// The English strings are the UI source's literals, the commands, All tools, the engine's
@@ -1503,7 +1503,9 @@ fn english_keys() -> std::collections::BTreeSet<(String, String)> {
 fn translation_gaps_report() {
     const SHOWN: usize = 3;
     if !catalogs_embedded() {
-        println!("{REPORT_START}\nTranslation gaps: skipped, built without craft-i18n (set CRAFT_I18N_DIR to a craft-i18n checkout)\n{REPORT_END}");
+        println!(
+            "{REPORT_START}\nTranslation gaps: skipped, built without nodalia-i18n (set NODALIA_I18N_DIR to a nodalia-i18n checkout)\n{REPORT_END}"
+        );
         return;
     }
     let keys = english_keys();

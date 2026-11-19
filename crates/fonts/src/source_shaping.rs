@@ -231,7 +231,7 @@ mod tests {
     #[test]
     fn thai_positioning_does_not_require_optional_gsub() {
         let Some(face) = crate::document_thai_font() else {
-            eprintln!("skipping thai_positioning_does_not_require_optional_gsub: built without craft-fonts (set CRAFT_FONTS_DIR to run it)");
+            eprintln!("skipping thai_positioning_does_not_require_optional_gsub: built without nodalia-fonts (set NODALIA_FONTS_DIR to run it)");
             return;
         };
         let mut bytes = face.bytes.to_vec();

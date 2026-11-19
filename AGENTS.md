@@ -64,7 +64,7 @@ Anything else is forbidden, including assets whose licence you cannot prove from
   - SPDX licence, and the licence file in the repo;
   - SHA-256;
   - how it is used.
-- **Translations** live in craft-i18n (`locales/<code>/common.tsv` and `pdfcraft.tsv`), embedded at build time from the checkout pinned in `craft-i18n.rev`; Papel keeps no catalogs. `ATTRIBUTION.toml` records them as one `[[build_input]]` (`kind = "translation"`); craft-i18n's own `ATTRIBUTION.md` credits the translators. Every `[[asset]]` (fonts, images, data) is hashed.
+- **Translations** live in nodalia-i18n (`locales/<code>/common.tsv` and `papel.tsv`), embedded at build time from the checkout pinned in `nodalia-i18n.rev`; Papel keeps no catalogs. `ATTRIBUTION.toml` records them as one `[[build_input]]` (`kind = "translation"`); nodalia-i18n's own `ATTRIBUTION.md` credits the translators. Every `[[asset]]` (fonts, images, data) is hashed.
 - **`ATTRIBUTION.md`** is generated from it (`cargo xtask assets --write`). Never edit it by hand.
 - **`NOTICE`** keeps the licence notices that the licences require.
 - **`cargo xtask assets`** runs in `cargo xtask ci`. It fails if:
@@ -75,16 +75,16 @@ Anything else is forbidden, including assets whose licence you cannot prove from
   - an image, icon or font names Adobe as author or source, except a font licensed under OFL-1.1 alone.
 - **`cargo xtask demo-pdf`** downloads its fonts only from `ATTRIBUTION.toml` entries, pinned by SHA-256. Afterwards it **fails if the PDF embeds any font not in its allowlist**, which catches the browser silently falling back to a system font.
 
-### 1.4 Fonts live in craft-fonts
+### 1.4 Fonts live in nodalia-fonts
 
-- Font assets shared by the Nodalia apps, including every Japanese font, live in [getnodalia/foundation's `vendor/craft-fonts/main` branch](https://github.com/getnodalia/foundation/tree/vendor/craft-fonts/main), not here. **Never commit a font file to this repository**; adding a font means adding it to craft-fonts. (The Latin UI fonts already in `assets/fonts/` — Inter, JetBrains Mono, Dancing Script — stay.)
-- craft-fonts is an **optional build input**, never a Cargo dependency: `CRAFT_FONTS_DIR=<checkout> cargo build` makes `crates/fonts/build.rs` embed its fonts as `papel_fonts::CRAFT_FONTS`. Without it Papel builds, tests and runs, but has no Japanese face (Japanese UI text shows replacement boxes, and writing Japanese into a PDF returns a clear error). Release builds always set it (`.github/workflows/release-*.yml`), and `ATTRIBUTION.toml` lists it as a `[[build_input]]`.
+- Font assets shared by the Nodalia apps, including every Japanese font, live in [getnodalia/foundation's `nodalia/fonts` branch](https://github.com/getnodalia/foundation/tree/nodalia/fonts), not here. **Never commit a font file to this repository**; adding a font means adding it to nodalia-fonts. (The Latin UI fonts already in `assets/fonts/` — Inter, JetBrains Mono, Dancing Script — stay.)
+- nodalia-fonts is an **optional build input**, never a Cargo dependency: `NODALIA_FONTS_DIR=<checkout> cargo build` makes `crates/fonts/build.rs` embed its fonts as `papel_fonts::NODALIA_FONTS`. Without it Papel builds, tests and runs, but has no Japanese face (Japanese UI text shows replacement boxes, and writing Japanese into a PDF returns a clear error). Release builds always set it (`.github/workflows/release-*.yml`), and `ATTRIBUTION.toml` lists it as a `[[build_input]]`.
 - The desktop app may read one font **already installed on the user's machine** at runtime, as the last interface fallback for characters no embedded face has (`crates/ui-egui/src/system_fonts.rs`). That font is never embedded, shipped, committed or copied, and never appears in published screenshots (`PAPEL_SYSTEM_FONTS=0`, which `cargo xtask screenshots` sets). It is not a way around §1.2: nothing from it may enter a PDF, a package or the repository.
 - The page viewer may also draw a CID font of an Adobe CJK collection (Japan1, GB1, CNS1, Korea1) that a PDF does **not embed** with one face already installed on the machine (`crates/render/src/system_font.rs`), **on screen only**. `RenderConfig::system_fonts` is off by default and is enabled only for on-screen viewer and preview rasters (`RenderConfig::on_screen`, used by the engine viewer, Combine thumbnails and accessibility figure previews), so exports, printing, OCR and the automation tools never use it. Like the interface font it is read at runtime and never embedded, shipped, committed or copied; Noto CJK and Source Han are never candidates (§1.1), nor is any Adobe family; and `PAPEL_SYSTEM_FONTS=0` turns it off. It is not a way around §1.2 either: nothing drawn with it may be saved or printed.
 
 ### 1.5 Procedure for adding or changing an asset
 
-Fonts go to craft-fonts instead (§1.4).
+Fonts go to nodalia-fonts instead (§1.4).
 
 1. Find an asset under an allowed licence from its **original source**: the author's repository or a release, not a random mirror. Record the exact version or commit.
 2. Confirm the authorship. It must not be Adobe (§1.1). Keep the licence text.
@@ -133,7 +133,7 @@ Papel opens files from strangers, and people trust it with their work. A malform
 - **Page presses.** A page module decides what is under a point in one hit test (`Hit` in `crates/ui-egui/src/canvas/page_router.rs`) and acts on a press only through that router. Modules never read the router; they are told. `page_pointer::tests::page_modules_act_on_a_press_only_through_the_router` enforces it.
 - **Page keys.** Page code (everything under `canvas/` and `tools/`, `app/keys.rs`, `app/clipboard.rs` and the Pages panel's `panels/pages.rs`) reads keys and clipboard events through `PageKeys` (`crates/ui-egui/src/canvas/page_keys.rs`), which has none while something is over the pages (a dialog, the palette, a popup, a menu: `PapelApp::over_pages`), never egui's raw key state. The functions `NOT_PAGE_KEYS` lists, each with why, read raw: a window's or a field's own keys, which `PageKeys` would hide, and the few page reads it can't make (chords that wait for the menu bar instead, Escape ending what the pages hold, any key stopping a glide, the clipboard's hand-off to text fields). `page_pointer::tests::page_modules_read_keys_only_through_page_keys` enforces it.
 - **Fidelity.** The PDF object graph is the model. Preserve unknown data. Saves are incremental unless a full rewrite is required. Never silently drop or repair data without recording it.
-- **Fonts** are the optional build input `CRAFT_FONTS_DIR`. Code using `papel_fonts::CRAFT_FONTS` must work when it is empty.
+- **Fonts** are the optional build input `NODALIA_FONTS_DIR`. Code using `papel_fonts::NODALIA_FONTS` must work when it is empty.
 - **Quality gates** before every commit: `cargo fmt --check`, clippy with `-D warnings`, the tests, `cargo xtask layers`, `cargo xtask assets`, and the wasm check. New workspace crates include `workspace = true` under `[lints]`. Scope `cargo clippy -p <crate> --all-targets -- -D warnings` and `cargo test -p <crate>` to the crates you touched; the workspace sweep is CI's job.
 - **Review at four zooms** as you go: the clause, the function, the module, and the project (layering, wasm, undo, save fidelity, a matching automation tool, an honest `parity/` entry). Prove a test fails before the fix by reverting the fix once.
 - `plan/` is an optional gitignored notebook. Do not ask for it and do not stop when it is absent. Public status is [`ROADMAP.md`](ROADMAP.md), [`docs/gaps.md`](docs/gaps.md) and [`docs/roadmap.md`](docs/roadmap.md). "Shipped" in `parity/` means exists and tested, not parity with Acrobat.

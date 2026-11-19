@@ -46,7 +46,7 @@ let cells: Vec<table::Cell> = grid.cells_for(names)?;      // "Table1_1", "Table
   background and border, list-box selection.
   The `/DA` font is used when `/DR` has it as a simple font or a composite font with a predefined
   Unicode CMap; otherwise Helvetica (WinAnsi). Thai in a text field or combo box that the font
-  can't hold is drawn from the craft-fonts Thai face with Add text's writer
+  can't hold is drawn from the nodalia-fonts Thai face with Add text's writer
   (`papel_fonts::shaped_text`), beside the field's font, keeping `/DA`; a build without a Thai
   face refuses it. Any other value or button caption the font can't hold
   (Chinese in a Helvetica field, a character beyond U+FFFF in a UCS-2 CMap) is kept, as Acrobat

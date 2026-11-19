@@ -1124,7 +1124,7 @@ fn thai_a_field_font_cannot_hold_is_drawn_from_the_thai_face() {
     let thai = "ชื่อ: บุญฤทธิ์ น้ำฎู";
     if papel_fonts::document_thai_font().is_none() {
         let err = set_value(&mut doc, "name", &FieldValue::Text(thai.into())).unwrap_err();
-        assert!(matches!(&err, FormError::Invalid(m) if m.contains("Thai") && m.contains("CRAFT_FONTS_DIR")), "{err}");
+        assert!(matches!(&err, FormError::Invalid(m) if m.contains("Thai") && m.contains("NODALIA_FONTS_DIR")), "{err}");
         assert_eq!(field(&fields(&doc), "name").value, ["Ada"]);
         assert!(!need_appearances(&doc) && undrawn_fields(&doc).is_empty());
         return;

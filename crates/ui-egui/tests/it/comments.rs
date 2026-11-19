@@ -5428,7 +5428,7 @@ fn edit_delete_with_a_popup_open_removes_the_selected_comment() {
     h.run_steps(2);
     assert!(egui::Popup::is_any_open(&h.ctx), "the comment's menu is open");
     let ctx = h.ctx.clone();
-    h.state_mut().run_menu_command(&ctx, &craft_menu::CommandRef::new("edit.delete"));
+    h.state_mut().run_menu_command(&ctx, &nodalia_menu::CommandRef::new("edit.delete"));
     h.run_steps(4);
     assert!(comments(&h).is_empty(), "Edit ▸ Delete removed the comment");
 }
@@ -5443,7 +5443,7 @@ fn edit_delete_from_a_native_menu_with_the_hotbar_window_open_removes_the_commen
     assert!(h.query_by_label("Close menu").is_some(), "the Hotbar tools window is open");
     assert_eq!(h.state().views[0].comments.selected, Some((0, 0)), "the comment is still selected");
     let ctx = h.ctx.clone();
-    h.state_mut().run_menu_command(&ctx, &craft_menu::CommandRef::new("edit.delete"));
+    h.state_mut().run_menu_command(&ctx, &nodalia_menu::CommandRef::new("edit.delete"));
     h.run_steps(4);
     assert!(h.query_by_label("Close menu").is_none(), "Edit ▸ Delete closed the Hotbar tools window");
     assert!(comments(&h).is_empty(), "Edit ▸ Delete removed the comment");
@@ -5453,7 +5453,7 @@ fn edit_delete_from_a_native_menu_with_the_hotbar_window_open_removes_the_commen
 /// Hotbar tools window's search field focused, a native Edit ▸ Delete leaves the window open and
 /// deletes in the field. Closed, the window took the field with it, and the Delete removed the
 /// selected comment. (A native click on Edit ▸ Copy, Cut, Paste or Select all reaches a focused
-/// field as craft-menu's tap of the shortcut, not as a menu command.)
+/// field as nodalia-menu's tap of the shortcut, not as a menu command.)
 #[test]
 fn edit_delete_from_a_native_menu_into_the_hotbar_window_search_keeps_the_window() {
     let mut h = selected_square();
@@ -5470,7 +5470,7 @@ fn edit_delete_from_a_native_menu_into_the_hotbar_window_search_keeps_the_window
     h.run_steps(2);
     assert!(search(&h, "pen"), "typed into the search field");
     let ctx = h.ctx.clone();
-    h.state_mut().run_menu_command(&ctx, &craft_menu::CommandRef::new("edit.delete"));
+    h.state_mut().run_menu_command(&ctx, &nodalia_menu::CommandRef::new("edit.delete"));
     h.run_steps(3);
     assert!(h.query_by_label("Close menu").is_some(), "Edit ▸ Delete closed the Hotbar tools window");
     assert!(search(&h, "pe"), "Edit ▸ Delete deleted in the search field");
@@ -5571,7 +5571,7 @@ fn keys_under_the_update_prompt_leave_the_selected_comment() {
 fn edit_delete_from_a_native_menu_under_the_update_prompt_leaves_the_comment() {
     let mut h = selected_square_under_the_update_prompt();
     let ctx = h.ctx.clone();
-    h.state_mut().run_menu_command(&ctx, &craft_menu::CommandRef::new("edit.delete"));
+    h.state_mut().run_menu_command(&ctx, &nodalia_menu::CommandRef::new("edit.delete"));
     h.run_steps(4);
     assert_eq!(comments(&h).len(), 1, "Edit ▸ Delete under the update prompt deleted the comment");
     assert!(h.query_by_label_contains("Is Available").is_some(), "the prompt is still open");
@@ -5595,7 +5595,7 @@ fn edit_delete_from_a_native_menu_under_the_full_screen_prompt_leaves_the_commen
         h.run_steps(3);
         assert!(h.state().pending_full_screen.is_some(), "the full-screen prompt is open");
         let ctx = h.ctx.clone();
-        h.state_mut().run_menu_command(&ctx, &craft_menu::CommandRef::with_params("window.document", serde_json::json!({ "index": 0 })));
+        h.state_mut().run_menu_command(&ctx, &nodalia_menu::CommandRef::with_params("window.document", serde_json::json!({ "index": 0 })));
         h.run_steps(3);
         assert_eq!(h.state().active, Some(0), "Window ▸ the first document switched to it");
         assert!(h.state().pending_full_screen.is_some(), "the full-screen prompt is still open");
@@ -5603,7 +5603,7 @@ fn edit_delete_from_a_native_menu_under_the_full_screen_prompt_leaves_the_commen
         h.key_press(egui::Key::Delete);
         h.run_steps(3);
         assert_eq!(comments(&h).len(), 1, "Delete under the full-screen prompt deleted the comment (full screen: {full_screen})");
-        h.state_mut().run_menu_command(&ctx, &craft_menu::CommandRef::new("edit.delete"));
+        h.state_mut().run_menu_command(&ctx, &nodalia_menu::CommandRef::new("edit.delete"));
         h.run_steps(4);
         assert_eq!(comments(&h).len(), 1, "Edit ▸ Delete under the full-screen prompt deleted the comment (full screen: {full_screen})");
         h.key_press(egui::Key::Escape);

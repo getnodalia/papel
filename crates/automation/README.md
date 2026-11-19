@@ -225,7 +225,7 @@ The bounds, limits and font requirements are in [existing-text editing](../../do
 and [image editing](../../docs/editing-images.md).
 
 `text_fonts` also lists `builtin:thai` when the build includes the bundled Noto Sans Thai face
-(the optional craft-fonts input). Passing it as `text_edit.font_resource` explicitly replaces a
+(the optional nodalia-fonts input). Passing it as `text_edit.font_resource` explicitly replaces a
 paragraph or range with that face; the source font is never swapped for it silently. A build
 without the face never lists it, and `text_edit` refuses it there. A page whose own fonts fill
 the listing's 32 MiB preview budget can leave it out too; `text_edit` still accepts it then.

@@ -178,19 +178,19 @@ fn thai_words(atoms: Vec<(String, f64)>) -> Vec<Vec<(String, f64)>> {
 pub(super) use papel_fonts::shaped_text::{Piece, is_thai};
 
 /// Arabic letters, marks, digits and punctuation: an item with any of them is shaped with the
-/// craft-fonts Arabic face.
+/// nodalia-fonts Arabic face.
 pub(super) fn is_arabic(c: char) -> bool {
     matches!(u32::from(c), 0x0600..=0x06FF | 0x0750..=0x077F | 0x0870..=0x08FF | 0xFB50..=0xFDFF | 0xFE70..=0xFEFC)
 }
 
 /// Hebrew letters, points, cantillation marks and punctuation (and the presentation forms): an
-/// item with any of them is drawn with the craft-fonts Hebrew face.
+/// item with any of them is drawn with the nodalia-fonts Hebrew face.
 pub(super) fn is_hebrew(c: char) -> bool {
     matches!(u32::from(c), 0x0591..=0x05F4 | 0xFB1D..=0xFB4F)
 }
 
 /// The first character of `t` that would be drawn as `?`: outside WinAnsiEncoding and not drawn
-/// with the craft-fonts Arabic (#125) or Hebrew (#128) face, or Arabic or Hebrew that the face can't
+/// with the nodalia-fonts Arabic (#125) or Hebrew (#128) face, or Arabic or Hebrew that the face can't
 /// draw (or that has no face to draw it). Page-content tools refuse such text; the Add-text editor
 /// keeps it open.
 pub fn first_undrawable(t: &AddedText) -> Option<char> {
@@ -220,7 +220,7 @@ pub fn first_undrawable(t: &AddedText) -> Option<char> {
     })
 }
 
-/// Whether `t` has Arabic or Hebrew that its craft-fonts face draws (so `draw` lays it out with
+/// Whether `t` has Arabic or Hebrew that its nodalia-fonts face draws (so `draw` lays it out with
 /// [`draw_shaped`]).
 fn shaped_by_a_face(t: &AddedText) -> bool {
     (papel_fonts::document_arabic_font().is_some() && t.text.chars().any(is_arabic))
@@ -319,7 +319,7 @@ pub(crate) fn shaped_width(t: &AddedText, s: &str, rtl: bool) -> f64 {
 pub(super) fn arabic_error(e: GlyphError, text: &str) -> EditError {
     EditError::Invalid(match e {
         GlyphError::NoFont => "Arabic text needs Papel's Arabic font, which this build doesn't include \
-                               (to build it in, set CRAFT_FONTS_DIR to a craft-fonts checkout that has an Arab face)"
+                               (to build it in, set NODALIA_FONTS_DIR to a nodalia-fonts checkout that has an Arab face)"
             .into(),
         GlyphError::Missing => format!("the Arabic font can't show \"{text}\""),
         GlyphError::TooComplex => format!("the Arabic font's glyphs for \"{text}\" are too complex"),
@@ -329,7 +329,7 @@ pub(super) fn arabic_error(e: GlyphError, text: &str) -> EditError {
 pub(super) fn hebrew_error(e: GlyphError, text: &str) -> EditError {
     EditError::Invalid(match e {
         GlyphError::NoFont => "Hebrew text needs Papel's Hebrew font, which this build doesn't include \
-                               (to build it in, set CRAFT_FONTS_DIR to a craft-fonts checkout that has a Hebr face)"
+                               (to build it in, set NODALIA_FONTS_DIR to a nodalia-fonts checkout that has a Hebr face)"
             .into(),
         GlyphError::Missing => format!("the Hebrew font can't show \"{text}\""),
         GlyphError::TooComplex => format!("the Hebrew font's glyphs for \"{text}\" are too complex"),

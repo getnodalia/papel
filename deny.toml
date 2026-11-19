@@ -50,9 +50,9 @@ ignore = [
     # (ADR-0009). Revisit when a fixed `rsa` ships.
     { id = "RUSTSEC-2023-0071", reason = "rsa is used for verification only (ADR-0009)" },
     # proc-macro-error is unmaintained (no vulnerability). It reaches the tree as a proc macro of
-    # winprint's fmt-derive (craft-print's Windows spooler), so it runs at compile time on Windows
+    # winprint's fmt-derive (nodalia-print's Windows spooler), so it runs at compile time on Windows
     # and is not in the binary.
-    { id = "RUSTSEC-2024-0370", reason = "compile-time proc macro of winprint's fmt-derive (craft-print Windows printing, #1107)" },
+    { id = "RUSTSEC-2024-0370", reason = "compile-time proc macro of winprint's fmt-derive (nodalia-print Windows printing, #1107)" },
     # zvariant, zbus_names and zvariant_derive are unmaintained (no vulnerability, and no fixed
     # release to move to). They reach the tree as the D-Bus stack behind `accesskit_unix` ->
     # `atspi`, which is Linux accessibility only, and as a dev-dependency of papel-platform.
@@ -70,8 +70,8 @@ ignore = [
 crate = "epaint_default_fonts"
 allow = ["OFL-1.1", "Ubuntu-font-1.0"]
 
-# winprint (craft-print's Windows spooler, #1107) lists reqwest as a build-dependency for its
-# PDFium download, which only runs with its `pdfium` feature; craft-print turns that off. The CA
+# winprint (nodalia-print's Windows spooler, #1107) lists reqwest as a build-dependency for its
+# PDFium download, which only runs with its `pdfium` feature; nodalia-print turns that off. The CA
 # bundle reqwest brings is CDLA-Permissive-2.0 data and is compiled into winprint's build script
 # only, never into Papel. Remove when winprint makes those build-dependencies optional.
 [[licenses.exceptions]]

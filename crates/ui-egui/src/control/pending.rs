@@ -3,7 +3,7 @@ use super::{Arc, Control, Host, Pending, Reply, Sender, Value, not_drawn, timeou
 
 /// A screenshot pending in the `finish_pending` pass, with ownership of its reply.
 struct PendingCapture {
-    slot: craft_ui::capture::CaptureSlot,
+    slot: nodalia_ui::capture::CaptureSlot,
     callback: Option<egui::ScreenshotCallback>,
     region: Option<egui::Rect>,
     reply: Sender<Reply>,
@@ -130,7 +130,7 @@ impl PendingFinisher {
             return None;
         };
         self.reserved_total = new_total;
-        let (slot, callback) = craft_ui::capture::CaptureSlot::new(ctx, egui::ViewportId::ROOT, MAX_IMAGE_BYTES);
+        let (slot, callback) = nodalia_ui::capture::CaptureSlot::new(ctx, egui::ViewportId::ROOT, MAX_IMAGE_BYTES);
         Some(Pending::Screenshot {
             slot,
             callback: Some(callback),

@@ -1,5 +1,5 @@
 //! The menus: one definition ([`PapelApp::menu_bar`]) for the native macOS menu bar and the
-//! in-window bar on Windows, Linux and the web, laid out for each platform by craft-menu.
+//! in-window bar on Windows, Linux and the web, laid out for each platform by nodalia-menu.
 //!
 //! Items run registry commands (`papel_engine::commands`) by id, with the registry's label and
 //! shortcut, so a menu click and its shortcut run the same command. A few items have menu-only
@@ -7,8 +7,8 @@
 //! keys, the recent files and the open documents. [`PapelApp::run_menu_command`] runs every
 //! one of them, once per click, whichever bar it came from.
 
-use craft_keymap::{Key, Mods};
-use craft_menu::{
+use nodalia_keymap::{Key, Mods};
+use nodalia_menu::{
     Builtin, Chord, CommandRef, Document, Gate, Item, ItemRole, ItemState, Labeled, LayoutOptions, Menu, MenuBar, MenuRole, Node, Target,
 };
 use papel_engine::catalog::{Availability, TOOL_GROUPS};
@@ -230,8 +230,8 @@ const WINDOW: &[&str] = &["view.next_tab", "view.previous_tab"];
 const HELP: &[&str] =
     &["help.shortcuts", SEP, "help.app_page", "help.github", "help.website", "help.report_issue", SEP, "help.check_updates", SEP, "help.about"];
 
-/// A registry shortcut as a craft-keymap chord: `command` is ⌘ (Ctrl elsewhere) and `mac_ctrl`
-/// the Control key on macOS. `None` for a key craft-keymap doesn't name.
+/// A registry shortcut as a nodalia-keymap chord: `command` is ⌘ (Ctrl elsewhere) and `mac_ctrl`
+/// the Control key on macOS. `None` for a key nodalia-keymap doesn't name.
 pub(crate) fn chord(s: Shortcut) -> Option<Chord> {
     let key = Key::parse(s.key)?;
     Some(Chord::new(Mods { cmd: s.command, ctrl: s.mac_ctrl, alt: false, shift: s.shift }, key))
@@ -260,7 +260,7 @@ fn english(labeled: Labeled<'_>) -> Option<String> {
 }
 
 fn translate(english: &'static str) -> String {
-    // craft_menu's bar writes "⋯" (U+22EF, MIDLINE HORIZONTAL ELLIPSIS) itself, for the menu of
+    // nodalia_menu's bar writes "⋯" (U+22EF, MIDLINE HORIZONTAL ELLIPSIS) itself, for the menu of
     // titles that don't fit: a sentinel to translate, not an English phrase, and the only one of
     // its four reserved labels no font this app ships or falls back to has a glyph for.
     // MissingGlyphPolicy::Panic (egui 0.37) crashes on it. The ordinary ellipsis every other
@@ -367,18 +367,18 @@ impl PapelApp {
         view.extend(list(&["view.palette"], &mut used));
         let mut bar = MenuBar {
             menus: vec![
-                Menu::new(tl!("File"), craft_menu::tidy(file)).role(MenuRole::File),
-                Menu::new(tl!("Edit"), craft_menu::tidy(edit)).role(MenuRole::Edit),
-                Menu::new(tl!("View"), craft_menu::tidy(view)).role(MenuRole::View),
-                Menu::new(tl!("Sign"), craft_menu::tidy(sign)),
+                Menu::new(tl!("File"), nodalia_menu::tidy(file)).role(MenuRole::File),
+                Menu::new(tl!("Edit"), nodalia_menu::tidy(edit)).role(MenuRole::Edit),
+                Menu::new(tl!("View"), nodalia_menu::tidy(view)).role(MenuRole::View),
+                Menu::new(tl!("Sign"), nodalia_menu::tidy(sign)),
                 Menu::new(tl!("Window"), window).role(MenuRole::Window),
-                Menu::new(tl!("Help"), craft_menu::tidy(help)).role(MenuRole::Help),
+                Menu::new(tl!("Help"), nodalia_menu::tidy(help)).role(MenuRole::Help),
             ],
             documents: self.menu_documents(),
         };
         bar.tag_item(&CommandRef::new("help.about"), ItemRole::About);
         bar.tag_item(&CommandRef::new("app.preferences"), ItemRole::Settings);
-        craft_menu::apply_state(&mut bar, |command| self.menu_state(ctx, command));
+        nodalia_menu::apply_state(&mut bar, |command| self.menu_state(ctx, command));
         bar
     }
 
@@ -463,7 +463,7 @@ impl PapelApp {
     }
 
     /// What may run from the menus now: a dialog, a prompt or the command palette holds the
-    /// window. Edit's text items stay with a focused text field (craft-menu's gate).
+    /// window. Edit's text items stay with a focused text field (nodalia-menu's gate).
     pub fn menu_gate(&self, ctx: &egui::Context) -> Gate {
         Gate { modal: self.modal_open() || self.palette_open, recording_shortcut: false, text_editing: ctx.text_edit_focused() }
     }
@@ -586,12 +586,12 @@ impl PapelApp {
     /// couldn't be installed), where the top bar starts. Runs the commands chosen.
     pub(crate) fn menu_bar_ui(&mut self, ui: &mut egui::Ui) {
         let ctx = ui.ctx().clone();
-        let bar = craft_menu::layout(&self.menu_bar(&ctx), Target::current(), &layout_options()).bar;
+        let bar = nodalia_menu::layout(&self.menu_bar(&ctx), Target::current(), &layout_options()).bar;
         let gate = self.menu_gate(&ctx);
         // The mode tabs, search and buttons follow the bar in the same row: it takes its titles'
         // width, less when the row is short, where the menus that don't fit move into its "⋯".
         let fit = (ui.available_width() - ROW_AFTER_MENUS).max(MIN_MENUS_WIDTH);
-        let chosen = craft_menu::MenuBarUi::new(&bar)
+        let chosen = nodalia_menu::MenuBarUi::new(&bar)
             .gate(gate)
             .label(&translate)
             .english(&english)
@@ -608,15 +608,15 @@ impl PapelApp {
     #[cfg(target_os = "macos")]
     pub fn install_native_menu(&mut self, ctx: &egui::Context) -> bool {
         crate::i18n::set_current(crate::i18n::Lang::from_pref(&self.language));
-        let bar = craft_menu::mac_layout(&self.menu_bar(ctx), &layout_options()).bar;
+        let bar = nodalia_menu::mac_layout(&self.menu_bar(ctx), &layout_options()).bar;
         // The Window menu lists the open documents itself, so AppKit's window list stays off.
-        self.native_menu = craft_menu::mac::install_with(ctx, &bar, craft_menu::mac::MacOptions::default().window_list(false));
+        self.native_menu = nodalia_menu::mac::install_with(ctx, &bar, nodalia_menu::mac::MacOptions::default().window_list(false));
         self.native_menu.is_some()
     }
 
     /// Serve the menus to the desktop's top bar (Linux's global menu). `shown` says whether the
     /// desktop shows them right now; while it doesn't, they stay in the window.
-    pub fn install_global_menu(&mut self, menu: craft_menu::NativeMenu, shown: std::sync::Arc<std::sync::atomic::AtomicBool>) {
+    pub fn install_global_menu(&mut self, menu: nodalia_menu::NativeMenu, shown: std::sync::Arc<std::sync::atomic::AtomicBool>) {
         self.native_menu = Some(menu);
         self.native_menu_shown = Some(shown);
     }
@@ -642,7 +642,7 @@ impl PapelApp {
         if self.native_menu.is_none() {
             return;
         }
-        let layout = craft_menu::layout(&self.menu_bar(ctx), Target::current(), &layout_options());
+        let layout = nodalia_menu::layout(&self.menu_bar(ctx), Target::current(), &layout_options());
         let gate = self.menu_gate(ctx);
         if let Some(native) = self.native_menu.as_mut() {
             native.set_gate(gate);
@@ -669,7 +669,7 @@ mod tests {
     use std::cell::RefCell;
     use std::rc::Rc;
 
-    use craft_menu::{Backend, Dispatch, Event, ItemKind, NativeMenu};
+    use nodalia_menu::{Backend, Dispatch, Event, ItemKind, NativeMenu};
 
     use super::*;
 
@@ -685,7 +685,7 @@ mod tests {
     }
 
     fn linux(app: &PapelApp, ctx: &egui::Context) -> MenuBar {
-        craft_menu::layout(&app.menu_bar(ctx), Target::Linux, &layout_options()).bar
+        nodalia_menu::layout(&app.menu_bar(ctx), Target::Linux, &layout_options()).bar
     }
 
     fn item<'b>(bar: &'b MenuBar, command: &CommandRef) -> &'b Item {
@@ -796,7 +796,7 @@ mod tests {
         app.run_menu_command(&ctx, &CommandRef::with_params(DOCUMENT, serde_json::json!({ "index": 0 })));
         assert_eq!(app.active, Some(0));
         // The macOS layout lists them once too.
-        let mac = craft_menu::mac_layout(&app.menu_bar(&ctx), &layout_options()).bar;
+        let mac = nodalia_menu::mac_layout(&app.menu_bar(&ctx), &layout_options()).bar;
         let listed = mac.items().iter().filter(|it| it.command.id == DOCUMENT).count();
         assert_eq!(listed, 2);
         app.recent.clear();

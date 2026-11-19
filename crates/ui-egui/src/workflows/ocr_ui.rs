@@ -263,7 +263,7 @@ pub(crate) fn body(ui: &mut egui::Ui, app: &mut PapelApp, t: &Tokens) -> (bool, 
         egui::Grid::new("ocr-settings").num_columns(2).spacing([12.0, 8.0]).show(ui, |ui| {
             ui.label(tl!("Document language"));
             let name = LANGUAGES.iter().find(|l| l.0 == d.language).map_or("English", |l| l.1);
-            craft_ui::ComboBox::from_id_salt("ocr-language").selected_text(tl!(name)).width(220.0).show_ui(ui, |ui| {
+            nodalia_ui::ComboBox::from_id_salt("ocr-language").selected_text(tl!(name)).width(220.0).show_ui(ui, |ui| {
                 for (code, name) in LANGUAGES {
                     ui.selectable_value(&mut d.language, (*code).to_string(), tl!(*name));
                 }
@@ -275,7 +275,7 @@ pub(crate) fn body(ui: &mut egui::Ui, app: &mut PapelApp, t: &Tokens) -> (bool, 
                 EngineChoice::Ocrs => tl!("Built-in"),
                 EngineChoice::Tesseract => tl!("Tesseract"),
             };
-            craft_ui::ComboBox::from_id_salt("ocr-engine").selected_text(engine_name).width(220.0).show_ui(ui, |ui| {
+            nodalia_ui::ComboBox::from_id_salt("ocr-engine").selected_text(engine_name).width(220.0).show_ui(ui, |ui| {
                 let choices: [(EngineChoice, &str); 3] =
                     [(EngineChoice::Auto, "Automatic"), (EngineChoice::Ocrs, "Built-in"), (EngineChoice::Tesseract, "Tesseract")];
                 for (choice, name) in choices {
@@ -289,7 +289,7 @@ pub(crate) fn body(ui: &mut egui::Ui, app: &mut PapelApp, t: &Tokens) -> (bool, 
                 MergeStrategy::ConfidenceWeighted => tl!("Confidence weighted"),
                 MergeStrategy::RoverVote => tl!("ROVER vote"),
             };
-            craft_ui::ComboBox::from_id_salt("ocr-strategy").selected_text(strategy_name).width(220.0).show_ui(ui, |ui| {
+            nodalia_ui::ComboBox::from_id_salt("ocr-strategy").selected_text(strategy_name).width(220.0).show_ui(ui, |ui| {
                 let choices: [(MergeStrategy, &str); 3] = [
                     (MergeStrategy::PrimaryOnly, "Primary only"),
                     (MergeStrategy::ConfidenceWeighted, "Confidence weighted"),
@@ -305,7 +305,7 @@ pub(crate) fn body(ui: &mut egui::Ui, app: &mut PapelApp, t: &Tokens) -> (bool, 
                 OutputMode::Searchable => tl!("Searchable Image (Exact)"),
                 OutputMode::EditableText => tl!("Editable text"),
             };
-            craft_ui::ComboBox::from_id_salt("ocr-output").selected_text(mode_name).width(220.0).show_ui(ui, |ui| {
+            nodalia_ui::ComboBox::from_id_salt("ocr-output").selected_text(mode_name).width(220.0).show_ui(ui, |ui| {
                 let s = ui
                     .selectable_label(d.output_mode == OutputMode::Searchable, tl!("Searchable Image (Exact)"))
                     .on_hover_text(tl!("Adds invisible text over each word; the page image is not changed"));
@@ -321,7 +321,7 @@ pub(crate) fn body(ui: &mut egui::Ui, app: &mut PapelApp, t: &Tokens) -> (bool, 
             });
             ui.end_row();
             ui.label(tl!("Downsample to"));
-            craft_ui::ComboBox::from_id_salt("ocr-dpi").selected_text(format!("{} dpi", d.dpi)).width(220.0).show_ui(ui, |ui| {
+            nodalia_ui::ComboBox::from_id_salt("ocr-dpi").selected_text(format!("{} dpi", d.dpi)).width(220.0).show_ui(ui, |ui| {
                 for v in [600, 300, 150, 72] {
                     ui.selectable_value(&mut d.dpi, v, format!("{v} dpi"));
                 }

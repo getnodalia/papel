@@ -13,20 +13,20 @@ repository = "https://github.com/getnodalia/papel"
 
 [workspace.dependencies]
 # Shared frontend components; engines remain independent of egui.
-craft-ui = { git = "https://github.com/getnodalia/foundation", version = "0.1.0", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff", features = ["serde"] }
+nodalia-ui = { git = "https://github.com/getnodalia/foundation", version = "0.1.0", rev = "d7130bd0ce460e49116c86a8b11a9824801be4bb", features = ["serde"] }
 # Quit the macOS way (#1136): ⌘Q asks about unsaved changes, and closing quits through `terminate:`.
-craft-quit = { git = "https://github.com/getnodalia/foundation", version = "0.1.0", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff" }
+nodalia-quit = { git = "https://github.com/getnodalia/foundation", version = "0.1.0", rev = "d7130bd0ce460e49116c86a8b11a9824801be4bb" }
 # One menu definition for the native macOS menu bar and the in-window bar elsewhere.
-craft-menu = { git = "https://github.com/getnodalia/foundation", version = "0.1.0", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff" }
-craft-keymap = { git = "https://github.com/getnodalia/foundation", version = "0.1.0", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff", default-features = false }
-# Interface translations: lookup, fallback, CLDR plurals and language names over the craft-i18n
-# catalogs that `crates/ui-egui/build.rs` embeds from `CRAFT_I18N_DIR` (getnodalia/foundation (vendor/craft-i18n), at
-# the commit in `craft-i18n.rev`). Already in the tree through craft-ui.
-craft-i18n = { git = "https://github.com/getnodalia/foundation", version = "0.1.0", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff" }
+nodalia-menu = { git = "https://github.com/getnodalia/foundation", version = "0.1.0", rev = "d7130bd0ce460e49116c86a8b11a9824801be4bb" }
+nodalia-keymap = { git = "https://github.com/getnodalia/foundation", version = "0.1.0", rev = "d7130bd0ce460e49116c86a8b11a9824801be4bb", default-features = false }
+# Interface translations: lookup, fallback, CLDR plurals and language names over the nodalia-i18n
+# catalogs that `crates/ui-egui/build.rs` embeds from `NODALIA_I18N_DIR` (getnodalia/foundation (vendor/nodalia-i18n), at
+# the commit in `nodalia-i18n.rev`). Already in the tree through nodalia-ui.
+nodalia-i18n = { git = "https://github.com/getnodalia/foundation", version = "0.1.0", rev = "d7130bd0ce460e49116c86a8b11a9824801be4bb" }
 # Shared system spooler; document composition remains in papel-print.
-craft-print = { git = "https://github.com/getnodalia/foundation", version = "0.1.0", rev = "1146cdc4f92e6c5c4fc3d67efbf0e1cec436a10c" }
+nodalia-print = { git = "https://github.com/getnodalia/foundation", version = "0.1.0", rev = "c8c76d140340266aa304607a10850f11fa9ee986" }
 # Whether a path stored in a document may be opened (GoToR link targets).
-craft-docpath = { version = "0.1.0", git = "https://github.com/getnodalia/foundation", rev = "787a7a0f972fd1d7a7618fdbeca3a5267a0407ff" }
+nodalia-docpath = { version = "0.1.0", git = "https://github.com/getnodalia/foundation", rev = "d7130bd0ce460e49116c86a8b11a9824801be4bb" }
 # In-app updates from this app's GitHub releases, with the update windows for egui.
 nodalia-update = { git = "https://github.com/getnodalia/nodalia-design", rev = "114848a2ff1a7c29c9a5432fb12e955fbe0aeef2", version = "0.1.0-alpha.1", features = ["egui"] }
 # The Nodalia Design Language: palette, icons, window controls and the office apps' shared parts.
@@ -75,7 +75,7 @@ lopdf = "0.45"
 # zlib-rs: miniz_oxide took about 1.7 µs for every fixed-Huffman block, empty or not
 # (`papel_filters::FLATE_READ_WORK`). Other dependencies still build flate2's default
 # miniz_oxide backend; flate2 prefers zlib-rs when both are built, as the Windows build already did
-# through craft-update. `flate::tests::a_copy_from_before_the_start_is_damage` shows which runs.
+# through nodalia-update. `flate::tests::a_copy_from_before_the_start_is_damage` shows which runs.
 flate2 = { version = "1.1", default-features = false, features = ["zlib-rs"] }
 weezl = "0.2"
 # CCITT Group 4 encoding (papel-filters); already in the tree through tiff.
@@ -171,8 +171,3 @@ eframe = { git = "https://github.com/getnodalia/foundation", rev = "725a39fca940
 egui_demo_lib = { git = "https://github.com/getnodalia/foundation", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
 egui_inspection = { git = "https://github.com/getnodalia/foundation", rev = "725a39fca940f77149ffbb9c58eef405a16997bc" }
 winit = { git = "https://github.com/getnodalia/foundation", rev = "a517b3846ee8457d84ee4975110bfda6797c44dc" }
-
-# A vendored library still names this by its old home; the same commits are kept in foundation.
-[patch."https://github.com/storytold/winprint.rs"]
-craft-winprint-gdi = { git = "https://github.com/getnodalia/foundation", rev = "64e7afd4d1483512385012c340ecaaaf0f3beb7f" }
-winprint = { git = "https://github.com/getnodalia/foundation", rev = "3c978dfcf3d460577fabd87aeea7a84ffdcfb396" }

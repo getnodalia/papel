@@ -727,46 +727,46 @@ fn the_desktop_entry_names_the_window_class() {
     assert_eq!(class, Some(super::APP_ID));
 }
 
-/// Both flatpak manifests build with the craft-i18n commit `craft-i18n.rev` pins: CI and
+/// Both flatpak manifests build with the nodalia-i18n commit `nodalia-i18n.rev` pins: CI and
 /// releases read the file, and the manifests have to name the commit themselves. The pin may
 /// have a trailing newline or CRLF (a Windows checkout), so it is trimmed, as every reader does.
 #[test]
 fn the_flatpak_manifests_pin_the_craft_i18n_rev() {
     let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
-    let rev = std::fs::read_to_string(root.join("craft-i18n.rev")).unwrap();
+    let rev = std::fs::read_to_string(root.join("nodalia-i18n.rev")).unwrap();
     let rev = rev.trim();
-    assert!(rev.len() == 40 && rev.bytes().all(|b| b.is_ascii_hexdigit()), "craft-i18n.rev holds one full SHA: {rev:?}");
+    assert!(rev.len() == 40 && rev.bytes().all(|b| b.is_ascii_hexdigit()), "nodalia-i18n.rev holds one full SHA: {rev:?}");
     for manifest in ["dev.danielmiguelt.Papel.yml", "dev.danielmiguelt.Papel.bundle.yml"] {
         let text = std::fs::read_to_string(root.join("packaging/linux/flatpak").join(manifest)).unwrap();
         let source =
-            text.split("url: https://github.com/getnodalia/foundation").nth(1).unwrap_or_else(|| panic!("{manifest}: a craft-i18n git source"));
+            text.split("url: https://github.com/getnodalia/foundation").nth(1).unwrap_or_else(|| panic!("{manifest}: a nodalia-i18n git source"));
         let source = source.split("- type:").next().unwrap_or(source);
         let commit = source
             .lines()
             .find_map(|l| l.trim().strip_prefix("commit:"))
-            .unwrap_or_else(|| panic!("{manifest}: the craft-i18n source pins a commit"));
+            .unwrap_or_else(|| panic!("{manifest}: the nodalia-i18n source pins a commit"));
         assert_eq!(commit.trim().trim_matches(['\'', '"']), rev, "{manifest}");
-        assert!(text.contains("CRAFT_I18N_DIR: /run/build/papel/craft-i18n"), "{manifest}: the build names the catalogs");
+        assert!(text.contains("NODALIA_I18N_DIR: /run/build/papel/nodalia-i18n"), "{manifest}: the build names the catalogs");
     }
 }
 
 /// Every release workflow builds with the translations (Papel 0.1.0 shipped Linux and Windows
 /// packages in English only, because those two never checked them out). Each one checks out
-/// the commit `craft-i18n.rev` pins, names it in `CRAFT_I18N_DIR`, and makes a missing catalog
+/// the commit `nodalia-i18n.rev` pins, names it in `NODALIA_I18N_DIR`, and makes a missing catalog
 /// fail the build rather than ship English silently.
 #[test]
 fn every_release_workflow_builds_with_the_pinned_translations() {
     let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
-    let rev = std::fs::read_to_string(root.join("craft-i18n.rev")).unwrap();
+    let rev = std::fs::read_to_string(root.join("nodalia-i18n.rev")).unwrap();
     let rev = rev.trim();
     for workflow in ["release-linux.yml", "release-macos.yml", "release-windows.yml"] {
         let text = std::fs::read_to_string(root.join(".github/workflows").join(workflow)).unwrap();
-        let step = text.split("- name: Check out craft-i18n").nth(1).unwrap_or_else(|| panic!("{workflow}: checks out craft-i18n"));
+        let step = text.split("- name: Check out nodalia-i18n").nth(1).unwrap_or_else(|| panic!("{workflow}: checks out nodalia-i18n"));
         let step = step.split("- name:").next().unwrap_or(step);
         let pinned = step.lines().find_map(|l| l.trim().strip_prefix("ref:")).unwrap_or_else(|| panic!("{workflow}: pins a ref"));
-        assert_eq!(pinned.trim(), rev, "{workflow}: the commit craft-i18n.rev pins");
-        assert!(text.contains("CRAFT_I18N_DIR:"), "{workflow}: the build names the catalogs");
-        assert!(text.contains("CRAFT_I18N_REQUIRED: \"1\""), "{workflow}: a missing catalog fails the build");
+        assert_eq!(pinned.trim(), rev, "{workflow}: the commit nodalia-i18n.rev pins");
+        assert!(text.contains("NODALIA_I18N_DIR:"), "{workflow}: the build names the catalogs");
+        assert!(text.contains("NODALIA_I18N_REQUIRED: \"1\""), "{workflow}: a missing catalog fails the build");
     }
 }
 

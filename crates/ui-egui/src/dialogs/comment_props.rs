@@ -357,7 +357,7 @@ pub(crate) fn body(ui: &mut egui::Ui, app: &mut PapelApp, t: &Tokens) -> (bool, 
                 egui::Grid::new("comment-props").num_columns(2).spacing([12.0, 10.0]).show(ui, |ui| {
                     if let Some(icon) = e.icon.as_mut() {
                         ui.label(tl!("Icon"));
-                        craft_ui::ComboBox::from_id_salt("note-icon").selected_text(icon.name()).show_ui(ui, |ui| {
+                        nodalia_ui::ComboBox::from_id_salt("note-icon").selected_text(icon.name()).show_ui(ui, |ui| {
                             for i in ICONS {
                                 ui.selectable_value(icon, i, i.name());
                             }
@@ -383,7 +383,7 @@ pub(crate) fn body(ui: &mut egui::Ui, app: &mut PapelApp, t: &Tokens) -> (bool, 
                     // Text boxes and typewriter text: an oval or a circle goes around the text.
                     if let Some(shape) = e.border_shape.as_mut() {
                         let label = ui.label(tl!("Border shape"));
-                        craft_ui::ComboBox::from_id_salt("border-shape")
+                        nodalia_ui::ComboBox::from_id_salt("border-shape")
                             .selected_text(tl!(shape.name()))
                             .show_ui(ui, |ui| {
                                 for s in papel_engine::BorderShape::ALL {
@@ -461,7 +461,7 @@ pub(crate) fn body(ui: &mut egui::Ui, app: &mut PapelApp, t: &Tokens) -> (bool, 
                         ui.label(tl!("Line ending"));
                         ui.horizontal(|ui| {
                             for (i, ending) in ends.iter_mut().enumerate() {
-                                craft_ui::ComboBox::from_id_salt(("line-ending", i)).selected_text(ending_label(*ending)).width(188.0).show_ui(
+                                nodalia_ui::ComboBox::from_id_salt(("line-ending", i)).selected_text(ending_label(*ending)).width(188.0).show_ui(
                                     ui,
                                     |ui| {
                                         for style in LineEnding::ALL {

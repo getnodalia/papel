@@ -483,7 +483,7 @@ fn view_menu(os: OperatingSystem) -> Harness<'static, PapelApp> {
 fn view_menu_and_tooltips_write_shortcuts_for_the_platform() {
     // On Linux, View ▸ Zoom and Page navigation showed ⌘1, ⌘[ … (hard-coded) while the
     // registered items under them showed Ctrl+K; tooltips showed ⌘ too.
-    // The menu bar writes its shortcuts for the build's platform (craft-menu tests that).
+    // The menu bar writes its shortcuts for the build's platform (nodalia-menu tests that).
     let h = view_menu(OperatingSystem::Nix);
     h.get_by_label("Zoom in (Ctrl++)");
     h.get_by_label("Print (Ctrl+P)");

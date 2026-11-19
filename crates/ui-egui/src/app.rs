@@ -389,24 +389,24 @@ impl PapelApp {
         self.covers_pages()
             || self.hotbar.picker_over_pages(ctx)
             || egui::Popup::is_any_open(ctx)
-            || craft_menu::bar::is_open(ctx)
-            || craft_menu::bar::is_focused(ctx)
+            || nodalia_menu::bar::is_open(ctx)
+            || nodalia_menu::bar::is_focused(ctx)
     }
 
     /// Edit ▸ Copy, Cut, Select all and Delete stand for keys, and Edit ▸ Paste for the paste the
     /// platform answers with. They go where the user's would: to a text field that has the
     /// keyboard, else to the pages. They join the input once the menu bar has let go of the keys,
-    /// which an in-window menu's click does a pass later (craft-menu stores the menu as open on
+    /// which an in-window menu's click does a pass later (nodalia-menu stores the menu as open on
     /// the pass its click closes it). A native menu's click leaves egui's popups and the Hotbar
     /// tools window open, which hold the pages' keys; a click anywhere else closes them, and so
     /// does this. Edit ▸ Paste asks the platform for the clipboard only then, so its answer, on a
     /// later pass, is an ordinary paste. With a text field focused, a native click on Copy, Cut,
-    /// Paste or Select all doesn't come here: craft-menu taps the shortcut for the field instead.
+    /// Paste or Select all doesn't come here: nodalia-menu taps the shortcut for the field instead.
     fn release_menu_input(&mut self, ctx: &egui::Context) {
         if self.menu_input.is_empty() && self.menu_pastes == 0 {
             return;
         }
-        if craft_menu::bar::is_open(ctx) || craft_menu::bar::is_focused(ctx) {
+        if nodalia_menu::bar::is_open(ctx) || nodalia_menu::bar::is_focused(ctx) {
             ctx.request_repaint();
             return;
         }
@@ -719,7 +719,7 @@ impl PapelApp {
         self.guard_quit(ctx);
         // macOS: quit through `terminate:` instead of dropping the window (Touch Bar crash, #1136).
         #[cfg(target_os = "macos")]
-        craft_quit::on_close_request(ctx);
+        nodalia_quit::on_close_request(ctx);
         self.autosave_tick(ctx, web_time::Instant::now());
         // Reload documents whose files a build rewrote (#431).
         #[cfg(not(target_arch = "wasm32"))]
@@ -740,7 +740,7 @@ impl PapelApp {
         self.release_menu_input(ctx);
         // A command's chord pressed with the keyboard on the menu bar (Alt, F10) takes it off the
         // bar, so the chord runs in the same press, the pages' as well as the registry's.
-        craft_menu::bar::leave_for_shortcut(ctx);
+        nodalia_menu::bar::leave_for_shortcut(ctx);
         self.hotbar.close_hidden_picker(ctx, self.hotbar_hidden());
         self.page_keys = page_keys::PageKeys::new(self.over_pages(ctx));
         self.shortcuts(ctx);

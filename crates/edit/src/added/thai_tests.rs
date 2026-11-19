@@ -1,6 +1,6 @@
 //! Existing Thai text drawn from the bundled Thai outlines (`thai_glyph_resources`): one Type 3
 //! code per distinct glyph and cluster text, in fonts of `GLYPHS_PER_FONT` codes each. The
-//! outline checks need the craft-fonts Thai face; the budget check runs without it.
+//! outline checks need the nodalia-fonts Thai face; the budget check runs without it.
 
 use papel_cos::{Dict, Document};
 use papel_fonts::source_shaping::{ShapedGlyph, ShapedRun};
@@ -29,7 +29,7 @@ fn thai_glyph_resources_refuse_a_row_past_the_glyph_budget() {
 fn thai_glyph_resources_shard_distinct_clusters_at_the_font_boundary() {
     let Some(face) = papel_fonts::document_thai_font() else {
         eprintln!(
-            "skipping thai_glyph_resources_shard_distinct_clusters_at_the_font_boundary: built without craft-fonts (set CRAFT_FONTS_DIR to run it)"
+            "skipping thai_glyph_resources_shard_distinct_clusters_at_the_font_boundary: built without nodalia-fonts (set NODALIA_FONTS_DIR to run it)"
         );
         return;
     };

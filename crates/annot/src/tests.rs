@@ -5409,7 +5409,7 @@ fn thai_in_fill_sign_text_and_text_boxes_is_drawn_from_the_thai_face() {
     if papel_fonts::document_thai_font().is_none() {
         for shape in shapes {
             let err = add_annotation(&mut doc, &item(shape), &meta("t")).unwrap_err();
-            assert!(matches!(&err, AnnotError::Undrawable(m) if m.contains("Thai") && m.contains("CRAFT_FONTS_DIR")), "{err:?}");
+            assert!(matches!(&err, AnnotError::Undrawable(m) if m.contains("Thai") && m.contains("NODALIA_FONTS_DIR")), "{err:?}");
         }
         assert_eq!(list(&doc, 0).len(), 1, "nothing was added");
         let t = add_annotation(&mut doc, &new(0, Shape::TextBox { rect: [100.0, 600.0, 300.0, 650.0], font_size: 12.0 }), &meta("b")).unwrap();

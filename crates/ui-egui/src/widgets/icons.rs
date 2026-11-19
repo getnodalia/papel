@@ -5,8 +5,8 @@
 use std::collections::HashMap;
 use std::sync::{Arc, OnceLock};
 
-use craft_ui::buttons::{ButtonVisuals, IconButton, IconButtonStyle};
-use craft_ui::icons::{SvgIconSet, SvgStyle};
+use nodalia_ui::buttons::{ButtonVisuals, IconButton, IconButtonStyle};
+use nodalia_ui::icons::{SvgIconSet, SvgStyle};
 
 use egui::{Color32, Rect, Response, Stroke, Vec2};
 
@@ -236,7 +236,7 @@ mod tests {
     fn shared_button_preserves_pointer_responses() {
         // The shared button must respond like the original allocate-and-paint path in both
         // themes. Its painting differs on purpose (the eased press wash, the selected outline
-        // and the sinking glyph); the keyboard-focus outline is covered in craft-ui.
+        // and the sinking glyph); the keyboard-focus outline is covered in nodalia-ui.
         fn frame(
             ctx: &egui::Context,
             events: Vec<egui::Event>,

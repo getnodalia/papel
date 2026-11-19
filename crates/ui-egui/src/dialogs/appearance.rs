@@ -145,7 +145,7 @@ pub(crate) fn preferences_section_with_context(
     ctx.label(ui, tl_ctx!("theme", "Appearance"), theme::semibold(13.0), t.text);
     ui.horizontal(|ui| {
         let label = ctx.label(ui, tl!("Appearance mode"), theme::regular(13.0), t.text);
-        let combo = craft_ui::ComboBox::from_id_salt("appearance-mode").selected_text(tl!(mode_label(app.theme_preference))).show_ui(ui, |ui| {
+        let combo = nodalia_ui::ComboBox::from_id_salt("appearance-mode").selected_text(tl!(mode_label(app.theme_preference))).show_ui(ui, |ui| {
             for preference in [ThemePreference::System, ThemePreference::Light, ThemePreference::Dark] {
                 if ui.selectable_label(app.theme_preference == preference, tl!(mode_label(preference))).clicked() {
                     app.execute(mode_command(preference));

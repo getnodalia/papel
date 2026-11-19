@@ -637,7 +637,7 @@ fn a_picture_for_a_native_edit_paste_with_a_context_menu_open_lands_on_the_page(
     assert!(egui::Popup::is_any_open(&h.ctx), "the context menu is open");
     let before = can_undo(&h, 0);
     let ctx = h.ctx.clone();
-    h.state_mut().run_menu_command(&ctx, &craft_menu::CommandRef::new("edit.paste"));
+    h.state_mut().run_menu_command(&ctx, &nodalia_menu::CommandRef::new("edit.paste"));
     h.step();
     assert!(crate::support::asked_for_the_clipboard(&h), "Edit ▸ Paste asked the platform for the clipboard");
     assert!(!egui::Popup::is_any_open(&h.ctx), "Edit ▸ Paste closed the context menu");

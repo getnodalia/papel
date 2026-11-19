@@ -10,7 +10,7 @@
 //!
 //! The note icons are Papel's own drawings (AGENTS.md §1). Text boxes use a standard text
 //! font with WinAnsi encoding: Helvetica, or the face their `/DA` or `/DS` asks for
-//! ([`crate::text_style`]), and draw Thai from the craft-fonts Thai face as Type 3 glyphs
+//! ([`crate::text_style`]), and draw Thai from the nodalia-fonts Thai face as Type 3 glyphs
 //! (`papel_fonts::shaped_text`, the writer Add text uses); lines break at that face's
 //! standard-14 widths and the Thai face's shaped advances (no other font program is bundled).
 

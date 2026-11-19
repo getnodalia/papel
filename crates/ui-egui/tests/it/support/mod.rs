@@ -81,16 +81,16 @@ pub fn outside_menus<'h>(h: &'h Harness<'static, PapelApp>, label: &str) -> egui
 /// Whether the test `name` must skip because the interface fonts lack a glyph for a character it
 /// draws: one in `text` or in the catalog of the interface `language`. egui 0.37 test harnesses
 /// panic on a missing glyph, and Japanese, Chinese and Thai faces come only from the optional
-/// craft-fonts build input or a face installed on this machine. Prints the skip line.
+/// nodalia-fonts build input or a face installed on this machine. Prints the skip line.
 ///
 /// The fonts are those the app installs for `language` and for the default CJK preference: a
 /// switch to Chinese installs its fonts for the next frame, so the first frame in Chinese draws
 /// with the fonts of the language before it.
 ///
-/// A build that requires craft-fonts (`CRAFT_FONTS_REQUIRED=1`, as the CI gate sets) never skips:
+/// A build that requires nodalia-fonts (`NODALIA_FONTS_REQUIRED=1`, as the CI gate sets) never skips:
 /// a missing glyph there is a failure.
 pub fn skip_without_glyphs(name: &str, language: &str, text: &str) -> bool {
-    if std::env::var("CRAFT_FONTS_REQUIRED").as_deref() == Ok("1") {
+    if std::env::var("NODALIA_FONTS_REQUIRED").as_deref() == Ok("1") {
         return false;
     }
     let catalogs: Vec<&str> = i18n::Lang::from_code(language).into_iter().flat_map(i18n::Lang::catalog_texts).collect();
@@ -106,15 +106,15 @@ pub fn skip_without_glyphs(name: &str, language: &str, text: &str) -> bool {
     let Some(missing) = missing else {
         return false;
     };
-    eprintln!("skipping {name}: no interface font draws {missing:?} (set CRAFT_FONTS_DIR to a craft-fonts checkout with a face for it)");
+    eprintln!("skipping {name}: no interface font draws {missing:?} (set NODALIA_FONTS_DIR to a nodalia-fonts checkout with a face for it)");
     true
 }
 
-/// Whether `name` is skipped because the build embeds no craft-i18n catalogs (English only).
+/// Whether `name` is skipped because the build embeds no nodalia-i18n catalogs (English only).
 pub fn skip_without_catalogs(name: &str) -> bool {
     let skip = !papel_ui_egui::i18n::catalogs_embedded();
     if skip {
-        eprintln!("skipping {name}: built without craft-i18n (set CRAFT_I18N_DIR to a craft-i18n checkout)");
+        eprintln!("skipping {name}: built without nodalia-i18n (set NODALIA_I18N_DIR to a nodalia-i18n checkout)");
     }
     skip
 }

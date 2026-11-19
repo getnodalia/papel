@@ -763,7 +763,7 @@ fn explicit_font_and_disjoint_ranges_save_reopen_through_tools() {
 #[test]
 fn added_arabic_text_keeps_copy_search_and_editor_order_after_retyping_and_reopen() {
     if papel_fonts::document_arabic_font().is_none() {
-        eprintln!("set CRAFT_FONTS_DIR to exercise added Arabic text");
+        eprintln!("set NODALIA_FONTS_DIR to exercise added Arabic text");
         return;
     }
     let dir = workdir("arabic-copy-order");
@@ -4501,7 +4501,7 @@ fn superscript_and_subscript_through_tools() {
 #[test]
 fn styled_cyrillic_fallback_is_batched_through_tools_and_reopen() {
     if papel_fonts::document_japanese_font().is_none() {
-        eprintln!("skipping: built without craft-fonts");
+        eprintln!("skipping: built without nodalia-fonts");
         return;
     }
     let dir = workdir("styled-fallback");
@@ -4536,8 +4536,8 @@ fn styled_cyrillic_fallback_is_batched_through_tools_and_reopen() {
 }
 
 /// #2593: a paragraph whose own font cannot show a character is written from Papel's fallback
-/// faces. The Cyrillic the craft-fonts faces lack (Uzbek қ ғ ҳ, Kazakh ә ө ү ұ һ) comes from the
-/// bundled Inter face, so the edit is not refused even without `CRAFT_FONTS_DIR`, and the words
+/// faces. The Cyrillic the nodalia-fonts faces lack (Uzbek қ ғ ҳ, Kazakh ә ө ү ұ һ) comes from the
+/// bundled Inter face, so the edit is not refused even without `NODALIA_FONTS_DIR`, and the words
 /// survive a save and a reopen. (`crates/edit/src/tests.rs::uzbek_and_kazakh_cyrillic_use_the_bundled_latin_face`
 /// pins which face drew them.)
 #[test]
@@ -4633,7 +4633,7 @@ fn a_line_split_across_content_streams_is_listed_and_edited() {
 #[test]
 fn mixed_script_paragraph_keeps_source_fonts_through_tools_and_reopen() {
     if papel_fonts::document_japanese_font().is_none() {
-        eprintln!("skipping mixed-script fallback: build with CRAFT_FONTS_DIR");
+        eprintln!("skipping mixed-script fallback: build with NODALIA_FONTS_DIR");
         return;
     }
     let dir = workdir("mixed-script-paragraph");
@@ -11356,7 +11356,7 @@ fn thai_in_fill_sign_text_comments_fields_and_page_marks_is_drawn_and_found() {
     if papel_fonts::document_thai_font().is_none() {
         for (tool, args) in calls {
             let err = a.call(tool, &args).unwrap_err().to_string();
-            assert!(err.contains("Thai") && err.contains("CRAFT_FONTS_DIR"), "{tool}: {err}");
+            assert!(err.contains("Thai") && err.contains("NODALIA_FONTS_DIR"), "{tool}: {err}");
         }
         assert_eq!(ok(&mut a, "comment_list", json!({"doc": doc}))["comments"].as_array().map(Vec::len), Some(0));
         return;

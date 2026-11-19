@@ -319,7 +319,7 @@ pub(crate) fn body(ui: &mut egui::Ui, d: &mut LinkDraft, pages: usize, t: &Token
     widgets::section_title(ui, tl!("Link Appearance"));
     egui::Grid::new("link-appearance").num_columns(2).spacing([12.0, 8.0]).show(ui, |ui| {
         ui.label(tl!("Link Type:"));
-        craft_ui::ComboBox::from_id_salt("link-type")
+        nodalia_ui::ComboBox::from_id_salt("link-type")
             .selected_text(if d.style.visible { tl!("Visible Rectangle") } else { tl!("Invisible Rectangle") })
             .show_ui(ui, |ui| {
                 ui.selectable_value(&mut d.style.visible, true, tl!("Visible Rectangle"));
@@ -327,7 +327,7 @@ pub(crate) fn body(ui: &mut egui::Ui, d: &mut LinkDraft, pages: usize, t: &Token
             });
         ui.end_row();
         ui.label(tl!("Highlight Style:"));
-        craft_ui::ComboBox::from_id_salt("link-hl").selected_text(tl!(d.style.highlight.label())).show_ui(ui, |ui| {
+        nodalia_ui::ComboBox::from_id_salt("link-hl").selected_text(tl!(d.style.highlight.label())).show_ui(ui, |ui| {
             for h in LinkHighlight::ALL {
                 ui.selectable_value(&mut d.style.highlight, h, tl!(h.label()));
             }
@@ -335,7 +335,7 @@ pub(crate) fn body(ui: &mut egui::Ui, d: &mut LinkDraft, pages: usize, t: &Token
         ui.end_row();
         if d.style.visible {
             ui.label(tl!("Line Thickness:"));
-            craft_ui::ComboBox::from_id_salt("link-w")
+            nodalia_ui::ComboBox::from_id_salt("link-w")
                 .selected_text(if d.style.width <= 1.0 {
                     tl!("Thin")
                 } else if d.style.width <= 2.0 {
@@ -357,7 +357,7 @@ pub(crate) fn body(ui: &mut egui::Ui, d: &mut LinkDraft, pages: usize, t: &Token
             } else {
                 0
             };
-            craft_ui::ComboBox::from_id_salt("link-s").selected_text(tl!(["Solid", "Dashed", "Underline"][style])).show_ui(ui, |ui| {
+            nodalia_ui::ComboBox::from_id_salt("link-s").selected_text(tl!(["Solid", "Dashed", "Underline"][style])).show_ui(ui, |ui| {
                 for (k, l) in ["Solid", "Dashed", "Underline"].iter().enumerate() {
                     ui.selectable_value(&mut style, k, tl!(l));
                 }
@@ -395,7 +395,7 @@ pub(crate) fn body(ui: &mut egui::Ui, d: &mut LinkDraft, pages: usize, t: &Token
             ui.horizontal(|ui| {
                 ui.add_space(24.0);
                 let label = ui.label(tl!("Zoom"));
-                craft_ui::ComboBox::from_id_salt("link-zoom")
+                nodalia_ui::ComboBox::from_id_salt("link-zoom")
                     .selected_text(zoom_label(d.zoom))
                     .show_ui(ui, |ui| {
                         for z in ZOOMS {

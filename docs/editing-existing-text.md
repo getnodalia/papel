@@ -49,7 +49,7 @@ completes its subsets automatically, including new Chinese characters. When the 
 the complete program of a paragraph's font (not a subset) and its licence allows editable
 embedding, a character the font's encoding can't show is drawn with that same program. A
 character no available face has is refused with an error that names it, and a CJK character
-without a craft-fonts build says so. Replacement text takes the craft-fonts Japanese faces when
+without a nodalia-fonts build says so. Replacement text takes the nodalia-fonts Japanese faces when
 they can draw all of it, and the bundled Inter face (`assets/fonts`) for the Latin, Greek and
 Cyrillic letters they lack (Uzbek `қизил`, Kazakh `әже`): that face needs no build input, so
 these work in every build, the web one included. Choosing another face
@@ -63,10 +63,10 @@ shares a single copy of it. The Type 3 fonts generated for Japanese or Hebrew ch
 page's fonts lack are made anew by each edit; after an edit, those nothing on the page shows any
 more leave the page's resources, unless some content that could name them can't be read.
 Original subset bytes are
-preserved. Optional matching faces from `CRAFT_FONTS_DIR` can also complete source subsets;
+preserved. Optional matching faces from `NODALIA_FONTS_DIR` can also complete source subsets;
 this works only when that build input actually contains the full face. This change does not
 add a font binary or change the release font pin. Fonts shared by releases belong in
-`getnodalia/foundation (vendor/craft-fonts)` under the repository's asset rules.
+`getnodalia/foundation (vendor/nodalia-fonts)` under the repository's asset rules.
 
 With **Keep source fonts**, an upright single-style paragraph can combine its source font
 with a fallback even when the replacement has no explicit line break (#2750). Characters
@@ -90,7 +90,7 @@ A source subset that lacks a needed contextual glyph produces an error asking fo
 complete original face or an explicit replacement. Cross-family replacement requires an
 explicit choice. The document-font menu offers **Noto Sans Thai**: pass its `text_fonts`
 resource (normally `builtin:thai`) as `text_edit.font_resource` or a range's `font_resource`. This replacement
-requires the optional craft-fonts Thai input and currently uses Regular. A matching Noto
+requires the optional nodalia-fonts Thai input and currently uses Regular. A matching Noto
 subset can still be completed by that same bundled family when it is Regular and upright; a
 subset its name or descriptor marks bold or italic needs an explicit replacement.
 

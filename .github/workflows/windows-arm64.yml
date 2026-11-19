@@ -26,9 +26,9 @@ permissions:
   contents: read
 
 env:
-  # Same commits as ci.yml and the release-*.yml workflows; craft-i18n's is craft-i18n.rev.
-  FONTS_REF: b076417b5880bd4154bd22f00695b1d28c6bea83
-  I18N_REF: a3a500bd683b98c458018f0bea392c994ea52c7a
+  # Same commits as ci.yml and the release-*.yml workflows; nodalia-i18n's is nodalia-i18n.rev.
+  FONTS_REF: d4f57e6b31d7c7526b539f7aaaa07312c9908bb8
+  I18N_REF: 4df0177d9ad0772ecd34649956c6e81f467f240c
 
 jobs:
   package:
@@ -36,30 +36,30 @@ jobs:
     runs-on: windows-2025
     timeout-minutes: 120
     env:
-      CRAFT_FONTS_DIR: ${{ github.workspace }}\craft-fonts
-      CRAFT_FONTS_REQUIRED: "1"
-      CRAFT_I18N_DIR: ${{ github.workspace }}\craft-i18n
-      CRAFT_I18N_REQUIRED: "1"
+      NODALIA_FONTS_DIR: ${{ github.workspace }}\nodalia-fonts
+      NODALIA_FONTS_REQUIRED: "1"
+      NODALIA_I18N_DIR: ${{ github.workspace }}\nodalia-i18n
+      NODALIA_I18N_REQUIRED: "1"
       DIST: ${{ github.workspace }}\dist
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Check out craft-fonts
+      - name: Check out nodalia-fonts
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: getnodalia/foundation # kept at vendor/craft-fonts/main
+          repository: getnodalia/foundation # kept at nodalia/fonts
           ref: ${{ env.FONTS_REF }}
-          path: craft-fonts
+          path: nodalia-fonts
           persist-credentials: false
 
-      - name: Check out craft-i18n
+      - name: Check out nodalia-i18n
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: getnodalia/foundation # kept at vendor/craft-i18n/main
+          repository: getnodalia/foundation # kept at nodalia/i18n
           ref: ${{ env.I18N_REF }}
-          path: craft-i18n
+          path: nodalia-i18n
           persist-credentials: false
 
       - uses: dtolnay/rust-toolchain@39008827e6b4319a349e9a42dfc90579dd25f1ca # stable
@@ -119,27 +119,27 @@ jobs:
     runs-on: windows-11-arm
     timeout-minutes: 150
     env:
-      CRAFT_FONTS_DIR: ${{ github.workspace }}\craft-fonts
-      CRAFT_I18N_DIR: ${{ github.workspace }}\craft-i18n
+      NODALIA_FONTS_DIR: ${{ github.workspace }}\nodalia-fonts
+      NODALIA_I18N_DIR: ${{ github.workspace }}\nodalia-i18n
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Check out craft-fonts
+      - name: Check out nodalia-fonts
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: getnodalia/foundation # kept at vendor/craft-fonts/main
+          repository: getnodalia/foundation # kept at nodalia/fonts
           ref: ${{ env.FONTS_REF }}
-          path: craft-fonts
+          path: nodalia-fonts
           persist-credentials: false
 
-      - name: Check out craft-i18n
+      - name: Check out nodalia-i18n
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: getnodalia/foundation # kept at vendor/craft-i18n/main
+          repository: getnodalia/foundation # kept at nodalia/i18n
           ref: ${{ env.I18N_REF }}
-          path: craft-i18n
+          path: nodalia-i18n
           persist-credentials: false
 
       - uses: dtolnay/rust-toolchain@39008827e6b4319a349e9a42dfc90579dd25f1ca # stable

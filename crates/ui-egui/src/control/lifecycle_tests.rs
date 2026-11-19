@@ -750,7 +750,7 @@ fn a_timed_out_screenshot_releases_its_slot_and_budget() {
     }
     let ctx = egui::Context::default();
     let (mut control, _client) = attach(&ctx);
-    let (slot, callback) = craft_ui::capture::CaptureSlot::new(&ctx, egui::ViewportId::ROOT, MAX_IMAGE_BYTES);
+    let (slot, callback) = nodalia_ui::capture::CaptureSlot::new(&ctx, egui::ViewportId::ROOT, MAX_IMAGE_BYTES);
     let (reply, rx) = channel();
     control.pending.push(Pending::Screenshot {
         slot,
@@ -782,7 +782,7 @@ fn completed_screenshots_obey_the_admission_deadline_before_success_or_retry() {
         .drop_without_applying_deltas();
         let (mut control, _client) = attach(&ctx);
         let geometry = Geometry::current(&ctx, 0);
-        let (slot, callback) = craft_ui::capture::CaptureSlot::new(&ctx, egui::ViewportId::ROOT, MAX_IMAGE_BYTES);
+        let (slot, callback) = nodalia_ui::capture::CaptureSlot::new(&ctx, egui::ViewportId::ROOT, MAX_IMAGE_BYTES);
         let image = Arc::new(egui::ColorImage::filled([64, 32], egui::Color32::RED));
         let weak_image = Arc::downgrade(&image);
         callback.complete(image);
@@ -829,7 +829,7 @@ fn completed_screenshots_obey_the_admission_deadline_before_success_or_retry() {
 fn expired_unissued_screenshots_are_not_issued_and_late_callbacks_are_harmless() {
     let ctx = egui::Context::default();
     let (mut control, _client) = attach(&ctx);
-    let (slot, callback) = craft_ui::capture::CaptureSlot::new(&ctx, egui::ViewportId::ROOT, MAX_IMAGE_BYTES);
+    let (slot, callback) = nodalia_ui::capture::CaptureSlot::new(&ctx, egui::ViewportId::ROOT, MAX_IMAGE_BYTES);
     let late_callback = callback.clone();
     let geometry = Geometry { size: egui::vec2(64.0, 32.0), pixels_per_point: 1.0, epoch: 0 };
     let (reply, rx) = channel();

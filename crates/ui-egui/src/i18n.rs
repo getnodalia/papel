@@ -1,24 +1,24 @@
-//! UI localisation. Strings in code stay English and are the default lookup keys; the craft-i18n
+//! UI localisation. Strings in code stay English and are the default lookup keys; the nodalia-i18n
 //! catalogs map them to display text at render time. Command ids, document text, file names, the
 //! control channel, the CLI and MCP never see translated text, so agents and scripts are
 //! unaffected. A string without a translation is shown in English, so coverage can grow
 //! incrementally, and a missing translation never fails a build, a test or a release.
 //!
-//! The catalogs live in [getnodalia/foundation (vendor/craft-i18n)](https://github.com/getnodalia/foundation/tree/vendor/craft-i18n/main)
-//! (`locales/<code>/common.tsv`, shared by the Crafting Apps, and `pdfcraft.tsv`), not in this
-//! repository. `build.rs` embeds them from `CRAFT_I18N_DIR` (CI and releases check out the commit
-//! in `craft-i18n.rev`); without it the build is English only. Lookup, fallback (Papel's rows
-//! over shared ones), plural forms (CLDR) and language names are the `craft-i18n` crate's
-//! (craft-libs). Which languages are offered, how the system locale picks one, right to left and
+//! The catalogs live in [getnodalia/foundation (vendor/nodalia-i18n)](https://github.com/getnodalia/foundation/tree/nodalia/i18n)
+//! (`locales/<code>/common.tsv`, shared by the Crafting Apps, and `papel.tsv`), not in this
+//! repository. `build.rs` embeds them from `NODALIA_I18N_DIR` (CI and releases check out the commit
+//! in `nodalia-i18n.rev`); without it the build is English only. Lookup, fallback (Papel's rows
+//! over shared ones), plural forms (CLDR) and language names are the `nodalia-i18n` crate's
+//! (nodalia-libs). Which languages are offered, how the system locale picks one, right to left and
 //! `{name}` placeholders stay here.
 //!
 //! # Adding or changing a translation
-//! In craft-i18n: add rows to `locales/<code>/pdfcraft.tsv` (its `docs/integration.md`). They show
-//! here once `craft-i18n.rev` moves to a commit that has them. A feature PR here adds the English
+//! In nodalia-i18n: add rows to `locales/<code>/papel.tsv` (its `docs/integration.md`). They show
+//! here once `nodalia-i18n.rev` moves to a commit that has them. A feature PR here adds the English
 //! only.
 //!
 //! # Adding a language
-//! 1. craft-i18n gets `locales/<code>/pdfcraft.tsv` with its `@id language.name` row.
+//! 1. nodalia-i18n gets `locales/<code>/papel.tsv` with its `@id language.name` row.
 //! 2. Add one row to [`LANGUAGES`] (code, right to left), and its English name to
 //!    [`Lang::english_name`].
 //!
@@ -36,15 +36,15 @@ use std::cell::Cell;
 use std::collections::HashSet;
 use std::sync::{LazyLock, OnceLock};
 
-use craft_i18n::I18n;
+use nodalia_i18n::I18n;
 
-include!(concat!(env!("OUT_DIR"), "/craft_i18n.rs"));
+include!(concat!(env!("OUT_DIR"), "/nodalia_i18n.rs"));
 
 /// The embedded catalogs, offering exactly the languages in [`LANGUAGES`]. Built on first use; a
 /// locale is parsed on its first lookup.
 static I18N: LazyLock<I18n> = LazyLock::new(|| {
     let offered: Vec<&str> = LANGUAGES.iter().map(|l| l.code).collect();
-    let (i18n, problems) = I18n::new(CRAFT_I18N, &offered);
+    let (i18n, problems) = I18n::new(NODALIA_I18N, &offered);
     for problem in problems {
         log::warn!("interface catalogs: {problem}");
     }
@@ -55,10 +55,10 @@ static I18N: LazyLock<I18n> = LazyLock::new(|| {
 pub const AUTO: &str = "auto";
 
 /// One UI language Papel offers, when its catalogs are embedded: what the app needs beyond
-/// them. Its name and translations come from craft-i18n.
+/// them. Its name and translations come from nodalia-i18n.
 pub struct LangInfo {
     /// BCP 47 code, lowercase (`ja`, `zh-hans`, `pt-br`). Also the `language` preference value and
-    /// the craft-i18n locale.
+    /// the nodalia-i18n locale.
     pub code: &'static str,
     /// The language is written right to left. Catalogs stay in logical order: the egui 0.37 fork
     /// owns bidi shaping/reordering (E5/E12), so preordering here would reverse Arabic twice.
@@ -160,7 +160,7 @@ static OWN_ROWS: [OnceLock<HashSet<(&'static str, &'static str)>>; LANGUAGE_COUN
 /// embedded.
 #[derive(Clone, Copy)]
 pub struct Lang {
-    lang: craft_i18n::Lang,
+    lang: nodalia_i18n::Lang,
     /// The catalogs it is looked up in: the embedded ones ([`I18N`]), or a test fixture's.
     catalogs: Option<&'static I18n>,
 }
@@ -180,7 +180,7 @@ impl PartialEq for Lang {
 impl Eq for Lang {}
 
 impl Lang {
-    pub const EN: Lang = Lang { lang: craft_i18n::Lang::EN, catalogs: None };
+    pub const EN: Lang = Lang { lang: nodalia_i18n::Lang::EN, catalogs: None };
 
     fn i18n(self) -> &'static I18n {
         self.catalogs.unwrap_or_else(|| LazyLock::force(&I18N))
@@ -208,7 +208,7 @@ impl Lang {
     }
 
     /// Every language the interface can be shown in: [`LANGUAGES`] in order, those whose catalogs
-    /// are embedded (English alone in a build without craft-i18n).
+    /// are embedded (English alone in a build without nodalia-i18n).
     pub fn all() -> impl Iterator<Item = Lang> {
         LANGUAGES.iter().filter_map(|l| Lang::from_code(l.code))
     }
@@ -297,7 +297,7 @@ impl Lang {
         self.info().is_some_and(|l| l.rtl)
     }
 
-    /// Whether Papel's own catalog (`pdfcraft.tsv`, not the shared `common.tsv`) has the row
+    /// Whether Papel's own catalog (`papel.tsv`, not the shared `common.tsv`) has the row
     /// (`context`, `source`). The shared catalog's `@id` rows are keyed by the other apps' command
     /// ids, which can name another command (in Bulgarian and Indonesian its `file.close` row holds
     /// an id rather than a label), so command-id lookups ask this; every `@id` row Papel had is
@@ -309,7 +309,7 @@ impl Lang {
         let code = self.code();
         let Some(slot) = LANGUAGES.iter().position(|l| l.code == code).and_then(|i| OWN_ROWS.get(i)) else { return false };
         let rows: &HashSet<(&str, &str)> = slot.get_or_init(|| {
-            let app = CRAFT_I18N.iter().find(|(c, ..)| c.eq_ignore_ascii_case(code)).map_or("", |(_, _, app)| *app);
+            let app = NODALIA_I18N.iter().find(|(c, ..)| c.eq_ignore_ascii_case(code)).map_or("", |(_, _, app)| *app);
             app.lines()
                 .filter(|l| !l.starts_with('#'))
                 .filter_map(|l| {
@@ -326,14 +326,14 @@ impl Lang {
     /// English. For checks that the interface fonts draw every translation.
     pub fn catalog_texts(self) -> impl Iterator<Item = &'static str> {
         let code = self.code();
-        CRAFT_I18N.iter().filter(move |(c, ..)| c.eq_ignore_ascii_case(code)).flat_map(|(_, shared, app)| [*shared, *app])
+        NODALIA_I18N.iter().filter(move |(c, ..)| c.eq_ignore_ascii_case(code)).flat_map(|(_, shared, app)| [*shared, *app])
     }
 }
 
-/// Whether this build embeds the craft-i18n catalogs (`CRAFT_I18N_DIR` was set). Without them the
+/// Whether this build embeds the nodalia-i18n catalogs (`NODALIA_I18N_DIR` was set). Without them the
 /// interface is English only; tests that need a translation skip with a note.
 pub fn catalogs_embedded() -> bool {
-    !CRAFT_I18N.is_empty()
+    !NODALIA_I18N.is_empty()
 }
 
 /// The canonical `language` preference for user input: [`AUTO`] or a registered code (any case).
@@ -566,7 +566,7 @@ pub fn tr_id<'a>(lang: Lang, id: &str, label: &'a str) -> &'a str {
 }
 
 /// Whether `lang` has Papel's own `@id` row for `id` ([`Lang::has_own`]: command ids are each
-/// app's own) and it keeps the `{placeholders}` and trailing `…` of the English `label`. craft-i18n
+/// app's own) and it keeps the `{placeholders}` and trailing `…` of the English `label`. nodalia-i18n
 /// can't check that, because an `@id` row's source is the id, so a row that doesn't is skipped
 /// here and the label's translation shows instead.
 fn own_id(lang: Lang, id: &str, label: &str) -> bool {
@@ -574,7 +574,7 @@ fn own_id(lang: Lang, id: &str, label: &str) -> bool {
 }
 
 /// Whether `translated` has the `{placeholders}` (in any order) and the trailing `…` of `english`,
-/// the check craft-i18n makes on every row whose source is English text, and no `{` left open or
+/// the check nodalia-i18n makes on every row whose source is English text, and no `{` left open or
 /// `}` without its `{`.
 fn same_shape(translated: &str, english: &str) -> bool {
     let placeholders = |text: &str| -> Option<Vec<String>> {
@@ -714,19 +714,19 @@ fn name_sort_key(name: &str) -> String {
 /// don't depend on the embedded catalogs' wording. `code` picks the CLDR plural rules.
 #[cfg(test)]
 pub(crate) fn fixture_lang(code: &'static str, source: &'static str) -> Lang {
-    let embedded: &'static craft_i18n::Embedded = Box::leak(Box::new([(code, "", source)]));
+    let embedded: &'static nodalia_i18n::Embedded = Box::leak(Box::new([(code, "", source)]));
     let (i18n, _) = I18n::new(embedded, &[code]);
     let i18n: &'static I18n = Box::leak(Box::new(i18n));
-    let lang = i18n.from_code(code).unwrap_or(craft_i18n::Lang::EN);
+    let lang = i18n.from_code(code).unwrap_or(nodalia_i18n::Lang::EN);
     Lang { lang, catalogs: Some(i18n) }
 }
 
 /// For a test that needs the embedded catalogs: `false`, with a note, when none were embedded
-/// (`CRAFT_I18N_DIR` unset), so the test can skip; the interface is then English only.
+/// (`NODALIA_I18N_DIR` unset), so the test can skip; the interface is then English only.
 #[cfg(test)]
 pub(crate) fn needs_catalogs() -> bool {
     if !catalogs_embedded() {
-        eprintln!("skipped: built without craft-i18n (set CRAFT_I18N_DIR to a craft-i18n checkout); the interface is English only");
+        eprintln!("skipped: built without nodalia-i18n (set NODALIA_I18N_DIR to a nodalia-i18n checkout); the interface is English only");
     }
     catalogs_embedded()
 }

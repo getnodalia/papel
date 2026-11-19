@@ -10,7 +10,7 @@ use papel_fonts::{helvetica_width, literal, win_ansi};
 use crate::CreateError;
 
 /// The bundled face, Regular.
-fn face() -> Option<&'static papel_fonts::CraftFont> {
+fn face() -> Option<&'static papel_fonts::NodaliaFont> {
     papel_fonts::document_latin_fonts(false).into_iter().next()
 }
 

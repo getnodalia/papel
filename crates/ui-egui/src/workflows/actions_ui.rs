@@ -347,7 +347,7 @@ fn edit_body(ui: &mut egui::Ui, app: &mut PapelApp, t: &Tokens) -> bool {
     let all = Step::all();
     let add = &mut app.wizard.add;
     ui.horizontal(|ui| {
-        craft_ui::ComboBox::from_id_salt("action-add-step").selected_text(tl!(all[(*add).min(all.len() - 1)].label())).width(240.0).show_ui(
+        nodalia_ui::ComboBox::from_id_salt("action-add-step").selected_text(tl!(all[(*add).min(all.len() - 1)].label())).width(240.0).show_ui(
             ui,
             |ui| {
                 for (i, s) in all.iter().enumerate() {

@@ -1,5 +1,5 @@
 //! Shaped text written into a PDF: each distinct shaped cluster (a letter with its marks, and the
-//! text it stands for) becomes one glyph of a Type 3 font drawn from the craft-fonts face's
+//! text it stands for) becomes one glyph of a Type 3 font drawn from the nodalia-fonts face's
 //! outlines, with a `/ToUnicode` map so copy and search get each character once. No font file is
 //! embedded. Add text writes Arabic, Hebrew and Thai with it; text boxes, Fill & Sign text, form
 //! fields, headers, footers and watermarks write Thai with it, beside the standard font that
@@ -29,7 +29,7 @@ pub fn joins_previous(c: char) -> bool {
 /// Why Thai text can't be drawn, for a message an agent or user can act on.
 pub fn thai_message(e: GlyphError, text: &str) -> String {
     match e {
-        GlyphError::NoFont => "Thai text needs a Thai font, and this build has none; rebuild with CRAFT_FONTS_DIR pointing to a craft-fonts \
+        GlyphError::NoFont => "Thai text needs a Thai font, and this build has none; rebuild with NODALIA_FONTS_DIR pointing to a nodalia-fonts \
                                checkout with a Thai face"
             .into(),
         GlyphError::Missing => format!("the Thai font can't show \"{text}\""),
@@ -112,7 +112,7 @@ pub struct ShapedFonts {
 impl ShapedFonts {
     /// Build the fonts for `clusters` into `fonts`, under names starting `prefix` that neither
     /// `taken` (the page's fonts) nor `fonts` already has. `outline` gives a glyph's outline in its
-    /// script's face (the craft-fonts faces, or a stand-in in tests). `store` keeps each new
+    /// script's face (the nodalia-fonts faces, or a stand-in in tests). `store` keeps each new
     /// object and returns what refers to it: `doc.add` as a reference, or the object itself for
     /// an appearance that isn't in a document yet, whose streams [`store_streams`] then moves in.
     ///
@@ -493,7 +493,7 @@ mod tests {
             assert!(thai_message(GlyphError::NoFont, "").contains("this build has none"));
             assert_eq!(thai_width("น้ำ", 10.0, |s, size| s.chars().count() as f64 * size), 30.0, "measured by the standard font");
             assert_eq!(first_undrawable("ok\nชื่อ น้ำ"), Some('ช'));
-            assert!(thai_refusal("ok\nน้ำ").is_some_and(|m| m.contains("CRAFT_FONTS_DIR")));
+            assert!(thai_refusal("ok\nน้ำ").is_some_and(|m| m.contains("NODALIA_FONTS_DIR")));
             return;
         }
         assert_eq!((first_undrawable("ชื่อ: น้ำ\nOK"), thai_refusal("ชื่อ: น้ำ")), (None, None));

@@ -1,5 +1,5 @@
 //! The side panels around the page: the Tools pane, the rail and the open side panel
-//! ([`crate::RightPanel`]), drawn with craft-ui task panes ([`craft_ui::panes`]).
+//! ([`crate::RightPanel`]), drawn with nodalia-ui task panes ([`nodalia_ui::panes`]).
 //!
 //! On the right, outermost first: the rail, the Tools pane when Preferences ▸ Tools panel side is
 //! Right, then the side panel, then the page. Panes are docked only; their widths are resizable
@@ -7,7 +7,7 @@
 
 use std::ops::RangeInclusive;
 
-use craft_ui::panes::{Edge, PaneContent, PaneHost, PaneLabels, PaneRequest, PaneState, SidePolicy};
+use nodalia_ui::panes::{Edge, PaneContent, PaneHost, PaneLabels, PaneRequest, PaneState, SidePolicy};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
@@ -265,7 +265,7 @@ fn old_panel(old: &Value, panel: &str) -> (bool, bool, Option<f64>) {
     (right, false, size)
 }
 
-/// Reads the old docking layout (craft-ui's `Workspace`) as plain JSON. `None` when it has no
+/// Reads the old docking layout (nodalia-ui's `Workspace`) as plain JSON. `None` when it has no
 /// document view, which the old layout always held.
 fn migrate(old: &Value) -> Option<Restored> {
     find(old.get("layout")?.get("root")?, "canvas", 0)?;
@@ -483,7 +483,7 @@ mod tests {
         json!({"docking": {"layout": {"root": root, "floating": floating}, "hidden": hidden}})
     }
 
-    /// The old default layout, as craft-ui 5c874d5 serialized it.
+    /// The old default layout, as nodalia-ui 5c874d5 serialized it.
     fn docked(tools: f64, inspector: f64) -> Value {
         workspace(
             split(json!({"FixedFirst": tools}), tabs(&["tools"]), split(json!({"FixedSecond": inspector}), tabs(&["canvas"]), tabs(&["inspector"]))),

@@ -9,7 +9,7 @@ license.workspace = true
 workspace = true
 
 [dependencies]
-craft-print = { workspace = true }
+nodalia-print = { workspace = true }
 log = { workspace = true }
 papel-cos = { workspace = true }
 papel-content = { workspace = true }

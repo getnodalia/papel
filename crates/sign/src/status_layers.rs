@@ -30,7 +30,7 @@ use crate::pdf::{SignatureInfo, Status, walk_sig_fields};
 ///
 /// The font follows from the words, chosen for all three at once so two signatures in
 /// different states never read in two languages: the standard Helvetica when WinAnsi encodes
-/// them, else Inter, embedded and shaped (Latin, Cyrillic, Greek), else a craft-fonts face for
+/// them, else Inter, embedded and shaped (Latin, Cyrillic, Greek), else a nodalia-fonts face for
 /// Arabic, Japanese or Telugu, shaped and drawn as outlines, else all three in English.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct StatusCaptions {
@@ -68,7 +68,7 @@ enum Font {
     /// Inter, embedded on first use. Each state's caption is shaped and its glyphs embedded once
     /// per call (`None` when that failed), and every copy drawn in that state shares them.
     Inter { shaped: HashMap<Status, Option<(Object, ShapedRun)>> },
-    /// A craft-fonts face, shaped and drawn as filled glyph outlines: the Arabic and Telugu faces
+    /// A nodalia-fonts face, shaped and drawn as filled glyph outlines: the Arabic and Telugu faces
     /// are variable fonts, which cannot be embedded.
     Outlined { bytes: &'static [u8], rtl: bool },
 }
@@ -127,7 +127,7 @@ fn script_of(words: &[&str]) -> Option<&'static str> {
     }
 }
 
-/// A face that draws all of `words`: Inter when `script` is `None`, else a craft-fonts face that
+/// A face that draws all of `words`: Inter when `script` is `None`, else a nodalia-fonts face that
 /// Papel writes `script` into documents with. A face's scripts alone don't decide it: the
 /// Chinese one is for the interface alone (ATTRIBUTION.toml), whatever scripts it is meant for.
 fn face_for(script: Option<&str>, words: &[&str]) -> Option<&'static [u8]> {
@@ -614,7 +614,7 @@ fn helvetica_caption(words: &str, bbox: &[f64; 4]) -> (Dict, Vec<u8>) {
     (resources, ops)
 }
 
-/// `words` shaped in a craft-fonts face and drawn as filled glyph outlines where the shaper placed
+/// `words` shaped in a nodalia-fonts face and drawn as filled glyph outlines where the shaper placed
 /// them. The span keeps the words, in reading order, for copy and search where a reader takes them
 /// from it. `None` when the words cannot be shaped or a glyph has no usable outline; a caption too
 /// small to read is blank.
@@ -1508,12 +1508,12 @@ mod tests {
 
     #[test]
     fn captions_in_other_scripts_use_a_face_made_for_them_or_english() {
-        // Arabic, Japanese, Telugu, Thai and Devanagari are shaped in a craft-fonts face meant for
+        // Arabic, Japanese, Telugu, Thai and Devanagari are shaped in a nodalia-fonts face meant for
         // the script and drawn as outlines when the build has one, and drawn in English when it
         // does not.
         // Chinese is always English: no face is picked for it, since the Japanese ones would draw
         // Japanese letterforms and the Chinese one is for the interface alone, even where
-        // craft-fonts says it is meant for Hani.
+        // nodalia-fonts says it is meant for Hani.
         let cases = [
             ("Arab", ["التوقيع صالح", "الصلاحية غير معروفة", "التوقيع غير صالح"]),
             ("Jpan", ["署名は有効", "有効性は不明", "署名は無効"]),
@@ -1525,11 +1525,11 @@ mod tests {
         for (script, [valid, unknown, invalid]) in cases {
             assert_eq!(script_of(&[valid, unknown, invalid]), Some(script));
             let (shown, actual, font, ops, _) = caption_of(&captions(valid, unknown, invalid), Status::Valid);
-            // Decided apart from `face_for`: whether craft-fonts brings a face meant for the script.
+            // Decided apart from `face_for`: whether nodalia-fonts brings a face meant for the script.
             let has_face = match script {
                 "Jpan" => !papel_fonts::document_japanese_fonts_for_style(false, false).is_empty(),
                 "Hani" => false,
-                script => papel_fonts::CRAFT_FONTS.iter().any(|f| f.covers(script)),
+                script => papel_fonts::NODALIA_FONTS.iter().any(|f| f.covers(script)),
             };
             if has_face {
                 assert!(shown.is_empty() && font.is_none(), "{script}: outlines, not text");

@@ -11545,7 +11545,7 @@ fn a_late_paste_for_a_native_edit_paste_with_a_context_menu_open_pastes_the_page
     h.run_steps(2);
     assert!(egui::Popup::is_any_open(&h.ctx), "the page's context menu is open");
     let ctx = h.ctx.clone();
-    h.state_mut().run_menu_command(&ctx, &craft_menu::CommandRef::new("edit.paste"));
+    h.state_mut().run_menu_command(&ctx, &nodalia_menu::CommandRef::new("edit.paste"));
     h.step();
     assert!(support::asked_for_the_clipboard(&h), "Edit ▸ Paste asked the platform for the clipboard");
     h.run_steps(3);
@@ -11572,7 +11572,7 @@ fn two_native_edit_pastes_with_a_context_menu_open_paste_twice() {
     assert!(egui::Popup::is_any_open(&h.ctx), "the page's context menu is open");
     let ctx = h.ctx.clone();
     for _ in 0..2 {
-        h.state_mut().run_menu_command(&ctx, &craft_menu::CommandRef::new("edit.paste"));
+        h.state_mut().run_menu_command(&ctx, &nodalia_menu::CommandRef::new("edit.paste"));
         h.step();
         assert!(support::asked_for_the_clipboard(&h), "Edit ▸ Paste asked the platform for the clipboard");
     }
@@ -11596,7 +11596,7 @@ fn a_paste_behind_a_context_menu_opened_after_edit_paste_pastes_nothing() {
     assert!(h.state().page_clipboard.is_some(), "the page is copied");
     let pages = |h: &Harness<'static, PapelApp>| h.state().session.get(h.state().views[0].id).unwrap().info.pages.len();
     let ctx = h.ctx.clone();
-    h.state_mut().run_menu_command(&ctx, &craft_menu::CommandRef::new("edit.paste"));
+    h.state_mut().run_menu_command(&ctx, &nodalia_menu::CommandRef::new("edit.paste"));
     h.run_steps(2);
     h.get_by_label("Page 2").click_button(egui::PointerButton::Secondary);
     h.run_steps(2);
@@ -11624,7 +11624,7 @@ fn edit_paste_from_the_menu_bar_pastes_the_copied_page() {
     support::open_menu(&mut h, "Edit");
     support::menu_row(&h, "Paste").click();
     h.step();
-    assert!(craft_menu::bar::is_open(&h.ctx), "the bar reads as open on the pass after the click");
+    assert!(nodalia_menu::bar::is_open(&h.ctx), "the bar reads as open on the pass after the click");
     assert!(!support::asked_for_the_clipboard(&h), "Edit ▸ Paste asked while the bar held the keys");
     let mut asked = false;
     for _ in 0..4 {

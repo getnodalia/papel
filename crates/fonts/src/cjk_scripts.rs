@@ -16,15 +16,15 @@ pub const MAX_NATIVE_UI_CJK_BYTES: u64 = 16 << 20;
 /// ISO 15924 codes of the Han, Japanese and Korean scripts, Hangul on its own included.
 const CJK_SCRIPTS: [&str; 6] = ["Hani", "Hans", "Hant", "Jpan", "Kore", "Hang"];
 
-/// Whether a craft-fonts manifest script tag is CJK. A tag can carry a region after the code
-/// (craft-fonts tags Noto Sans HK UI `Hant-HK`), so only the part before `-` is compared.
+/// Whether a nodalia-fonts manifest script tag is CJK. A tag can carry a region after the code
+/// (nodalia-fonts tags Noto Sans HK UI `Hant-HK`), so only the part before `-` is compared.
 pub fn is_cjk_script(tag: &str) -> bool {
     let code = tag.trim().split('-').next().unwrap_or_default();
     CJK_SCRIPTS.contains(&code)
 }
 
 /// Whether a manifest's comma-separated script list contains `script` exactly, ignoring spaces.
-/// The interface and document lookups use exact tags (`CraftFont::covers`), so a regional tag
+/// The interface and document lookups use exact tags (`NodaliaFont::covers`), so a regional tag
 /// such as `Hans-HK` is not a `Hans` entry.
 pub fn has_script_tag(scripts: &str, script: &str) -> bool {
     scripts.split(',').any(|tag| tag.trim() == script)
@@ -49,7 +49,7 @@ pub fn cjk_cap_bytes(family: &str, wasm: bool) -> u64 {
 /// Decide whether a CJK face is embedded, skipped, or rejected.
 ///
 /// The Japanese document/UI families are embedded whole. Every other CJK family uses its cap;
-/// `required` marks the native Simplified Chinese manifest of a `CRAFT_FONTS_REQUIRED` build,
+/// `required` marks the native Simplified Chinese manifest of a `NODALIA_FONTS_REQUIRED` build,
 /// where an over-cap face must fail instead of quietly disappearing.
 pub fn cjk_size_decision(family: &str, bytes: u64, wasm: bool, required: bool) -> CjkSizeDecision {
     if WHOLE_CJK_FAMILIES.contains(&family) {

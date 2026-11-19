@@ -150,7 +150,7 @@ pub(crate) fn panel(
     ui.spacing_mut().combo_height = 360.0;
     let width = ui.available_width();
     let font_resp = outlined(ui, |ui| {
-        craft_ui::ComboBox::from_id_salt("format-font")
+        nodalia_ui::ComboBox::from_id_salt("format-font")
             .selected_text(fonts.shown.as_str())
             .width(width)
             .show_ui(ui, |ui| {
@@ -358,7 +358,7 @@ pub(crate) fn panel(
                 // The column is `half` wide in every language: a longer "Auto" is cut short (the
                 // menu and the tooltip have it whole).
                 ui.set_max_width(half);
-                let spacing_resp = craft_ui::ComboBox::from_id_salt("format-line-spacing")
+                let spacing_resp = nodalia_ui::ComboBox::from_id_salt("format-line-spacing")
                     .selected_text(centred(ui, &shown))
                     .width(half)
                     .wrap_mode(egui::TextWrapMode::Truncate)
@@ -378,7 +378,7 @@ pub(crate) fn panel(
                 let label = labelled_icon(ui, t, "pilcrow", tl!("Paragraph spacing"));
                 let tip = format!("{} — {}", tl!("Paragraph spacing"), tl!("Planned"));
                 let _ = outlined(ui, |ui| {
-                    craft_ui::ComboBox::from_id_salt("format-paragraph-spacing")
+                    nodalia_ui::ComboBox::from_id_salt("format-paragraph-spacing")
                         .selected_text(centred(ui, "0"))
                         .width(half)
                         .show_ui(ui, |_| {})

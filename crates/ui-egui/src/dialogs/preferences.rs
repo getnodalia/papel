@@ -571,7 +571,7 @@ fn card_general(ui: &mut egui::Ui, app: &mut PapelApp, t: &Tokens, ctx: &mut Pre
             (selected, picker)
         };
         let before = app.language.clone();
-        craft_ui::ComboBox::from_id_salt("interface-language")
+        nodalia_ui::ComboBox::from_id_salt("interface-language")
             .selected_text(selected)
             .width(160.0)
             .show_ui(ui, |ui| {
@@ -597,7 +597,7 @@ fn card_general(ui: &mut egui::Ui, app: &mut PapelApp, t: &Tokens, ctx: &mut Pre
         let auto_percent = ui_scale::percent(ui_scale::drawn(None, app.system_text_scale, native));
         let auto = crate::i18n::fmt(tl!("Auto ({percent}%)"), &[("percent", &auto_percent.to_string())]);
         let selected = app.ui_scale.map_or_else(|| auto.clone(), |f| format!("{}%", ui_scale::percent(f)));
-        craft_ui::ComboBox::from_id_salt("interface-size")
+        nodalia_ui::ComboBox::from_id_salt("interface-size")
             .selected_text(selected)
             .width(130.0)
             .show_ui(ui, |ui| {
@@ -842,7 +842,7 @@ fn date_format(ui: &mut egui::Ui, app: &mut PapelApp, t: &Tokens, ctx: &mut Pref
         let label = ctx.label_primary(ui, tl!("Fill & Sign dates"), t);
         let current = app.session.date_format().to_string();
         let selected = if DATE_FORMATS.contains(&current.as_str()) { sample(app, &current) } else { tl!("Custom").to_string() };
-        craft_ui::ComboBox::from_id_salt("date-format")
+        nodalia_ui::ComboBox::from_id_salt("date-format")
             .selected_text(selected)
             .width(240.0)
             .show_ui(ui, |ui| {
@@ -899,7 +899,7 @@ fn date_format(ui: &mut egui::Ui, app: &mut PapelApp, t: &Tokens, ctx: &mut Pref
             let names = DATE_LANGUAGES.iter().map(|l| (l, date_language_picker_name(l, drawable))).collect::<Vec<_>>();
             (follow, selected, current, names)
         };
-        craft_ui::ComboBox::from_id_salt("date-language")
+        nodalia_ui::ComboBox::from_id_salt("date-language")
             .selected_text(selected)
             .width(240.0)
             .show_ui(ui, |ui| {

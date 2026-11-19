@@ -139,7 +139,7 @@ pub enum RemoteDocumentPathError {
     TooLong,
     Hidden,
     /// A URL, a network or device path, or a path that climbs above its root.
-    NotLocal(craft_docpath::Refused),
+    NotLocal(nodalia_docpath::Refused),
     MissingSourcePath,
     /// The target doesn't end in `.pdf`.
     NotPdf,
@@ -177,7 +177,7 @@ pub fn remote_document_path_is_absolute(raw: &str) -> bool {
 /// Resolve a PDF remote-Go-To file specification to a local path without opening it.
 /// Relative paths are based on the source document, which should be an absolute path; an
 /// in-memory source has no fallback to CWD. URLs (including `file:`), network and device paths are
-/// refused ([`craft_docpath::resolve_absolute`]).
+/// refused ([`nodalia_docpath::resolve_absolute`]).
 pub fn resolve_remote_document_path(source: Option<&Path>, raw: &str) -> Result<PathBuf, RemoteDocumentPathError> {
     if raw.is_empty() || raw.trim().is_empty() {
         return Err(RemoteDocumentPathError::Empty);
@@ -195,13 +195,13 @@ pub fn resolve_remote_document_path(source: Option<&Path>, raw: &str) -> Result<
             && scheme.chars().next().is_some_and(|c| c.is_ascii_alphabetic())
             && scheme.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '+' | '-' | '.'));
         if is_scheme {
-            return Err(RemoteDocumentPathError::NotLocal(craft_docpath::Refused::Url));
+            return Err(RemoteDocumentPathError::NotLocal(nodalia_docpath::Refused::Url));
         }
     }
-    craft_docpath::resolve_absolute(raw, source).map_err(|r| match r {
+    nodalia_docpath::resolve_absolute(raw, source).map_err(|r| match r {
         // A path that resolves but not to an absolute one needed a source with an absolute path. With
         // such a source, it is a path this platform cannot open (`C:\x.pdf` on Unix).
-        craft_docpath::Refused::Invalid if !source.is_some_and(Path::is_absolute) && craft_docpath::resolve(raw, source).is_ok() => {
+        nodalia_docpath::Refused::Invalid if !source.is_some_and(Path::is_absolute) && nodalia_docpath::resolve(raw, source).is_ok() => {
             RemoteDocumentPathError::MissingSourcePath
         }
         r => RemoteDocumentPathError::NotLocal(r),
