@@ -1,4 +1,4 @@
-//! Modal dialogs: Document Properties, Keyboard Shortcuts, About (with the Contributors and Models credits).
+//! Modal dialogs: Document Properties, Keyboard Shortcuts, About.
 
 use egui::{Align, Layout};
 
@@ -11,7 +11,6 @@ pub(super) mod appearance;
 pub mod bookmark_styles_ui;
 pub(super) mod comment_props;
 pub(super) mod convert_colours_ui;
-pub(super) mod credits;
 pub(super) mod hairlines_ui;
 pub(super) mod marks_ui;
 pub(super) mod pageboxes;
@@ -164,7 +163,7 @@ fn dialogs(app: &mut PapelApp, ctx: &egui::Context) {
             Dialog::Print => 820.0,
             Dialog::FieldProps | Dialog::BulkFieldProps => 600.0,
             Dialog::Preferences => 610.0,
-            Dialog::About => 820.0,
+            Dialog::About => nodalia_theme::about::measures::WIDTH,
             Dialog::PinTool => 540.0,
             _ => 520.0,
         });
@@ -1653,52 +1652,44 @@ fn dialog_shortcuts(ui: &mut egui::Ui) -> bool {
     true
 }
 
-/// `Dialog::About` content. Returns `false` when it has its own buttons and no footer is wanted.
+/// `Dialog::About` content, as every Nodalia app draws it (`nodalia_theme::about`): the heading
+/// with its round close button, then the page with the icon, the name and version, one line on what
+/// it is, "Part of Nodalia", the links and the licence. Upstream authors are credited in NOTICE.
+/// It has its own close button, so no footer is wanted.
 fn dialog_about(ui: &mut egui::Ui, req: &mut Pending) -> bool {
+    use nodalia_theme::about as ndl;
     let t = Tokens::get(ui.ctx());
-    // Tabs About · Contributors · Models.
-    let tab_id = egui::Id::unique("about_tab");
-    let mut tab = ui.data_mut(|d| d.get_temp::<u8>(tab_id)).unwrap_or(0);
-    ui.horizontal_wrapped(|ui| {
-        for (i, label) in ["About", "Contributors", "Models"].into_iter().enumerate() {
-            let i = i as u8;
-            if widgets::mode_tab(ui, tl!(label), tab == i).clicked() {
-                tab = i;
-            }
-        }
-    });
-    ui.data_mut(|d| d.insert_temp(tab_id, tab));
-    ui.separator();
-    match tab {
-        1 => crate::credits::contributors_ui(ui),
-        2 => crate::credits::models_ui(ui),
-        _ => {
-            // Laid out as in every Nodalia office app: the icon, the name and version, "Part of
-            // Nodalia", the links and the licence. Upstream authors are credited in NOTICE.
-            ui.vertical_centered(|ui| {
-                ui.add_space(6.0);
-                widgets::app_icon(ui, 96.0);
-                ui.add_space(8.0);
-                ui.label(egui::RichText::new("Papel").font(theme::semibold(22.0)));
-                ui.label(
-                    egui::RichText::new(crate::i18n::fmt(tl!("Version {v}"), &[("v", &papel_engine::build_info::version())])).color(t.text_muted),
-                );
-                ui.label(egui::RichText::new(tl!("Part of Nodalia")).color(t.text_muted));
-                ui.add_space(10.0);
-                ui.label(tl!("Read, sign, edit and organize PDFs, in pure Rust."));
-                ui.add_space(10.0);
-                for l in papel_engine::links::LINKS {
-                    if ui.link(tl!(l.label)).on_hover_text(l.url).clicked() {
-                        req.link_command = Some(l.command);
-                    }
-                }
-                ui.add_space(10.0);
-                ui.label(egui::RichText::new(tl!("Licence: MIT OR Apache-2.0")).color(t.text_muted));
-                ui.label(egui::RichText::new(tl!("Includes work by other open-source authors (see NOTICE).")).small().color(t.text_faint));
-            });
-        }
+    let look =
+        nodalia_theme::creator::Look::new(theme::palette(t.kind)).strong_family(theme::semibold(1.0).family).medium_family(theme::medium(1.0).family);
+    let heading = ndl::heading(ui, &look, tl!("About Papel"), egui::Id::NULL.with("papel.about.close"));
+    if heading.closed {
+        req.close = true;
     }
-    true
+    let version = crate::i18n::fmt(tl!("Version {v}"), &[("v", &papel_engine::build_info::version())]);
+    let links: Vec<ndl::Link> = papel_engine::links::LINKS.iter().map(|l| ndl::Link { label: tl!(l.label), url: l.url }).collect();
+    let info = ndl::Info {
+        name: "Papel",
+        version: &version,
+        tagline: tl!("Read, sign, edit and organize PDFs, in pure Rust."),
+        suite: tl!("Part of Nodalia"),
+        links: &links,
+        footer: tl!("Licence: MIT OR Apache-2.0"),
+    };
+    let page = ndl::page(ui, &look, &info, |ui, rect| {
+        ui.scope_builder(egui::UiBuilder::new().max_rect(rect), |ui| {
+            widgets::app_icon(ui, rect.width());
+        });
+    });
+    if let Some(i) = page.picked
+        && let Some(link) = papel_engine::links::LINKS.get(i)
+    {
+        req.link_command = Some(link.command);
+    }
+    ui.add_space(4.0);
+    ui.vertical_centered(|ui| {
+        ui.label(egui::RichText::new(tl!("Includes work by other open-source authors (see NOTICE).")).small().color(t.text_faint));
+    });
+    false
 }
 
 fn dialog_pin_tool(ui: &mut egui::Ui, app: &mut PapelApp, req: &mut Pending) -> bool {
