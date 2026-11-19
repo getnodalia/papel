@@ -92,7 +92,7 @@ fn long_recent_names_and_paths_are_cut_before_the_page_count() {
 #[test]
 fn home_removes_one_recent_file_or_clears_them_all() {
     // Tall enough that the Recent list is on screen without scrolling.
-    let mut h = Harness::builder().with_size(egui::vec2(1400.0, 1600.0)).build_eframe(|_cc| {
+    let mut h = Harness::builder().with_size(egui::vec2(1400.0, 3000.0)).build_eframe(|_cc| {
         let mut app = PapelApp::new();
         app.set_option("language", "en").unwrap();
         for name in ["first.pdf", "second.pdf", "third.pdf"] {

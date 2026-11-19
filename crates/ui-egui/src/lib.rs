@@ -510,6 +510,8 @@ pub struct PapelApp {
     pub pinned_tools: Vec<String>,
     /// Search query for the Pin a tool selection dialog.
     pub pin_tool_search: String,
+    /// Home's template previews, rendered once each: `id|language|paper`.
+    pub template_previews: std::collections::HashMap<String, egui::TextureHandle>,
     pub toast: Option<(String, f64)>,
     /// The form script message the toast shows now, if it shows one: drawn with its title and
     /// icon (#4293).

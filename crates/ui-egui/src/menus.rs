@@ -108,6 +108,7 @@ const SEP: &str = "---";
 
 const FILE: &[&str] = &[
     "create.blank",
+    "create.template",
     "file.open",
     "file.open_recent",
     "file.pin_folder",

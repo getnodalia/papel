@@ -58,6 +58,7 @@ pub mod signature_scan;
 mod sources;
 pub mod spooler;
 mod stamp_preview;
+pub mod templates;
 #[cfg(test)]
 mod test_hooks;
 pub mod text_fonts;

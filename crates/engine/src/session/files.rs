@@ -15,6 +15,12 @@ impl Session {
         self.write_new(&papel_create::blank(width, height, pages)?)
     }
 
+    /// A new document from a built-in template (Create ▸ Templates): one fillable page in `lang`
+    /// on a page of `page` (width, height) points. See [`crate::templates`].
+    pub fn create_from_template(&self, id: &str, lang: crate::templates::Lang, page: (f64, f64)) -> Result<Arc<Vec<u8>>, EditError> {
+        self.write_new(&crate::templates::build(id, lang, page)?)
+    }
+
     /// A new document with one page per image (PNG, JPEG).
     pub fn create_from_images(&self, images: &[(String, Vec<u8>)]) -> Result<Arc<Vec<u8>>, EditError> {
         self.write_new(&papel_create::from_images(images)?)
