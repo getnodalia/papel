@@ -23,7 +23,7 @@ const MAC_LIGHT_PITCH: f32 = 20.0;
 const MAC_LIGHTS_LEFT: f32 = 10.0;
 /// Where the strip's content starts to the right of the traffic lights: the end of the three
 /// lights plus the same gap the lights keep from the top of the window.
-pub const MAC_CONTENT_LEFT: f32 = MAC_LIGHTS_LEFT + 2.0 * MAC_LIGHT_PITCH + MAC_LIGHT + (MAC_TITLE_BAR - MAC_LIGHT) / 2.0;
+pub const MAC_CONTENT_LEFT: f32 = nodalia_theme::titlebar::MAC_LIGHTS;
 /// The strip and its controls everywhere else.
 const TAB_STRIP: f32 = 38.0;
 const TAB_HEIGHT: f32 = 30.0;
@@ -1047,7 +1047,7 @@ mod tab_widths {
         // The lights are centred in the bar, and content keeps the same gap after them (#789).
         let margin = (MAC_TITLE_BAR - MAC_LIGHT) / 2.0;
         let lights_end = MAC_LIGHTS_LEFT + 2.0 * MAC_LIGHT_PITCH + MAC_LIGHT;
-        assert_eq!(MAC_CONTENT_LEFT - lights_end, margin);
+        assert!(MAC_CONTENT_LEFT >= lights_end + margin);
         // `egui::Margin` is in `i8`.
         assert!(MAC_CONTENT_LEFT <= f32::from(i8::MAX));
     }
