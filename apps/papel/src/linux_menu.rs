@@ -13,7 +13,7 @@ use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, PoisonError};
 
-use craft_menu::{Backend, CommandRef, Dispatch, Event, MenuBar, Node};
+use nodalia_menu::{Backend, CommandRef, Dispatch, Event, MenuBar, Node};
 use zbus::blocking::Connection;
 use zbus::zvariant::{OwnedValue, StructureBuilder, Value};
 
@@ -334,13 +334,13 @@ pub fn install(ctx: &egui::Context, app: &mut papel_ui_egui::PapelApp, wayland: 
     if let Err(e) = spawned {
         log::warn!("global menu: couldn't watch the registrar ({e})");
     }
-    app.install_global_menu(craft_menu::NativeMenu::new(Box::new(LinuxMenu { conn, shared })), shown);
+    app.install_global_menu(nodalia_menu::NativeMenu::new(Box::new(LinuxMenu { conn, shared })), shown);
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use craft_menu::{Item, ItemKind, Menu, MenuRole, Platforms};
+    use nodalia_menu::{Item, ItemKind, Menu, MenuRole, Platforms};
 
     fn item(label: &str, id: &str, enabled: bool) -> Node {
         Node::Item(Item {

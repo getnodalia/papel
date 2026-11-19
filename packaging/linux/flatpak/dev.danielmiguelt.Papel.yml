@@ -53,7 +53,7 @@ finish-args:
 build-options:
   append-path: /usr/lib/sdk/rust-stable/bin
 modules:
-  # CUPS client tools for craft-print: the runtime has libcups but not lpstat/lp/lpoptions.
+  # CUPS client tools for nodalia-print: the runtime has libcups but not lpstat/lp/lpoptions.
   # Linked statically against this release's libcups, so a runtime update can't break them;
   # the socket path matches the host's, which --socket=cups mounts.
   - name: cups-client
@@ -103,9 +103,9 @@ modules:
       env:
         CARGO_HOME: /run/build/papel/cargo
         CARGO_NET_OFFLINE: 'true'
-        # The interface translations (the craft-i18n source below), embedded by build.rs.
-        CRAFT_I18N_DIR: /run/build/papel/craft-i18n
-        CRAFT_I18N_REQUIRED: '1'
+        # The interface translations (the nodalia-i18n source below), embedded by build.rs.
+        NODALIA_I18N_DIR: /run/build/papel/nodalia-i18n
+        NODALIA_I18N_REQUIRED: '1'
     build-commands:
       - cargo --offline build --release --locked -p papel
       - install -Dm755 target/release/papel /app/bin/papel
@@ -129,9 +129,9 @@ modules:
           - corpus
           - build-flatpak
           - .flatpak-builder
-      # The interface translations at the commit in craft-i18n.rev (a test keeps the two equal).
+      # The interface translations at the commit in nodalia-i18n.rev (a test keeps the two equal).
       - type: git
         url: https://github.com/getnodalia/foundation
-        commit: a3a500bd683b98c458018f0bea392c994ea52c7a
-        dest: craft-i18n
+        commit: 4df0177d9ad0772ecd34649956c6e81f467f240c
+        dest: nodalia-i18n
       - cargo-sources.json

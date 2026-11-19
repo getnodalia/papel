@@ -3,7 +3,7 @@
 //!
 //! A subset program numbers its glyphs anew: ReportLab's Arial subsets draw a space with glyph 11
 //! (Arial Bold: glyph 8), where the installed Arial's space is glyph 3. Windows' print path
-//! (Windows.Data.Pdf drawing into Direct2D's print control, through craft-print) keeps the
+//! (Windows.Data.Pdf drawing into Direct2D's print control, through nodalia-print) keeps the
 //! subset's glyph numbers but draws them with the installed font of the same name, so every letter
 //! prints as the installed glyph with that number: `Revisión de clientes,` in the bold subset comes
 //! out as `Wj{nxn s%ij%hqnjsyjx1`, its `z` as `Ä`. Both Brother queues and the Adobe PDF printer

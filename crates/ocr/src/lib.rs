@@ -9,7 +9,7 @@
 //! page content: invisible text (rendering mode 3) over each word, so the page becomes a
 //! searchable image (Acrobat's "Searchable Image (Exact)": the image is left untouched).
 //!
-//! Visible editable output uses [`papel_fonts::TextPlan`] and optional craft-fonts glyph
+//! Visible editable output uses [`papel_fonts::TextPlan`] and optional nodalia-fonts glyph
 //! outlines; unsupported visible characters become `?` and are counted. The engine's invisible
 //! searchable layer uses empty Type3 programs and ToUnicode maps, preserving Unicode without
 //! display fonts. WinAnsi-only invisible text keeps the standard Helvetica layout here.
@@ -698,8 +698,8 @@ mod tests {
     /// planned word must not inherit its font.
     #[test]
     fn helvetica_is_restored_after_a_planned_word() {
-        if papel_fonts::CRAFT_FONTS.is_empty() {
-            eprintln!("skipping: built without craft-fonts (set CRAFT_FONTS_DIR to run it)");
+        if papel_fonts::NODALIA_FONTS.is_empty() {
+            eprintln!("skipping: built without nodalia-fonts (set NODALIA_FONTS_DIR to run it)");
             return;
         }
         let word = |text: &str| PlacedWord {
@@ -732,8 +732,8 @@ mod tests {
     /// same exact box fit as the Helvetica words (the matrix x-axis spans across / advance).
     #[test]
     fn planned_words_draw_in_their_font_with_the_same_exact_fit() {
-        if papel_fonts::CRAFT_FONTS.is_empty() {
-            eprintln!("skipping: built without craft-fonts (set CRAFT_FONTS_DIR to run it)");
+        if papel_fonts::NODALIA_FONTS.is_empty() {
+            eprintln!("skipping: built without nodalia-fonts (set NODALIA_FONTS_DIR to run it)");
             return;
         }
         let w =
@@ -758,7 +758,7 @@ mod tests {
         assert!(v.contains(&format!("{} Tz", num(60.0 / (total * size) * 100.0))), "{v}");
     }
 
-    /// Without planned characters (an empty plan: built without craft-fonts, or before the
+    /// Without planned characters (an empty plan: built without nodalia-fonts, or before the
     /// fonts are registered) the WinAnsi path stands, '?' included.
     #[test]
     fn unplanned_words_fall_back_to_win_ansi_question_marks() {
@@ -773,8 +773,8 @@ mod tests {
     /// by the plan.
     #[test]
     fn substitutions_are_written_as_the_font_s_question_mark() {
-        if papel_fonts::CRAFT_FONTS.is_empty() {
-            eprintln!("skipping: built without craft-fonts (set CRAFT_FONTS_DIR to run it)");
+        if papel_fonts::NODALIA_FONTS.is_empty() {
+            eprintln!("skipping: built without nodalia-fonts (set NODALIA_FONTS_DIR to run it)");
             return;
         }
         let w = PlacedWord {

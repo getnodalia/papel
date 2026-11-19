@@ -1454,7 +1454,7 @@ fn toolbar(app: &mut PapelApp, ui: &mut egui::Ui, n: &mut Intents) {
 
     // Row 1: the settings (each written back into the persisted draft).
     ui.horizontal_wrapped(|ui| {
-        craft_ui::ComboBox::from_id_salt("ocr-verify-language").width(150.0).selected_text(language_name(&d.language)).show_ui(ui, |ui| {
+        nodalia_ui::ComboBox::from_id_salt("ocr-verify-language").width(150.0).selected_text(language_name(&d.language)).show_ui(ui, |ui| {
             for (code, name) in papel_engine::ocr::LANGUAGES {
                 ui.selectable_value(&mut d.language, (*code).to_string(), *name);
             }
@@ -1560,7 +1560,7 @@ fn strategy_label(strategy: MergeStrategy) -> &'static str {
 /// engine) moves the strategy to Automatic's own default, Confidence weighted.
 fn engine_combo(ui: &mut egui::Ui, engine: &mut EngineChoice, strategy: &mut MergeStrategy) {
     ocr_ui::keep_asking_while_probing(ui.ctx());
-    craft_ui::ComboBox::from_id_salt("ocr-verify-engine").width(120.0).selected_text(engine_label(*engine)).show_ui(ui, |ui| {
+    nodalia_ui::ComboBox::from_id_salt("ocr-verify-engine").width(120.0).selected_text(engine_label(*engine)).show_ui(ui, |ui| {
         for (choice, label) in [(EngineChoice::Auto, tl!("Automatic")), (EngineChoice::Ocrs, "ocrs"), (EngineChoice::Tesseract, "Tesseract")] {
             let why = papel_engine::ocr::engine_unavailable_reason(choice);
             let resp = ui.add_enabled(why.is_none(), egui::Button::selectable(*engine == choice, label));
@@ -1591,7 +1591,7 @@ fn engine_combo(ui: &mut egui::Ui, engine: &mut EngineChoice, strategy: &mut Mer
 /// ensemble strategies still run — they just degrade to the primary reading (the tooltip says
 /// so), because only one engine was asked to read.
 fn strategy_combo(ui: &mut egui::Ui, strategy: &mut MergeStrategy) {
-    craft_ui::ComboBox::from_id_salt("ocr-verify-strategy").width(150.0).selected_text(strategy_label(*strategy)).show_ui(ui, |ui| {
+    nodalia_ui::ComboBox::from_id_salt("ocr-verify-strategy").width(150.0).selected_text(strategy_label(*strategy)).show_ui(ui, |ui| {
         for (s, label, hint) in [
             (MergeStrategy::PrimaryOnly, tl!("Primary only"), tl!("Use the chosen engine's reading alone")),
             (MergeStrategy::ConfidenceWeighted, tl!("Confidence weighted"), tl!("Add a second engine's reading when the first is unsure")),
@@ -1612,7 +1612,7 @@ fn output_combo(ui: &mut egui::Ui, mode: &mut OutputMode) {
         OutputMode::Searchable => tl!("Searchable Image (Exact)"),
         OutputMode::EditableText => tl!("Editable text"),
     };
-    craft_ui::ComboBox::from_id_salt("ocr-verify-output").width(180.0).selected_text(name).show_ui(ui, |ui| {
+    nodalia_ui::ComboBox::from_id_salt("ocr-verify-output").width(180.0).selected_text(name).show_ui(ui, |ui| {
         let s = ui
             .selectable_label(*mode == OutputMode::Searchable, tl!("Searchable Image (Exact)"))
             .on_hover_text(tl!("Adds invisible text over each word; the page image is not changed"));

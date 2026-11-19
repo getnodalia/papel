@@ -66,7 +66,7 @@ fn remote_document_paths_are_local_and_source_relative() {
     assert_eq!(resolve(None, "target.pdf"), Err(E::MissingSourcePath));
     assert_eq!(resolve(Some(Path::new("source.pdf")), "target.pdf"), Err(E::MissingSourcePath), "a relative source is not used");
     #[cfg(unix)]
-    assert_eq!(resolve(Some(source), "C:\\x.pdf"), Err(E::NotLocal(craft_docpath::Refused::Invalid)), "a Windows path on Unix needs no source");
+    assert_eq!(resolve(Some(source), "C:\\x.pdf"), Err(E::NotLocal(nodalia_docpath::Refused::Invalid)), "a Windows path on Unix needs no source");
     assert_eq!(resolve(Some(source), ""), Err(E::Empty));
     assert_eq!(resolve(Some(source), "   "), Err(E::Empty));
     for url in
@@ -76,7 +76,7 @@ fn remote_document_paths_are_local_and_source_relative() {
     }
     assert_eq!(resolve(Some(source), "folder/hidden\u{200B}.pdf"), Err(E::Hidden));
     #[cfg(windows)]
-    assert_eq!(resolve(Some(source), "folder/a:b.pdf"), Err(E::NotLocal(craft_docpath::Refused::Invalid)));
+    assert_eq!(resolve(Some(source), "folder/a:b.pdf"), Err(E::NotLocal(nodalia_docpath::Refused::Invalid)));
     assert_eq!(resolve(Some(source), &"a".repeat(super::MAX_REMOTE_DOCUMENT_PATH_BYTES + 1)), Err(E::TooLong));
 }
 

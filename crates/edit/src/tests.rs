@@ -1559,9 +1559,9 @@ fn added_arabic_text_is_shaped_in_display_order_and_stays_searchable() {
     let text =
         AddedText { rect: [72.0, 600.0, 400.0, 700.0], text: "مرحبا World".into(), size: 14.0, align: Align::Right, ..AddedText::default() };
     if papel_fonts::document_arabic_font().is_none() {
-        eprintln!("skipping the Arabic drawing checks: built without a craft-fonts Arab face (set CRAFT_FONTS_DIR)");
+        eprintln!("skipping the Arabic drawing checks: built without a nodalia-fonts Arab face (set NODALIA_FONTS_DIR)");
         let err = add_content(&mut doc, 0, &Content::Text(text)).unwrap_err();
-        assert!(matches!(&err, EditError::Invalid(m) if m.contains("CRAFT_FONTS_DIR")), "{err:?}");
+        assert!(matches!(&err, EditError::Invalid(m) if m.contains("NODALIA_FONTS_DIR")), "{err:?}");
         assert!(!doc.is_modified(), "nothing is written when the font is missing");
         return;
     }
@@ -1610,7 +1610,7 @@ fn added_hebrew_text_is_drawn_right_to_left_and_stays_searchable() {
         ..AddedText::default()
     };
     if papel_fonts::document_hebrew_font(false).is_none() {
-        eprintln!("skipping the Hebrew drawing checks: built without a craft-fonts Hebr face (set CRAFT_FONTS_DIR)");
+        eprintln!("skipping the Hebrew drawing checks: built without a nodalia-fonts Hebr face (set NODALIA_FONTS_DIR)");
         assert_eq!(first_undrawable(&text), Some('ש'));
         let err = add_content(&mut doc, 0, &Content::Text(text)).unwrap_err();
         assert!(matches!(&err, EditError::Invalid(m) if m.contains("U+05E9")), "{err:?}");
@@ -1974,18 +1974,18 @@ fn descriptor_text_page() -> Document {
     Document::open(Arc::new(out)).unwrap()
 }
 
-/// The Japanese fallback face comes from craft-fonts, an optional build input.
-fn without_craft_fonts(test: &str) -> bool {
+/// The Japanese fallback face comes from nodalia-fonts, an optional build input.
+fn without_nodalia_fonts(test: &str) -> bool {
     if papel_fonts::document_japanese_font().is_some() {
         return false;
     }
-    eprintln!("skipping {test}: built without craft-fonts (set CRAFT_FONTS_DIR to run it)");
+    eprintln!("skipping {test}: built without nodalia-fonts (set NODALIA_FONTS_DIR to run it)");
     true
 }
 
 #[test]
 fn japanese_line_uses_unicode_type3_fallback() {
-    if without_craft_fonts("japanese_line_uses_unicode_type3_fallback") {
+    if without_nodalia_fonts("japanese_line_uses_unicode_type3_fallback") {
         return;
     }
     let mut doc = text_page("BT /F2 12 Tf 72 700 Td (ab) Tj ET");
@@ -2027,7 +2027,7 @@ fn fallback_paths(doc: &Document) -> Vec<Vec<u8>> {
 
 #[test]
 fn japanese_line_fallback_uses_real_source_family_and_weight() {
-    if without_craft_fonts("japanese_line_fallback_uses_real_source_family_and_weight") {
+    if without_nodalia_fonts("japanese_line_fallback_uses_real_source_family_and_weight") {
         return;
     }
     let mut sans = styled_text_page("Helvetica");
@@ -2038,7 +2038,7 @@ fn japanese_line_fallback_uses_real_source_family_and_weight() {
     text::replace_line(&mut bold, 0, 0, replacement).unwrap();
     text::replace_line(&mut serif, 0, 0, replacement).unwrap();
     assert_ne!(fallback_paths(&sans), fallback_paths(&serif), "sans source must not use Mincho outlines");
-    if papel_fonts::CRAFT_FONTS.iter().any(|f| f.family == "BIZ UDPGothic" && f.style == "Bold") {
+    if papel_fonts::NODALIA_FONTS.iter().any(|f| f.family == "BIZ UDPGothic" && f.style == "Bold") {
         assert_ne!(fallback_paths(&sans), fallback_paths(&bold), "bold must change the actual glyph paths");
     }
     for doc in [&sans, &bold, &serif] {
@@ -2048,7 +2048,7 @@ fn japanese_line_fallback_uses_real_source_family_and_weight() {
 
 #[test]
 fn japanese_paragraph_fallback_honors_requested_family_and_weight() {
-    if without_craft_fonts("japanese_paragraph_fallback_honors_requested_family_and_weight") {
+    if without_nodalia_fonts("japanese_paragraph_fallback_honors_requested_family_and_weight") {
         return;
     }
     let replacement = "見本商会　御中";
@@ -2073,7 +2073,7 @@ fn japanese_paragraph_fallback_honors_requested_family_and_weight() {
     )
     .unwrap();
     assert_ne!(fallback_paths(&regular), fallback_paths(&serif), "requested serif must change actual outlines");
-    if papel_fonts::CRAFT_FONTS.iter().any(|f| f.family == "BIZ UDPGothic" && f.style == "Bold") {
+    if papel_fonts::NODALIA_FONTS.iter().any(|f| f.family == "BIZ UDPGothic" && f.style == "Bold") {
         assert_ne!(fallback_paths(&regular), fallback_paths(&bold), "requested bold must change actual outlines");
         let mut source_bold = styled_text_page("Helvetica-Bold");
         text::replace_block(&mut source_bold, 0, 0, replacement).unwrap();
@@ -2086,7 +2086,7 @@ fn japanese_paragraph_fallback_honors_requested_family_and_weight() {
 
 #[test]
 fn japanese_fallback_reports_the_face_after_save_and_reopen() {
-    if without_craft_fonts("japanese_fallback_reports_the_face_after_save_and_reopen") {
+    if without_nodalia_fonts("japanese_fallback_reports_the_face_after_save_and_reopen") {
         return;
     }
     // F2 is (a subset of) Arial: a regular sans face, so the fallback is the regular Gothic.
@@ -2112,7 +2112,7 @@ fn japanese_fallback_reports_the_face_after_save_and_reopen() {
 #[test]
 #[ignore = "manual mixed-script rewrite timing probe; run with --ignored --nocapture"]
 fn mixed_script_paragraph_rewrite_timing_probe() {
-    assert!(papel_fonts::document_japanese_font().is_some(), "the timing probe requires the release-pinned craft-fonts input");
+    assert!(papel_fonts::document_japanese_font().is_some(), "the timing probe requires the release-pinned nodalia-fonts input");
     for (repeats, width) in [(32, 480.0), (512, 480.0), (2048, 480.0), (512, 14_400.0)] {
         let draft = "The quick brown fox шалом ".repeat(repeats);
         let mut samples = Vec::new();
@@ -2139,7 +2139,7 @@ fn mixed_script_paragraph_rewrite_timing_probe() {
 
 #[test]
 fn mixed_script_source_measurements_are_bounded_by_distinct_characters() {
-    if without_craft_fonts("mixed_script_source_measurements_are_bounded_by_distinct_characters") {
+    if without_nodalia_fonts("mixed_script_source_measurements_are_bounded_by_distinct_characters") {
         return;
     }
     for resource in ["F1", "F2"] {
@@ -2160,7 +2160,7 @@ fn mixed_script_source_measurements_are_bounded_by_distinct_characters() {
 
 #[test]
 fn mixed_script_cached_widths_follow_each_rewrite_state() {
-    if without_craft_fonts("mixed_script_cached_widths_follow_each_rewrite_state") {
+    if without_nodalia_fonts("mixed_script_cached_widths_follow_each_rewrite_state") {
         return;
     }
     let draft = "ab шалом ab шалом ab шалом ab";
@@ -2216,7 +2216,7 @@ fn mixed_script_cached_widths_follow_each_rewrite_state() {
 
 #[test]
 fn mixed_script_paragraph_keeps_the_source_font_without_an_explicit_line_break() {
-    if without_craft_fonts("mixed_script_paragraph_keeps_the_source_font_without_an_explicit_line_break") {
+    if without_nodalia_fonts("mixed_script_paragraph_keeps_the_source_font_without_an_explicit_line_break") {
         return;
     }
     let original = "The quick brown fox jumps over the lazy dog";
@@ -2242,7 +2242,7 @@ fn mixed_script_paragraph_keeps_the_source_font_without_an_explicit_line_break()
 
 #[test]
 fn mixed_script_subset_spaces_remain_extractable_after_saving() {
-    if without_craft_fonts("mixed_script_subset_spaces_remain_extractable_after_saving") {
+    if without_nodalia_fonts("mixed_script_subset_spaces_remain_extractable_after_saving") {
         return;
     }
     for (resource, draft) in [("F2", "ab шалом ab"), ("F2", "шалом ab"), ("F2", "ab шалом"), ("F1", "ab шалом ab")] {
@@ -2281,7 +2281,7 @@ fn mixed_script_row_alignment_is_refused_without_changes() {
 
 #[test]
 fn mixed_script_runs_use_source_and_fallback_advances_for_alignment() {
-    if without_craft_fonts("mixed_script_runs_use_source_and_fallback_advances_for_alignment") {
+    if without_nodalia_fonts("mixed_script_runs_use_source_and_fallback_advances_for_alignment") {
         return;
     }
     for (resource, prefix, suffix) in [("F1", "abc", "def"), ("F2", "ab", "ab"), ("F1", "abc ", "def")] {
@@ -2324,7 +2324,7 @@ fn mixed_script_runs_use_source_and_fallback_advances_for_alignment() {
 #[test]
 fn mixed_script_paragraph_batches_only_missing_glyphs_and_refuses_atomically() {
     let mut doc = text_page("BT /F1 12 Tf 72 700 Td (Latin text) Tj ET");
-    // Cyrillic also uses bundled Inter in builds without craft-fonts.
+    // Cyrillic also uses bundled Inter in builds without nodalia-fonts.
     text::rewrite_block_with_limit(&mut doc, 0, 0, Some("Latin шалом text"), &Default::default(), 2).unwrap();
     assert_eq!(page_font_programs(&doc).iter().filter(|(subtype, _)| subtype == b"Type3").count(), 3);
     let before = write_full(&doc, &Default::default()).unwrap();
@@ -2334,12 +2334,12 @@ fn mixed_script_paragraph_batches_only_missing_glyphs_and_refuses_atomically() {
 
 #[test]
 fn cyrillic_in_a_serif_line_falls_back_to_a_face_that_has_it() {
-    if without_craft_fonts("cyrillic_in_a_serif_line_falls_back_to_a_face_that_has_it") {
+    if without_nodalia_fonts("cyrillic_in_a_serif_line_falls_back_to_a_face_that_has_it") {
         return;
     }
     let replacement = "Привет, world";
-    let has_all = |f: &papel_fonts::CraftFont| replacement.chars().all(|ch| papel_fonts::japanese_glyph_from(f, ch).is_ok());
-    if !papel_fonts::CRAFT_FONTS.iter().any(|f| f.covers("Jpan") && has_all(f)) {
+    let has_all = |f: &papel_fonts::NodaliaFont| replacement.chars().all(|ch| papel_fonts::japanese_glyph_from(f, ch).is_ok());
+    if !papel_fonts::NODALIA_FONTS.iter().any(|f| f.covers("Jpan") && has_all(f)) {
         eprintln!("skipping: no Japanese fallback face has Cyrillic");
         return;
     }
@@ -2380,9 +2380,9 @@ fn mixed_source_subset_without_space_keeps_fallback_runs_after_reopen() {
     }
 }
 
-/// #2593: the craft-fonts faces are Japanese, and part of the Cyrillic (Uzbek қ ғ ҳ, Kazakh ә ө ү
+/// #2593: the nodalia-fonts faces are Japanese, and part of the Cyrillic (Uzbek қ ғ ҳ, Kazakh ә ө ү
 /// ұ һ) is in none of them. The bundled Inter face has it, so the replacement is written instead of
-/// being refused, and a build without craft-fonts can do it too.
+/// being refused, and a build without nodalia-fonts can do it too.
 #[test]
 fn uzbek_and_kazakh_cyrillic_use_the_bundled_latin_face() {
     for replacement in ["The quick brown fox jumps over the lazy dog қизил", "әже", "ўзбекча ғўза"] {
@@ -2417,7 +2417,7 @@ fn uzbek_and_kazakh_cyrillic_use_the_bundled_latin_face() {
 /// face it was drawn with before the bundled Latin face was added.
 #[test]
 fn cyrillic_the_japanese_faces_carry_keeps_them() {
-    if without_craft_fonts("cyrillic_the_japanese_faces_carry_keeps_them") {
+    if without_nodalia_fonts("cyrillic_the_japanese_faces_carry_keeps_them") {
         return;
     }
     let face = papel_fonts::document_japanese_font_for_style(false, false).unwrap();
@@ -2433,7 +2433,7 @@ fn cyrillic_the_japanese_faces_carry_keeps_them() {
 
 #[test]
 fn japanese_paragraph_uses_unicode_type3_fallback() {
-    if without_craft_fonts("japanese_paragraph_uses_unicode_type3_fallback") {
+    if without_nodalia_fonts("japanese_paragraph_uses_unicode_type3_fallback") {
         return;
     }
     let mut doc = text_page("BT /F2 12 Tf 72 700 Td (ab) Tj ET");
@@ -2443,8 +2443,8 @@ fn japanese_paragraph_uses_unicode_type3_fallback() {
     assert_eq!(text::text_blocks(&reopened, 0).unwrap()[0].text, replacement);
 }
 
-/// The first `n` Japanese characters, in code point order, that every craft-fonts face can draw, so
-/// whichever face an edit picks has them all. Without craft-fonts there are no faces, every character
+/// The first `n` Japanese characters, in code point order, that every nodalia-fonts face can draw, so
+/// whichever face an edit picks has them all. Without nodalia-fonts there are no faces, every character
 /// passes, and the text is still long.
 fn covered_japanese_chars(n: usize) -> String {
     let faces = papel_fonts::document_japanese_fonts_for_style(false, false);
@@ -2523,7 +2523,7 @@ fn rewriting_japanese_twice_keeps_only_the_fallback_fonts_it_shows() {
     let mut doc = text_page("BT /F1 12 Tf 72 700 Td (Hello) Tj ET");
     if text::rewrite_block(&mut doc, 0, 0, Some("日本語の文章"), &text::BlockStyle::default()).is_err() {
         assert!(papel_fonts::document_japanese_font().is_none());
-        eprintln!("built without a craft-fonts Japanese face: the Type 3 path is checked with CRAFT_FONTS_DIR");
+        eprintln!("built without a nodalia-fonts Japanese face: the Type 3 path is checked with NODALIA_FONTS_DIR");
         return;
     }
     let first: Vec<_> = fallback_fonts(&doc).into_iter().map(|(_, f)| f).collect();
@@ -2556,10 +2556,10 @@ fn fallback_fonts(doc: &Document) -> Vec<(Vec<u8>, Dict)> {
 fn japanese_replacement_over_240_unique_glyphs_is_split_across_fallback_fonts() {
     let replacement = covered_japanese_chars(300);
     let mut doc = text_page("BT /F2 12 Tf 72 700 Td (ab) Tj ET");
-    if without_craft_fonts("japanese_replacement_over_240_unique_glyphs_is_split_across_fallback_fonts") {
-        // Without craft-fonts the long text gets the clear error, not the old limit message.
+    if without_nodalia_fonts("japanese_replacement_over_240_unique_glyphs_is_split_across_fallback_fonts") {
+        // Without nodalia-fonts the long text gets the clear error, not the old limit message.
         let err = text::replace_line(&mut doc, 0, 0, &replacement).unwrap_err().to_string();
-        assert!(err.contains("CRAFT_FONTS_DIR"), "{err}");
+        assert!(err.contains("NODALIA_FONTS_DIR"), "{err}");
         return;
     }
     text::replace_line(&mut doc, 0, 0, &replacement).unwrap();
@@ -2582,7 +2582,7 @@ fn japanese_replacement_over_240_unique_glyphs_is_split_across_fallback_fonts() 
 
 #[test]
 fn styled_paragraph_batches_cyrillic_without_changing_source_fonts() {
-    if without_craft_fonts("styled_paragraph_batches_cyrillic_without_changing_source_fonts") {
+    if without_nodalia_fonts("styled_paragraph_batches_cyrillic_without_changing_source_fonts") {
         return;
     }
     let mut doc = text_page(
@@ -2605,7 +2605,7 @@ fn styled_paragraph_over_240_fallback_glyphs_splits_and_refuses_atomically() {
     let replacement = format!("{}\nLatin", covered_japanese_chars(300));
     let mut doc = text_page("BT /F1 12 Tf 14.4 TL 72 700 Td (Original) Tj T* (Latin) Tj ET");
     let original = write_incremental(&doc, &SaveOptions::default()).unwrap();
-    if without_craft_fonts("styled_paragraph_over_240_fallback_glyphs_splits_and_refuses_atomically") {
+    if without_nodalia_fonts("styled_paragraph_over_240_fallback_glyphs_splits_and_refuses_atomically") {
         assert!(text::replace_block(&mut doc, 0, 0, &replacement).is_err());
         assert_eq!(write_incremental(&doc, &SaveOptions::default()).unwrap(), original);
         return;
@@ -2628,10 +2628,10 @@ fn styled_paragraph_over_240_fallback_glyphs_splits_and_refuses_atomically() {
 
 #[test]
 fn styled_fallback_batches_keep_face_choices_and_range_styles() {
-    if without_craft_fonts("styled_fallback_batches_keep_face_choices_and_range_styles") {
+    if without_nodalia_fonts("styled_fallback_batches_keep_face_choices_and_range_styles") {
         return;
     }
-    if !papel_fonts::CRAFT_FONTS.iter().any(|f| f.family == "BIZ UDPGothic" && f.style == "Bold") {
+    if !papel_fonts::NODALIA_FONTS.iter().any(|f| f.family == "BIZ UDPGothic" && f.style == "Bold") {
         eprintln!("skipping: no bold Gothic face");
         return;
     }
@@ -2694,8 +2694,8 @@ fn styled_fallback_budget_is_enforced_before_objects_are_written() {
     let err = text::rewrite_block_with_limit(&mut doc, 0, 0, Some(&over_budget), &style, 1).unwrap_err().to_string();
     assert_eq!(write_incremental(&doc, &SaveOptions::default()).unwrap(), original, "refusal must add no objects");
     assert_eq!(write_incremental(&snapshot, &SaveOptions::default()).unwrap(), original);
-    if without_craft_fonts("styled_fallback_budget_is_enforced_before_objects_are_written") {
-        assert!(err.contains("CRAFT_FONTS_DIR"), "{err}");
+    if without_nodalia_fonts("styled_fallback_budget_is_enforced_before_objects_are_written") {
+        assert!(err.contains("NODALIA_FONTS_DIR"), "{err}");
         return;
     }
     assert!(err.contains("more than 64 fallback glyphs"), "{err}");
@@ -2710,10 +2710,10 @@ fn styled_fallback_budget_is_enforced_before_objects_are_written() {
 
 #[test]
 fn styled_fallback_same_base_font_and_character_keep_both_weights() {
-    if without_craft_fonts("styled_fallback_same_base_font_and_character_keep_both_weights") {
+    if without_nodalia_fonts("styled_fallback_same_base_font_and_character_keep_both_weights") {
         return;
     }
-    if !papel_fonts::CRAFT_FONTS.iter().any(|f| f.family == "BIZ UDPGothic" && f.style == "Bold") {
+    if !papel_fonts::NODALIA_FONTS.iter().any(|f| f.family == "BIZ UDPGothic" && f.style == "Bold") {
         eprintln!("skipping: no bold Gothic face");
         return;
     }
@@ -2764,7 +2764,7 @@ fn styled_fallback_same_base_font_and_character_keep_both_weights() {
 
 #[test]
 fn styled_fallback_shards_keep_text_advances_and_alignment() {
-    if without_craft_fonts("styled_fallback_shards_keep_text_advances_and_alignment") {
+    if without_nodalia_fonts("styled_fallback_shards_keep_text_advances_and_alignment") {
         return;
     }
     let source = "BT /F1 12 Tf 0.5 Tc 5 Tw 80 Tz 14.4 TL 72 700 Td (Original row) Tj T* (Second row) Tj ET";
@@ -2792,7 +2792,7 @@ fn styled_fallback_shards_keep_text_advances_and_alignment() {
 /// document nor a snapshot taken before the edit, which is what undo restores.
 #[test]
 fn japanese_replacement_missing_a_glyph_after_240_changes_nothing() {
-    if without_craft_fonts("japanese_replacement_missing_a_glyph_after_240_changes_nothing") {
+    if without_nodalia_fonts("japanese_replacement_missing_a_glyph_after_240_changes_nothing") {
         return;
     }
     // The first CJK character that no face draws: the 242nd unique character, in a second font.
@@ -2815,7 +2815,7 @@ fn japanese_replacement_missing_a_glyph_after_240_changes_nothing() {
 /// same box as with one font, and the font is switched only where the text moves to another font.
 #[test]
 fn japanese_fallback_split_across_fonts_keeps_order_and_positions() {
-    if without_craft_fonts("japanese_fallback_split_across_fonts_keeps_order_and_positions") {
+    if without_nodalia_fonts("japanese_fallback_split_across_fonts_keeps_order_and_positions") {
         return;
     }
     // 見 and 商 are in the first font, 御 in the second: runs [見商], [御], [見], three switches.
@@ -2844,7 +2844,7 @@ fn japanese_fallback_split_across_fonts_keeps_order_and_positions() {
 /// character, and a run of one font's characters switches nowhere.
 #[test]
 fn japanese_fallback_switches_font_only_between_runs() {
-    if without_craft_fonts("japanese_fallback_switches_font_only_between_runs") {
+    if without_nodalia_fonts("japanese_fallback_switches_font_only_between_runs") {
         return;
     }
     let alternating = "見商".repeat(500);
@@ -2864,7 +2864,7 @@ fn japanese_fallback_switches_font_only_between_runs() {
 /// wraps across lines.
 #[test]
 fn japanese_paragraph_split_across_fonts_reads_back_as_one_block() {
-    if without_craft_fonts("japanese_paragraph_split_across_fonts_reads_back_as_one_block") {
+    if without_nodalia_fonts("japanese_paragraph_split_across_fonts_reads_back_as_one_block") {
         return;
     }
     // Spaces are glyphs too, so two glyphs per font needs several fonts; the narrow box wraps the text.
@@ -2884,7 +2884,7 @@ fn japanese_paragraph_split_across_fonts_reads_back_as_one_block() {
 /// leaves the document as it was: the fallback fonts are written only once the edit is accepted.
 #[test]
 fn japanese_paragraph_refused_before_its_fallback_fonts_are_written() {
-    if without_craft_fonts("japanese_paragraph_refused_before_its_fallback_fonts_are_written") {
+    if without_nodalia_fonts("japanese_paragraph_refused_before_its_fallback_fonts_are_written") {
         return;
     }
     let plain = "BT /F2 12 Tf 72 700 Td (ab) Tj ET";
@@ -2911,7 +2911,7 @@ fn japanese_paragraph_refused_before_its_fallback_fonts_are_written() {
 /// has the wrong operand count.
 #[test]
 fn type3_fallback_glyphs_declare_a_well_formed_d1() {
-    if without_craft_fonts("type3_fallback_glyphs_declare_a_well_formed_d1") {
+    if without_nodalia_fonts("type3_fallback_glyphs_declare_a_well_formed_d1") {
         return;
     }
     // Cyrillic is respaced (shifted by its side bearing), and its box must move with it.
@@ -2942,7 +2942,7 @@ fn type3_fallback_glyphs_declare_a_well_formed_d1() {
 /// line takes a fallback face that has every letter instead of failing on the first one.
 #[test]
 fn cyrillic_replacement_in_a_serif_line_uses_a_face_with_the_letters() {
-    if without_craft_fonts("cyrillic_replacement_in_a_serif_line_uses_a_face_with_the_letters") {
+    if without_nodalia_fonts("cyrillic_replacement_in_a_serif_line_uses_a_face_with_the_letters") {
         return;
     }
     let replacement = "София 2027";
@@ -2976,7 +2976,7 @@ fn fallback_widths(doc: &Document) -> Vec<f64> {
 
 #[test]
 fn japanese_paragraph_keeps_ideographic_spaces() {
-    if without_craft_fonts("japanese_paragraph_keeps_ideographic_spaces") {
+    if without_nodalia_fonts("japanese_paragraph_keeps_ideographic_spaces") {
         return;
     }
     let mut doc = text_page("BT /F1 12 Tf 72 700 Td (Original paragraph) Tj ET");
@@ -2994,22 +2994,22 @@ fn japanese_paragraph_keeps_ideographic_spaces() {
     assert_eq!(text::text_lines(&reopen(&doc), 0).unwrap()[0].text, replacement);
 }
 
-/// Without craft-fonts there is no Japanese face: editing in Japanese is a clear error that
+/// Without nodalia-fonts there is no Japanese face: editing in Japanese is a clear error that
 /// leaves the page untouched, never a panic; Latin edits work as before.
 #[test]
-fn japanese_edit_without_craft_fonts_is_a_clear_error() {
+fn japanese_edit_without_nodalia_fonts_is_a_clear_error() {
     let mut doc = text_page("BT /F2 12 Tf 72 700 Td (ab) Tj ET");
     let before = page_content_bytes(&doc, 0);
     let line = text::replace_line(&mut doc, 0, 0, "日本語の文字");
     let block = text::replace_block(&mut doc, 0, 0, "日本語の文字");
     if papel_fonts::document_japanese_font().is_some() {
-        eprintln!("built with craft-fonts: the Japanese edits succeed (checked by the tests above)");
+        eprintln!("built with nodalia-fonts: the Japanese edits succeed (checked by the tests above)");
         assert!(line.is_ok() && block.is_ok());
         return;
     }
     for result in [line.map(|_| ()), block.map(|_| ())] {
         let Err(EditError::Invalid(msg)) = result else { panic!("expected a clear error, got {result:?}") };
-        assert!(msg.contains("Japanese fallback font") && msg.contains("CRAFT_FONTS_DIR"), "{msg}");
+        assert!(msg.contains("Japanese fallback font") && msg.contains("NODALIA_FONTS_DIR"), "{msg}");
     }
     assert_eq!(page_content_bytes(&doc, 0), before);
     let latin = text::replace_line(&mut doc, 0, 0, "Hello").unwrap();
@@ -3511,7 +3511,7 @@ fn missing_glyphs_substitute_helvetica_and_impossible_text_is_refused() {
     let doc2 = reopen(&doc);
     let lines = text::text_lines(&doc2, 0).unwrap();
     assert_eq!((lines[0].text.as_str(), lines[0].base_font.as_str()), ("abc", "Helvetica"));
-    // Neither the standard font nor the craft-fonts Japanese faces have this emoji.
+    // Neither the standard font nor the nodalia-fonts Japanese faces have this emoji.
     let mut doc = text_page("BT /F1 12 Tf 72 700 Td (Hello) Tj ET");
     assert!(text::replace_line(&mut doc, 0, 0, "\u{1f4a9}").is_err());
     assert!(text::replace_line(&mut doc, 0, 5, "x").is_err(), "no such line");
@@ -4086,7 +4086,7 @@ fn narrowing_then_widening_keeps_a_typed_double_space() {
 #[test]
 fn narrowing_then_widening_a_japanese_word_adds_no_space() {
     if papel_fonts::document_japanese_font().is_none() {
-        eprintln!("skipping narrowing_then_widening_a_japanese_word_adds_no_space: built without craft-fonts (set CRAFT_FONTS_DIR)");
+        eprintln!("skipping narrowing_then_widening_a_japanese_word_adds_no_space: built without nodalia-fonts (set NODALIA_FONTS_DIR)");
         return;
     }
     let text = "日本語の文章です";
@@ -6717,7 +6717,7 @@ fn justified_text_in_the_type3_fallback_stretches_its_spaces() {
     let rewritten = text::rewrite_block(&mut doc, 0, 0, Some(typed), &style);
     if papel_fonts::document_japanese_font().is_none() {
         assert!(rewritten.is_err());
-        eprintln!("built without a craft-fonts Japanese face: the Type 3 path is checked with CRAFT_FONTS_DIR");
+        eprintln!("built without a nodalia-fonts Japanese face: the Type 3 path is checked with NODALIA_FONTS_DIR");
         return;
     }
     rewritten.unwrap();
@@ -6731,7 +6731,7 @@ fn justified_text_in_the_type3_fallback_stretches_its_spaces() {
     assert!(ops.iter().filter(|o| o.is("Tw")).all(|o| o.operands.first().and_then(|n| n.as_f64()) == Some(0.0)), "{ops:?}");
 }
 
-/// Letters the page's font lacks are drawn with the Hebrew face from craft-fonts; a build
+/// Letters the page's font lacks are drawn with the Hebrew face from nodalia-fonts; a build
 /// without it says so and changes nothing. Hebrew points are refused, not misdrawn.
 #[test]
 fn hebrew_letters_the_page_font_lacks_use_the_hebrew_face() {
@@ -6747,9 +6747,9 @@ fn hebrew_letters_the_page_font_lacks_use_the_hebrew_face() {
     let line = text::replace_line(&mut doc, 0, 0, typed);
     if papel_fonts::document_hebrew_font(false).is_none() {
         let Err(EditError::Invalid(msg)) = line else { panic!("expected a clear error, got {line:?}") };
-        assert!(msg.contains("Hebrew fallback font") && msg.contains("CRAFT_FONTS_DIR"), "{msg}");
+        assert!(msg.contains("Hebrew fallback font") && msg.contains("NODALIA_FONTS_DIR"), "{msg}");
         assert_eq!(page_content_bytes(&doc, 0), before);
-        eprintln!("built without a craft-fonts Hebrew face: the Type 3 path is checked with CRAFT_FONTS_DIR");
+        eprintln!("built without a nodalia-fonts Hebrew face: the Type 3 path is checked with NODALIA_FONTS_DIR");
         return;
     }
     assert_eq!(line.unwrap().substituted.as_deref(), Some("Noto Sans Hebrew Type3"));
@@ -6822,7 +6822,7 @@ fn thai_headers_footers_and_watermarks_are_drawn_from_the_thai_face() {
     if papel_fonts::document_thai_font().is_none() {
         let mut doc = fixture();
         for err in [add_header_footer(&mut doc, &[0], &footer, false, &cx()).unwrap_err(), add_watermark(&mut doc, &[0], &wm, false).unwrap_err()] {
-            assert!(matches!(&err, EditError::Invalid(m) if m.contains("Thai") && m.contains("CRAFT_FONTS_DIR")), "{err:?}");
+            assert!(matches!(&err, EditError::Invalid(m) if m.contains("Thai") && m.contains("NODALIA_FONTS_DIR")), "{err:?}");
         }
         assert!(!doc.is_modified(), "nothing is written when the font is missing");
         assert_eq!((footer.first_undrawable(), wm.first_undrawable()), (Some('ห'), Some('ล')));
@@ -6893,7 +6893,7 @@ fn page_text_the_standard_fonts_cant_draw_is_refused() {
     };
     add_header_footer(&mut doc, &[0], &hf("Left\r\n<<Bates Number#6#1#ACME-#>>"), true, &cx()).unwrap();
     assert!(add_header_footer(&mut doc, &[0], &hf("A\rB"), true, &cx()).unwrap_err().to_string().contains("U+000D"));
-    // Arabic is shaped with the craft-fonts Arabic face (#403): drawable when that face is built
+    // Arabic is shaped with the nodalia-fonts Arabic face (#403): drawable when that face is built
     // in, refused (never written as `?`) when it isn't. Text left to the standard font still counts.
     let arabic = |text: &str| AddedText { rect: [72.0, 600.0, 300.0, 700.0], text: text.into(), ..AddedText::default() };
     // U+061C is in the Arabic block but is a direction mark that's dropped, not shaped: it never
@@ -6909,7 +6909,7 @@ fn page_text_the_standard_fonts_cant_draw_is_refused() {
     } else {
         // #403's own refusal says what's missing; the Add-text editor still keeps the draft.
         let err = add_content(&mut doc, 0, &Content::Text(arabic("مرحبا Hello"))).unwrap_err().to_string();
-        assert!(err.contains("CRAFT_FONTS_DIR"), "{err}");
+        assert!(err.contains("NODALIA_FONTS_DIR"), "{err}");
         assert_eq!(first_undrawable(&arabic("مرحبا Hello")), Some('م'));
         // An existing item may still take Arabic (#403 keeps it movable), but nothing else that
         // the standard font would write as `?`.
@@ -7396,7 +7396,7 @@ fn added_thai_text_wraps_clusters_and_survives_reopen() {
         assert_eq!(first_undrawable(&t), Some('ส'));
         let before = list_added(&doc);
         let err = add_content(&mut doc, 0, &Content::Text(t)).unwrap_err().to_string();
-        assert!(err.contains("Thai") && err.contains("CRAFT_FONTS_DIR"), "{err}");
+        assert!(err.contains("Thai") && err.contains("NODALIA_FONTS_DIR"), "{err}");
         assert_eq!(list_added(&doc), before);
         return;
     }
@@ -7420,7 +7420,7 @@ fn added_thai_text_wraps_clusters_and_survives_reopen() {
 #[test]
 fn added_thai_text_wraps_between_dictionary_words() {
     if papel_fonts::document_thai_font().is_none() {
-        eprintln!("skipping the Thai word wrapping checks: built without craft-fonts (set CRAFT_FONTS_DIR)");
+        eprintln!("skipping the Thai word wrapping checks: built without nodalia-fonts (set NODALIA_FONTS_DIR)");
         return;
     }
     let text = "การประปาส่วนภูมิภาคให้บริการน้ำประปาที่สะอาดแก่ประชาชนทั่วประเทศ";
@@ -9330,7 +9330,7 @@ fn a_subset_program_is_not_trusted_for_new_characters_and_the_error_names_the_ch
     let mut doc = embedded_program_page("BT /F1 12 Tf 72 700 Td (Stable text) Tj ET", "ABCDEF+Inter-Regular");
     // The subset's own program is not trusted for a character: a fallback face draws it through a
     // generated font instead (the subset may map a code whose outline was dropped). The Japanese
-    // sans face leads the fallbacks when built with craft-fonts; the bundled Inter face otherwise.
+    // sans face leads the fallbacks when built with nodalia-fonts; the bundled Inter face otherwise.
     let edit = text::rewrite_block(&mut doc, 0, 0, Some("Stable tőxt"), &text::BlockStyle::default()).unwrap();
     let face = papel_fonts::document_japanese_font_for_style(false, false).map_or("Inter", |f| f.family);
     assert_eq!(edit.substituted, Some(format!("{face} Type3")));
@@ -9376,7 +9376,7 @@ fn draft_layout_matches_the_paragraph_an_applied_edit_draws() {
 #[test]
 fn japanese_paragraphs_wrap_between_characters_without_closing_marks_at_a_row_start() {
     if papel_fonts::document_japanese_font().is_none() {
-        eprintln!("skipping the Japanese wrapping checks: built without craft-fonts (set CRAFT_FONTS_DIR)");
+        eprintln!("skipping the Japanese wrapping checks: built without nodalia-fonts (set NODALIA_FONTS_DIR)");
         return;
     }
     let text = "日本語の文章は単語の間に空白がないので、どの文字の間でも行を折り返せます。ただし「句読点」や小さい「っ」は行頭に来ません。";
@@ -13584,7 +13584,7 @@ fn ungroup_refuses_a_group_drawing_a_partly_unreadable_form() {
 /// through the font's ToUnicode CMap.
 #[test]
 fn stamp_with_fonts_registers_the_planned_type3_faces() {
-    if without_craft_fonts("stamp_with_fonts_registers_the_planned_type3_faces") {
+    if without_nodalia_fonts("stamp_with_fonts_registers_the_planned_type3_faces") {
         return;
     }
     let mut doc = text_page("BT /F2 12 Tf 72 700 Td (ab) Tj ET");
@@ -13613,7 +13613,7 @@ fn stamp_with_fonts_registers_the_planned_type3_faces() {
 /// A Type3 face built for page 1 is reused on page 2, but page 2 already has a font under the
 /// name page 1 gave it: page 2's own font keeps its name, and the shared face is registered on
 /// page 2 under a free one that the plan carries for page 2's content. (The plan is written out
-/// by hand, so this runs without the craft-fonts build input.)
+/// by hand, so this runs without the nodalia-fonts build input.)
 #[test]
 fn a_reused_type3_face_never_replaces_a_later_page_s_font_of_the_same_name() {
     let mut doc = build(&[
@@ -14193,10 +14193,10 @@ fn explicit_builtin_thai_replaces_an_unavailable_source_without_installing_a_fon
 
 #[test]
 fn existing_thai_subset_uses_shaped_matching_face_without_embedding_variable_font() {
-    // The matching full face is the optional craft-fonts input; CI builds with it.
+    // The matching full face is the optional nodalia-fonts input; CI builds with it.
     if papel_fonts::document_thai_font().is_none() {
         eprintln!(
-            "skipping existing_thai_subset_uses_shaped_matching_face_without_embedding_variable_font: built without craft-fonts (set CRAFT_FONTS_DIR to run it)"
+            "skipping existing_thai_subset_uses_shaped_matching_face_without_embedding_variable_font: built without nodalia-fonts (set NODALIA_FONTS_DIR to run it)"
         );
         return;
     }
@@ -14234,7 +14234,7 @@ fn existing_thai_subset_uses_shaped_matching_face_without_embedding_variable_fon
 fn a_bold_thai_subset_is_not_completed_with_the_regular_bundled_face() {
     if papel_fonts::document_thai_font().is_none() {
         eprintln!(
-            "skipping a_bold_thai_subset_is_not_completed_with_the_regular_bundled_face: built without craft-fonts (set CRAFT_FONTS_DIR to run it)"
+            "skipping a_bold_thai_subset_is_not_completed_with_the_regular_bundled_face: built without nodalia-fonts (set NODALIA_FONTS_DIR to run it)"
         );
         return;
     }
@@ -14263,7 +14263,7 @@ fn a_bold_thai_subset_is_not_completed_with_the_regular_bundled_face() {
 fn a_complete_program_in_another_style_does_not_keep_the_bundled_thai_face_out() {
     if papel_fonts::document_thai_font().is_none() {
         eprintln!(
-            "skipping a_complete_program_in_another_style_does_not_keep_the_bundled_thai_face_out: built without craft-fonts (set CRAFT_FONTS_DIR to run it)"
+            "skipping a_complete_program_in_another_style_does_not_keep_the_bundled_thai_face_out: built without nodalia-fonts (set NODALIA_FONTS_DIR to run it)"
         );
         return;
     }
@@ -15293,7 +15293,7 @@ fn thai_paragraphs_break_the_row_on_unicode_row_breaks() {
     let rows = |doc: &Document| -> Vec<String> { text::text_lines(&reopen(doc), 0).unwrap().into_iter().map(|l| l.text).collect() };
     let thai_face = papel_fonts::document_thai_font().is_some();
     if !thai_face {
-        eprintln!("thai_paragraphs_break_the_row_on_unicode_row_breaks: built without craft-fonts, so only the legacy subset is checked");
+        eprintln!("thai_paragraphs_break_the_row_on_unicode_row_breaks: built without nodalia-fonts, so only the legacy subset is checked");
     }
     for separator in ['\u{2028}', '\u{001C}'] {
         let draft = format!("กข{separator}ค");

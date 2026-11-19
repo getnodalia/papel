@@ -1,4 +1,4 @@
-//! `window.papel`: the page command API (`craft-web-api`, storytold/craft-libs#413) over the app's
+//! `window.papel`: the page command API (`nodalia-web-api`, storytold/craft-libs#413) over the app's
 //! UI control channel (`papel_ui_egui::control`), opt-in with `?control`.
 //!
 //! The crate owns the JavaScript side (`request`, `execute`, `commands`, `docInspect`, `uiInspect`,
@@ -40,8 +40,8 @@ mod web {
     use std::rc::Rc;
     use std::sync::mpsc::{Receiver, TryRecvError};
 
-    use craft_web_api::methods::Methods;
-    use craft_web_api::page::{PageApi, Request};
+    use nodalia_web_api::methods::Methods;
+    use nodalia_web_api::page::{PageApi, Request};
     use papel_ui_egui::control::{ControlClient, Reply};
     use serde_json::{Value, json};
     use wasm_bindgen_futures::JsFuture;

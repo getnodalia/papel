@@ -1,6 +1,6 @@
 # Current integration — 2026-10-25
 
-The local integration includes main `d764a8ebca2dc289841b34ea3048f613a9869bbb` and pins craft-ui, craft-quit and craft-print to published `42e30cd5b3f4b114270dd053fccbc33bedc47f68`. The egui, winit and independent craft-docpath pins are unchanged. Its `Cargo.lock` SHA-256 is `3e0c10576c8584eb1f45a27908177e7c65bb83f8e855bf3a5429edd4e7268c80`.
+The local integration includes main `d764a8ebca2dc289841b34ea3048f613a9869bbb` and pins nodalia-ui, nodalia-quit and nodalia-print to published `42e30cd5b3f4b114270dd053fccbc33bedc47f68`. The egui, winit and independent nodalia-docpath pins are unchanged. Its `Cargo.lock` SHA-256 is `3e0c10576c8584eb1f45a27908177e7c65bb83f8e855bf3a5429edd4e7268c80`.
 
 Main replaced the floating docking workspace with fixed shared side panes in `crates/ui-egui/src/panels/side_panels.rs`. `PaneHost` owns the Tools and inspector columns; `Rail` owns the fixed navigation rail and footer. The integration retains the 0.37 ID, text alignment, capture, IME and accessibility adaptations. The former `docking.rs`, `rail-nav` panel and read-mode inspector panel no longer exist. Floating windows, tab groups and drag/redock operations from the earlier design are not capabilities of this integrated UI. Their historical acceptance items below do not establish current behavior.
 
@@ -22,7 +22,7 @@ Status update (2026-10-25): Move Papel to the pinned egui 0.37 and winit forks, 
 
 The original planning record below is historical.
 
-Status: implemented locally against `a2ec27b4775f53c40cad3456936d9406611e3a8d`; not published. Production code, manifests, vendor provenance and tests in this checkout carry the migration. The 2026-10-25 qualification section below supersedes the historical external-config and missing-IME statements; the 2026-10-24 amendment records the earlier local state. The manifests pin egui `6d518fc799681571963842f95b55a6b68431b15a`, winit `a517b3846ee8457d84ee4975110bfda6797c44dc`, and craft-ui/craft-quit/craft-print `25da1314d443171b4adeaad2cd9454b273f35c6f` directly by immutable git revision, while `craft-docpath` remains at `82a24b006eefa036b43c09a67fb9a3fbd17ffe63`; `Cargo.lock` is `f5cee0acb795240d2071116230316fd4e4b6bfe4e4314c82b0a4ca5459739f80`, and the target-main observation is `a7801dc84e74dd12757aecbb6be324dce7a33939`. The repository quality gates passed as recorded below; publication still requires fresh human approval. This revision also incorporates the independent adversarial review of the prior plan (`f781bf52d03d59cd2fb4539771c7a0d196e2f49e64c48635e72c224c9bdcdcd0`).
+Status: implemented locally against `a2ec27b4775f53c40cad3456936d9406611e3a8d`; not published. Production code, manifests, vendor provenance and tests in this checkout carry the migration. The 2026-10-25 qualification section below supersedes the historical external-config and missing-IME statements; the 2026-10-24 amendment records the earlier local state. The manifests pin egui `6d518fc799681571963842f95b55a6b68431b15a`, winit `a517b3846ee8457d84ee4975110bfda6797c44dc`, and nodalia-ui/nodalia-quit/nodalia-print `25da1314d443171b4adeaad2cd9454b273f35c6f` directly by immutable git revision, while `nodalia-docpath` remains at `82a24b006eefa036b43c09a67fb9a3fbd17ffe63`; `Cargo.lock` is `f5cee0acb795240d2071116230316fd4e4b6bfe4e4314c82b0a4ca5459739f80`, and the target-main observation is `a7801dc84e74dd12757aecbb6be324dce7a33939`. The repository quality gates passed as recorded below; publication still requires fresh human approval. This revision also incorporates the independent adversarial review of the prior plan (`f781bf52d03d59cd2fb4539771c7a0d196e2f49e64c48635e72c224c9bdcdcd0`).
 
 ## Historical qualification state — 2026-10-25
 
@@ -31,7 +31,7 @@ The managed run `egui037-papel-reviewed-ui-ci-20261025-0541` passed the first ni
 The page-text editor keeps the prior four-by-two inset under egui 0.37, and print tests locate the Two-sided control by ComboBox role. Both narrow/wide text image regressions and booklet regressions passed before the full suite. Canonical dependency/source guards retain the vendored security and rendering provenance. The repository WASM gate checks the library layers. The separate web application shell also passed `cargo check --locked --target wasm32-unknown-unknown -p papel-web` in `egui037-papel-web-shell-check-20261025-0575`. Native GUI and IME/PRIMARY, browser interaction, packaged WASM size, real-world old settings and paired app performance remain open; these checks do not establish cross-platform acceptance.
 
 This section supersedes every historical statement below that the egui, winit or
-craft-libs revisions resolve through `local-integration-config.toml`, that the
+nodalia-libs revisions resolve through `local-integration-config.toml`, that the
 checked-in manifest does not pin them, or that E21b/P7b surrounding-text support is
 absent from the candidate. Those statements are planning-era history; the current
 tree does not use an external Cargo config.
@@ -40,7 +40,7 @@ tree does not use an external Cargo config.
 |---|---|
 | egui family | `6d518fc799681571963842f95b55a6b68431b15a` (storytold/egui) |
 | winit | `a517b3846ee8457d84ee4975110bfda6797c44dc` (storytold/winit) |
-| craft-ui / craft-quit / craft-print | `25da1314d443171b4adeaad2cd9454b273f35c6f` (getnodalia/foundation (vendor/craft-libs)) |
+| nodalia-ui / nodalia-quit / nodalia-print | `25da1314d443171b4adeaad2cd9454b273f35c6f` (getnodalia/foundation (vendor/nodalia-libs)) |
 | `Cargo.lock` SHA-256 | `f5cee0acb795240d2071116230316fd4e4b6bfe4e4314c82b0a4ca5459739f80` |
 | Target-main observation | `a7801dc84e74dd12757aecbb6be324dce7a33939` |
 
@@ -62,17 +62,17 @@ execution and the outgoing-text tests remain unqualified.
 | Papel lockfile | current `Cargo.lock` is the direct-pin qualification lock (SHA-256 `f5cee0acb795240d2071116230316fd4e4b6bfe4e4314c82b0a4ca5459739f80`); it is not publication evidence. The planning baseline lock SHA-256 was `eaee6973f7c1ba79f5bfc1bfa3da50ef457d13affeb51a3d50d27437804d4cf7`. |
 | Planning-baseline egui family | `egui`, `eframe`, `egui-winit`, `egui_extras`, `egui_kittest` 0.36.2 from crates.io; `egui-wgpu` 0.36.2 vendored |
 | Planning-baseline winit | 0.30.13 vendored; upstream tag commit `e9809ef54b18499bb4f2cac945719ecc2a61061b` |
-| Planning-baseline craft-libs pins | `craft-ui` `5c874d51eeb3de70e735c8ce87a59a7dedd47675`, `craft-quit` `f58bc1a3df490992d633393d0898af0588ce882c`, `craft-print` `666c358065261a2816b376fa3bb10538dbf53040`, `craft-docpath` `82a24b006eefa036b43c09a67fb9a3fbd17ffe63` |
-| Planning-era shared-libs integration base | `3832c47ef68a0e6214f2c1e85f3526b6adcb686e`; an ancestor of the current craft-libs pin `25da1314d443171b4adeaad2cd9454b273f35c6f` |
-| Historical planning observation of craft-libs PR 199 | OPEN / CONFLICTING at the then-inspected head `b68de8c5f4f1c060904d211a7b1320aa0f7bce78`; API-port ancestor `8614e4a04fae516fba16c22b31ff1008cb6be10b`; audit merge `ec8840af8c5fda695cf195cdd05e5ae078415c07` |
+| Planning-baseline nodalia-libs pins | `nodalia-ui` `5c874d51eeb3de70e735c8ce87a59a7dedd47675`, `nodalia-quit` `f58bc1a3df490992d633393d0898af0588ce882c`, `nodalia-print` `666c358065261a2816b376fa3bb10538dbf53040`, `nodalia-docpath` `82a24b006eefa036b43c09a67fb9a3fbd17ffe63` |
+| Planning-era shared-libs integration base | `3832c47ef68a0e6214f2c1e85f3526b6adcb686e`; an ancestor of the current nodalia-libs pin `25da1314d443171b4adeaad2cd9454b273f35c6f` |
+| Historical planning observation of nodalia-libs PR 199 | OPEN / CONFLICTING at the then-inspected head `b68de8c5f4f1c060904d211a7b1320aa0f7bce78`; API-port ancestor `8614e4a04fae516fba16c22b31ff1008cb6be10b`; audit merge `ec8840af8c5fda695cf195cdd05e5ae078415c07` |
 | Target egui | 0.37.0, upstream release commit `841a328ba2dd8f6996beb7189ebb7fc00e668a2a` |
 | Planning-era reviewed egui candidate | `aiongg/craft/0.37` HEAD `a4f9a17f64a6bae61350fb85804c9df0d9865916`; the current pin is `6d518fc799681571963842f95b55a6b68431b15a` |
 | Planning-era reviewed winit candidate | `craft/0.30.13-lang` HEAD `8b35388bd719e8cc86a95971ba0bc026c9a8f058`; it lacks W15P PRIMARY, which the current pin `a517b3846ee8457d84ee4975110bfda6797c44dc` contains |
-| Shared rollout contract | `craft-libs/docs/egui-037-suite-rollout.md`, current reviewed content identified by the publication/review ledger; record its landed commit before implementation |
-| Shared library plan | `craft-libs/docs/egui-037-migration-plan.md`, current reviewed content identified by the publication/review ledger; record its landed commit before implementation |
+| Shared rollout contract | `nodalia-libs/docs/egui-037-suite-rollout.md`, current reviewed content identified by the publication/review ledger; record its landed commit before implementation |
+| Shared library plan | `nodalia-libs/docs/egui-037-migration-plan.md`, current reviewed content identified by the publication/review ledger; record its landed commit before implementation |
 | Shared egui plan | `egui/docs/egui-037-migration-plan.md`, current reviewed content identified by the publication/review ledger; record its landed commit before implementation |
 
-The following paragraph records the pre-merge planning assessment; PR 199 subsequently merged, and the current pinned shared-library candidate includes its integration and later main work. At planning time, PR 199 was an input to the shared-library work, not a branch to merge. Its head and `ec8840a` are stale relative to current main: they omit `craft-platform` and revert security, settings, docking and printing fixes. Only the API-port hunks from `8614e4a` and the README change from `1764bca` are reused, applied onto `3832c47`; the final library revision must be reviewed and published separately.
+The following paragraph records the pre-merge planning assessment; PR 199 subsequently merged, and the current pinned shared-library candidate includes its integration and later main work. At planning time, PR 199 was an input to the shared-library work, not a branch to merge. Its head and `ec8840a` are stale relative to current main: they omit `nodalia-platform` and revert security, settings, docking and printing fixes. Only the API-port hunks from `8614e4a` and the README change from `1764bca` are reused, applied onto `3832c47`; the final library revision must be reviewed and published separately.
 
 This plan covers only Papel. It does not adopt, reset or migrate any other checkout, job, VM or shared target. Historical diagnostics retained in the private task evidence for `egui037-audit-20261022` are pointers only; they are not acceptance evidence.
 
@@ -129,7 +129,7 @@ No `run_ui_with_logic`/E22 scheduler API is adopted. There is no stable one-fram
 |---|---|
 | `target_arch = "wasm32"` | `apps/papel-web`; `ui-egui` disables `file_watch`, `pickers`, `system_fonts`; `fill_sign` image inbox and host bridge; no native window and no egui-winit clipboard |
 | `windows` | hidden-maximized restore, DPI change, DWM frame, IME cursor, auto language, measurement units, DX12 presentation (`apps/papel/src/main.rs`, `motion.rs`, `single_instance.rs`, winit patches W1/W3/W4/W18/W19) |
-| `target_os = "macos"` | Apple events, traffic lights/full-size content view, ⌘Q menu (`craft-quit`), title-bar drag, IME commit/discard/emoji/Korean (W6–W10, W12, W22–W24, W26) |
+| `target_os = "macos"` | Apple events, traffic lights/full-size content view, ⌘Q menu (`nodalia-quit`), title-bar drag, IME commit/discard/emoji/Korean (W6–W10, W12, W22–W24, W26) |
 | `target_os = "linux"` | GNOME/Wayland frame decision, compositor GPU selection, Wayland regular clipboard and W15P PRIMARY (W15/W15P/E4), X11 DPI/IME (W5/W11/W20/W21), Wayland scroll phases (W13) |
 | `unix, not macos` | single-instance Unix socket, Wayland/X11 detection, fontconfig directory parsing |
 | `not unix` / other | Windows and wasm branches above; no silent fallback to a native-only API |
@@ -161,13 +161,13 @@ Papel uses the 0.37 `Panel` API already in its 0.36 form:
 
 0.36 stores `PanelState` under the panel `Id` passed to the constructor. 0.37 derives it as `parent_ui.scope_id().with_salt(IdSalt::new(id_salt))`; the panel child `Ui` is also salted with the new panel ID. Every named panel key therefore changes, and in-panel widget/focus/scroll state may reset. This is not left to implementation: §6.2 migrates the persisted keys in the first compatibility PR and tests the upgrade from a 0.36 fixture.
 
-Docking is `crates/ui-egui/src/docking.rs`; `DockArea::new(egui::Id::unique("papel-docking"))` wraps `craft_ui::docking`. Persistence is Papel's own `Workspace` JSON, not egui panel memory. `DockArea::direction` is a new opt-in stock-compatible API planned in craft-libs CL-3; the explicit RTL adoption in PR 4 waits for that reviewed revision. Its visual policy preserves saved physical splits, rectangles and logical tab order.
+Docking is `crates/ui-egui/src/docking.rs`; `DockArea::new(egui::Id::unique("papel-docking"))` wraps `nodalia_ui::docking`. Persistence is Papel's own `Workspace` JSON, not egui panel memory. `DockArea::direction` is a new opt-in stock-compatible API planned in nodalia-libs CL-3; the explicit RTL adoption in PR 4 waits for that reviewed revision. Its visual policy preserves saved physical splits, rectangles and logical tab order.
 
 ### 2.7 Window frame, decorations and restoration
 
 `apps/papel/src/main.rs` owns native options, app creation and GPU setup. `apps/papel/src/decorations.rs` decides whether GNOME Wayland leaves the frame to the app. `crates/ui-egui/src/platform/window_controls.rs` draws the app frame and resize edges, and `window_state.rs` repairs a 64×64 restored window.
 
-`craft-window` owns `Frame`, `Layout` and `Button`; `window_controls.rs` currently has distinct duplicate types and its own GNOME `button-layout` parser. The migration makes `window_controls` re-export `craft_window::{Button, Layout}` and removes the duplicate parser. `decorations::app_drawn` uses `craft_window::Choice::probe(Prefix::new("PAPEL"))`; `PAPEL_TITLEBAR` accepts `app`, `system` and `desktop` (the last two force the desktop frame), matching craft-window. Papel still applies `with_decorations(false)` only when it will draw its own header bar, and the runtime “Use system title bar” preference still toggles `ViewportCommand::Decorations`; craft-window decides the startup frame, not the runtime preference. The probe is called once at startup and never from `App::ui`.
+`nodalia-window` owns `Frame`, `Layout` and `Button`; `window_controls.rs` currently has distinct duplicate types and its own GNOME `button-layout` parser. The migration makes `window_controls` re-export `nodalia_window::{Button, Layout}` and removes the duplicate parser. `decorations::app_drawn` uses `nodalia_window::Choice::probe(Prefix::new("PAPEL"))`; `PAPEL_TITLEBAR` accepts `app`, `system` and `desktop` (the last two force the desktop frame), matching nodalia-window. Papel still applies `with_decorations(false)` only when it will draw its own header bar, and the runtime “Use system title bar” preference still toggles `ViewportCommand::Decorations`; nodalia-window decides the startup frame, not the runtime preference. The probe is called once at startup and never from `App::ui`.
 
 ### 2.8 Fonts and language
 
@@ -209,7 +209,7 @@ At planning time the lockfile contained one egui family at 0.36.2; the current q
 
 `vendor/winit` is 0.30.13 (`vendor/winit/.cargo_vcs_info.json` = `e9809ef5…`) and carries **W1–W13**, not W1–W15. It has no language APIs. The planning-era candidate winit fork `8b35388b` carried W1–W15 plus W17–W27 but not W15P; W16 is not in this cut. W14 (`c488d2e9`, macOS cancelable termination plus `dpi` from crates.io) and W15 (`cf73a29c`, `b05ce129`, per-seat Wayland data device and regular clipboard) are in the fork, not the current vendor.
 
-W14 remains opt-in in the shared winit revision and is **not enabled** by Papel; its existing termination path stays `craft-quit`. Validate that `dpi` resolves once with the git source. W15 regular clipboard is required by E4. In the planning-era candidate `8b35388b`, the **W15P** PRIMARY implementation was a prerequisite added by the shared winit work, using SCTK 0.19.2's `PrimarySelectionManagerState`/device/source/offer on the existing connection and event queue, and had to land before egui P2b. The current pin `a517b384` contains W15P (`PATCHES.md` W15P row; `src/platform_impl/linux/wayland/clipboard.rs`) and W27; native evidence remains open. No second regular `wl_data_device` is acceptable.
+W14 remains opt-in in the shared winit revision and is **not enabled** by Papel; its existing termination path stays `nodalia-quit`. Validate that `dpi` resolves once with the git source. W15 regular clipboard is required by E4. In the planning-era candidate `8b35388b`, the **W15P** PRIMARY implementation was a prerequisite added by the shared winit work, using SCTK 0.19.2's `PrimarySelectionManagerState`/device/source/offer on the existing connection and event queue, and had to land before egui P2b. The current pin `a517b384` contains W15P (`PATCHES.md` W15P row; `src/platform_impl/linux/wayland/clipboard.rs`) and W27; native evidence remains open. No second regular `wl_data_device` is acceptable.
 
 The egui fork requires companion winit APIs on their target platforms. Integrate and review the series in the approved public storytold fork, compare every current Papel vendor delta, transfer behavioral tests, then replace the path patch with the final immutable git revision. Record provenance and old/new source hashes in migration evidence. Keep the original vendor until equivalence is established; do not publish an interim personal-fork branch dependency.
 
@@ -234,15 +234,15 @@ Papel keeps the retained `vendor/winit` and `vendor/egui-wgpu` copies as provena
 
 Integrate E2+E3 and the behavioral regressions into the central 0.37 fork, then consume the approved revision. Replace the source-path/source-absence assertions with immutable package identity checks. `surface_texture_limits` and `configure_gpu` remain: the first raises the enabled 2D limit, the second preserves adapter selection, DX12 presentation and indirect-validation behavior.
 
-### 3.6 craft-libs: port only, and account for craft-print/GDI/rgb drift
+### 3.6 nodalia-libs: port only, and account for nodalia-print/GDI/rgb drift
 
-PR 199's egui port changes `craft-ui` roles, `Id::unique`/`Ui::scope_id`, `egui_extras`/`egui_kittest` 0.37, and the docking fixture's `⋮` → `…`. Reuse those API hunks on current main; do not import the stale tree. Papel needs `craft-ui` for docking/icons/tabs/layout, `craft-window` for the frame decision, and no wholesale move of its PDF-specific print UI into `craft_ui::printing`.
+PR 199's egui port changes `nodalia-ui` roles, `Id::unique`/`Ui::scope_id`, `egui_extras`/`egui_kittest` 0.37, and the docking fixture's `⋮` → `…`. Reuse those API hunks on current main; do not import the stale tree. Papel needs `nodalia-ui` for docking/icons/tabs/layout, `nodalia-window` for the frame decision, and no wholesale move of its PDF-specific print UI into `nodalia_ui::printing`.
 
-Bumping all four craft-libs crates from their four current pins listed in section 1 to a revision based on `3832c47` carries more than a new field:
+Bumping all four nodalia-libs crates from their four current pins listed in section 1 to a revision based on `3832c47` carries more than a new field:
 
-- `craft-print` adds the unconditional `craft-winprint-gdi` dependency (`getnodalia/foundation (vendor/winprint.rs)`, revision `417ac3c4…`), a public `rgb` re-export of the GDI transport, `lpstat -l` description parsing and `Printer.description`.
-- Audit `craft-winprint-gdi` licensing/target cfg/`cargo deny`/Windows build, and the non-Windows `rgb::PrintError::Unsupported` behavior.
-- `Printer` now has `description`; update every literal in the repository. At baseline there are 19 `Printer { … }` literals across `crates/print` and UI tests, not 13. This is a mechanical compile fix, with the craft-print tests and Windows native checks re-run.
+- `nodalia-print` adds the unconditional `nodalia-winprint-gdi` dependency (`getnodalia/foundation (vendor/winprint.rs)`, revision `417ac3c4…`), a public `rgb` re-export of the GDI transport, `lpstat -l` description parsing and `Printer.description`.
+- Audit `nodalia-winprint-gdi` licensing/target cfg/`cargo deny`/Windows build, and the non-Windows `rgb::PrintError::Unsupported` behavior.
+- `Printer` now has `description`; update every literal in the repository. At baseline there are 19 `Printer { … }` literals across `crates/print` and UI tests, not 13. This is a mechanical compile fix, with the nodalia-print tests and Windows native checks re-run.
 - Keep Papel's own `print_ui.rs` sheet preview and options. `description` is not automatically displayed; a product change to show it is separate.
 - The current main already includes intervening security bounds, settings merge, docking permissions and linear printer-name collision checks; preserve them. The shared-library plan's CL-1 diff gate remains mandatory.
 
@@ -261,7 +261,7 @@ Bumping all four craft-libs crates from their four current pins listed in sectio
 
 | Change | Papel use | Required action |
 |---|---|---|
-| `default_fonts` no longer a default feature | explicit in ui-egui, papel, web, craft-ui dev-dep | keep explicit |
+| `default_fonts` no longer a default feature | explicit in ui-egui, papel, web, nodalia-ui dev-dep | keep explicit |
 | `monochrome_emoji_fonts` gates emoji faces | `✔`, `▲`, `▼` and previously `⏵` text | enable the feature; add `egui-icons.ttf` attribution; keep painted submenu arrows out of font coverage |
 | eframe `clipboard` becomes explicit | native eframe with `default-features = false` | enable in native app and native UI tests; web needs none; add feature-identity check |
 | `WidgetType` deprecated alias for `Role` | 52 references, 56 `widget_info` closures | map roles explicitly |
@@ -336,7 +336,7 @@ The retained vendor carries W1–W13. The planning-era reviewed language branch 
 Compatibility rules:
 
 - The egui fork's `egui-winit` calls `winit::platform::latin_layout::KeyEventExtLatinLayout`, `KeyEventExtMacOS::key_with_command`, `WindowExtMacOS::take_ime_delete_surrounding` and `WindowExtWayland::take_ime_delete_surrounding`; E21b also calls `WindowExtWayland::set_ime_surrounding_text`.
-- W14 remains compiled in the shared fork but not opted into by Papel; `craft-quit` remains its terminate path.
+- W14 remains compiled in the shared fork but not opted into by Papel; `nodalia-quit` remains its terminate path.
 - Re-run winit policy/unit tests in the selected fork and app-facing regressions. Native IME/compositor acceptance still requires actual workflows.
 
 ## 6. Migration design
@@ -372,7 +372,7 @@ Further tests:
 - Panel order: tab strip → mode bar → right rail → central panel. Read-mode inspector must not reorder the rail or duplicate a panel ID.
 - A panel's content clip is a subset of the panel rect and parent clip; popups/comment overlays use `Area`/`Window` layers.
 - Floating docking, tab detach, group move and split resize survive restart from `Workspace` JSON, not egui memory.
-- `DockArea::new(Id::unique("papel-docking"))`; keep the same salt for craft-ui state. If RTL is selected, pass the explicit direction; persisted split/rectangles/logical tab order stay unchanged.
+- `DockArea::new(Id::unique("papel-docking"))`; keep the same salt for nodalia-ui state. If RTL is selected, pass the explicit direction; persisted split/rectangles/logical tab order stay unchanged.
 
 ### 6.3 Viewports
 
@@ -391,7 +391,7 @@ Replace `ViewportCommand::Screenshot(UserData)` plus `Event::Screenshot` with a 
 - store issuance-time target-UI logical viewport rect, `pixels_per_point`, requested region
   and geometry epoch in the slot. Reject/retry any resize/DPI/zoom/surface epoch change
   before save, even a change back. Callback arguments contain pixels only. The callback image may be smaller because E2 surface fitting reduced it; derive x/y image scale from the returned dimensions and recorded logical bounds, verify aspect/rounding, and do not use `ctx.pixels_per_point()` at completion. A resize/DPI generation mismatch retries within the deadline or returns a defined error;
-- PR 1 waits for the approved craft-ui CL-2F completion-slot helper and adopts it directly; no temporary app-local implementation. Preserve Papel request/path/region/reply policy in `control.rs`.
+- PR 1 waits for the approved nodalia-ui CL-2F completion-slot helper and adopts it directly; no temporary app-local implementation. Preserve Papel request/path/region/reply policy in `control.rs`.
 
 Hidden-window tests are separate:
 
@@ -417,12 +417,12 @@ Glyph decision: enable `egui/monochrome_emoji_fonts` in `papel-ui-egui`, the nat
 
 Attribution and assets in the first green PR:
 
-- treat the 0.37 font change as a deliberate fixture change: `⋮` (U+22EE) was never covered by the bundled faces, and the craft-libs test fixture moves to `…`; do not restore a tofu-drawing fixture. Production `…`/`−` remain covered;
+- treat the 0.37 font change as a deliberate fixture change: `⋮` (U+22EE) was never covered by the bundled faces, and the nodalia-libs test fixture moves to `…`; do not restore a tofu-drawing fixture. Production `…`/`−` remain covered;
 - update all four `[[bundled]]` `epaint_default_fonts` entries from 0.36.2 to 0.37.0;
 - add `egui-icons.ttf`, SHA-256 `122806555c73df7cef55aa1d945289ae27fbc4dbbd31abbb4204ee0cda829cc8`, recorded as the MIT-licensed `emoji-icon-font` subset by John Slegers, with its exact usage;
 - run `cargo xtask assets --write` and then `cargo xtask assets`.
 
-Adopt E14 for fallbacks: set `FontTweak::fallback_align = FallbackAlign::Baseline` for script fallbacks; remove metric-derived `y_offset_factor`; keep Windows JetBrains Mono hinting. Add a glyph-coverage test for every UI literal and catalog translation with `MissingGlyphPolicy::Panic` (or `Fonts::has_glyphs`) for embedded-only, craft-fonts, each script fallback, and `PAPEL_SYSTEM_FONTS=0/1`. A missing glyph is a failure, not a snapshot update.
+Adopt E14 for fallbacks: set `FontTweak::fallback_align = FallbackAlign::Baseline` for script fallbacks; remove metric-derived `y_offset_factor`; keep Windows JetBrains Mono hinting. Add a glyph-coverage test for every UI literal and catalog translation with `MissingGlyphPolicy::Panic` (or `Fonts::has_glyphs`) for embedded-only, nodalia-fonts, each script fallback, and `PAPEL_SYSTEM_FONTS=0/1`. A missing glyph is a failure, not a snapshot update.
 
 ### 6.6 Language and RTL
 
@@ -435,7 +435,7 @@ End state:
 - Translated UI text stays logical in catalogs. Remove `catalog.map_translations(display_rtl)`, `bidi::display_rtl` and the matching label preordering. Rely on E5/E12.
 - Use explicit `TextDirection::RightToLeft` for `ar`/`ckb` labels whose first strong character may be Latin or a placeholder; use `LeftToRight` for file/path labels where the extension must stay at the end; use `Auto` for document-authored text. A small local direction helper is used only where multiple call sites need it; no new fork-only API.
 - Replace `bidi::wrap`/`widgets::wrapped_text` with native `Label`/`LayoutJob` wrapping once E15 is active. A remaining custom wrapper must measure with the same direction/language it paints.
-- Set `Style::right_to_left` for `ar`/`ckb` after auditing manual `Layout::right_to_left` call sites. E9 mirrors chrome, not every manually positioned control. Pass an explicit direction to `craft_ui::DockArea`; do not reverse saved workspace order.
+- Set `Style::right_to_left` for `ar`/`ckb` after auditing manual `Layout::right_to_left` call sites. E9 mirrors chrome, not every manually positioned control. Pass an explicit direction to `nodalia_ui::DockArea`; do not reverse saved workspace order.
 - Keep `bidi::visual` only for painter paths that cannot use a `LayoutJob`; never combine it with native bidi on the same text.
 - AccessKit labels and copied text stay logical; only painting is reordered.
 
@@ -487,13 +487,13 @@ The implementation is blocked until the shared plans publish approved immutable 
 
 - the reviewed winit W1–W15, W17–W27 and **W15P** PRIMARY path (all present in the current pin `a517b384`);
 - the reviewed egui E1–E21 and **E21b/P7b** outgoing surrounding-text integration;
-- the craft-libs API-port hunks on current main, with `craft-window` and `craft-print` drift reviewed.
+- the nodalia-libs API-port hunks on current main, with `nodalia-window` and `nodalia-print` drift reviewed.
 
 Papel does not vendor a private copy or bypass missing publication with a path patch.
 
 ### PR 1 — atomic first-green compatibility change
 
-Depends on: Stage 0 and the complete approved egui/winit revisions (P2b bounded W15/W15P, P7 key release pairing, P7b IME lifecycle, P7c selection fix), plus craft-libs CL-1/CL-2F. PR 4 RTL docking additionally waits for CL-3.
+Depends on: Stage 0 and the complete approved egui/winit revisions (P2b bounded W15/W15P, P7 key release pairing, P7b IME lifecycle, P7c selection fix), plus nodalia-libs CL-1/CL-2F. PR 4 RTL docking additionally waits for CL-3.
 
 Scope (one reviewable change set; commits may split by file only if every commit is green):
 
@@ -504,7 +504,7 @@ Scope (one reviewable change set; commits may split by file only if every commit
 - Rename `WidgetType`/`Id::new`/`Ui::id`/`UiBuilder::id`; map roles; fix all kittest accessible-name and missing-glyph failures (204 harnesses).
 - Update painted submenu labels: `"File ⏵"` → `"File"`, etc.; update AccessKit/name expectations across `commands.rs`, `theme.rs`, `editing.rs`, `control.rs`, `text_select.rs`, `view.rs`; assert the arrow is painted.
 - Add `MouseWheel.source` with the real variants; migrate the screenshot path to the bounded callback; add panel-key migration.
-- Port from craft-libs current main using only the reviewed API hunks and `craft-window`; add `craft-window` type reuse and retain `PAPEL_TITLEBAR`/runtime preference semantics. Add `Printer.description` to every literal (19 at baseline) and audit craft-print/GDI/rgb drift.
+- Port from nodalia-libs current main using only the reviewed API hunks and `nodalia-window`; add `nodalia-window` type reuse and retain `PAPEL_TITLEBAR`/runtime preference semantics. Add `Printer.description` to every literal (19 at baseline) and audit nodalia-print/GDI/rgb drift.
 - Transfer winit/egui-wgpu source guards centrally; replace Papel source-path and `source =` assertions with immutable git graph checks.
 - Remove catalog preordering and `display_rtl` as the fork becomes the sole UI bidi owner;
   include the focused logical-text/selection regression in this first fork pin.
@@ -539,7 +539,7 @@ Scope:
 - Expand native wrapping and explicit `TextDirection` tests; catalog preordering and
   `display_rtl` removal already landed in PR 1 and must not be restored independently.
 - E14 fallback alignment; glyph coverage; `system_font_fallback = false`.
-- `Style::right_to_left` after manual-layout audit; craft-ui `DockArea::direction`.
+- `Style::right_to_left` after manual-layout audit; nodalia-ui `DockArea::direction`.
 - Role/name tests already required by PR 1 are strengthened, not introduced here.
 
 Rollback: revert PR 3; PR 2 remains. If native bidi proves wrong, revert the whole 0.37 family to the 0.36 fork tag `767b1cad` with the old preordering.
@@ -550,7 +550,7 @@ Depends on: PR 1 (can run in parallel with PR 2/3 after rebase).
 
 Scope:
 
-- The type re-export/parser replacement lands in PR 1; PR 4 completes extended native policy tests for `craft-window`: `window_controls` re-exports `craft_window::{Button, Layout}`; `decorations` uses `Choice::probe(Prefix::new("PAPEL"))`; remove duplicate parser; keep runtime `Use system title bar` toggle.
+- The type re-export/parser replacement lands in PR 1; PR 4 completes extended native policy tests for `nodalia-window`: `window_controls` re-exports `nodalia_window::{Button, Layout}`; `decorations` uses `Choice::probe(Prefix::new("PAPEL"))`; remove duplicate parser; keep runtime `Use system title bar` toggle.
 - Native Linux/Windows GUI checks, web build, packaging checks and clipboard/PRIMARY/IME workflows.
 - Update `vendor/README.md`/`SOURCE.json` only for retained vendors; document removed window-stack copies and exact replacement revisions.
 - Update `docs/development.md` and version statements.
@@ -606,7 +606,7 @@ Include `crates/ui-egui/tests/it/control.rs`, its discarded-pass requests and `s
 | Control | `after_frames_counts_accepted_frames` | Forced discard does not answer early; answers after intended accepted frames |
 | Input | `unknown_wheel_source_keeps_wayland_fling` | `Unknown` + Point + End glides on Linux; `Trackpad`/`Momentum` policy covered; no `Finger`/`WheelTilt` |
 | Input | `one_finger_lift_glides_once` | Offset after 0.5 s follows `fling.rs`; egui kinetic adds no second document curve |
-| Fonts | `every_ui_string_has_all_glyphs` | All `tl!` literals and catalogs pass `MissingGlyphPolicy::Panic` for embedded + craft-fonts + system-font-off |
+| Fonts | `every_ui_string_has_all_glyphs` | All `tl!` literals and catalogs pass `MissingGlyphPolicy::Panic` for embedded + nodalia-fonts + system-font-off |
 | Fonts | `fallback_rows_share_the_baseline` | Fallback baseline equals primary; row grows; `y_offset_factor` not the mechanism |
 | Language | `arabic_ui_labels_use_an_explicit_paragraph_direction` | With an Arabic face, the label's paragraph direction is `RightToLeft` and its Latin run sits right of the Arabic; English stays `Auto` |
 | Language | `arabic_catalog_stays_logical` | Catalog and command lookups stay in logical order and placeholders keep their positions |
@@ -645,7 +645,7 @@ Before accepting each test, temporarily revert the fix and confirm the named tes
 Record for every run:
 
 - exact source SHA, lockfile SHA-256, `cargo metadata` package IDs and sources;
-- features (`CRAFT_FONTS_DIR` set/unset, `PAPEL_SYSTEM_FONTS=0/1`, `PAPEL_RENDERER=wgpu/gl`, `monochrome_emoji_fonts`, `clipboard`);
+- features (`NODALIA_FONTS_DIR` set/unset, `PAPEL_SYSTEM_FONTS=0/1`, `PAPEL_RENDERER=wgpu/gl`, `monochrome_emoji_fonts`, `clipboard`);
 - fixture hash (`tests/perf.rs::big(500)`, `named_comments(10_000)`, panel fixture);
 - OS/kernel, CPU, RAM, GPU/adapter/driver/backend, DPI/scale, window size (1400×900), renderer, profile;
 - software adapter (llvmpipe/WARP) versus real GPU;
@@ -715,8 +715,8 @@ Platform rows:
 | Linux Wayland GNOME | app-drawn frame, window controls, resize edges, panel clipping, PRIMARY |
 | Linux Wayland KDE/Sway | server-side frame, same layout and shortcuts, regular clipboard |
 | Linux Wayland Hyprland | text clipboard/PRIMARY single-device, screenshot control |
-| Windows 11 | real GPU and WARP, mixed-DPI drag, hidden maximized restore, >8192 surface, Korean IME, screenshot, craft-print/GDI build |
-| macOS | traffic lights/title-bar drag, ⌘Q save prompt via craft-quit (W14 not opted in), press-and-hold/dictation IME, emoji picker, Korean space |
+| Windows 11 | real GPU and WARP, mixed-DPI drag, hidden maximized restore, >8192 surface, Korean IME, screenshot, nodalia-print/GDI build |
+| macOS | traffic lights/title-bar drag, ⌘Q save prompt via nodalia-quit (W14 not opted in), press-and-hold/dictation IME, emoji picker, Korean space |
 | FreeBSD | CI or explicitly unresolved; no GUI claim without a real session |
 | Web (Chromium/Firefox) | `trunk build`, open a PDF, Arabic UI, shortcuts on a non-Latin layout, image paste, no named-key text leakage |
 
@@ -737,7 +737,7 @@ Headless `egui_kittest` is not proof of native focus, IME, file pickers, clipboa
 11. **Default-font glyph loss.** 0.37 gates emoji fonts; enable `monochrome_emoji_fonts`, add `egui-icons.ttf`, and keep the kittest glyph panic.
 12. **Kittest stricter accessibility.** Unnamed inputs fail; fix labels rather than disabling checks.
 13. **`WidgetType::TextEdit` does not exist as a `Role`.** It is `Role::TextInput`; `Checkbox` is `Role::CheckBox`.
-14. **craft-print drift.** The bump adds `craft-winprint-gdi`, `rgb`, `lpstat -l` descriptions and `Printer.description`; audit all, fix 19 literals and preserve current main's security fixes.
+14. **nodalia-print drift.** The bump adds `nodalia-winprint-gdi`, `rgb`, `lpstat -l` descriptions and `Printer.description`; audit all, fix 19 literals and preserve current main's security fixes.
 15. **Winit source guards.** Twelve app modules read old vendor paths; move them centrally and use exact git identities.
 16. **Snapshot churn is not acceptance.** Review every diff and keep semantic pixel tests.
 17. **PRIMARY.** W15P is required and is present in the current winit pin; filtering `MiddleClickPaste` does not avoid the protocol risk and is not the selected design.
@@ -751,15 +751,15 @@ Decisions made by this plan:
 - **Kinetic scrolling:** Papel's `fling.rs` owns document motion; ordinary widget `ScrollArea`s keep egui's kinetic default. Use `Unknown`/`Wheel`/`Trackpad`/`Momentum`; macOS custom fling is off.
 - **Panels:** migrate persisted `PanelState` keys in PR 1; transient in-panel focus/scroll may reset once only if the upgrade test proves it.
 - **PRIMARY:** adopt W15P on the existing winit connection/event queue; no app-level filtering and no second regular data device.
-- **RTL:** remove catalog preordering; explicit `TextDirection` for UI labels; `Style::right_to_left` after manual-layout audit; explicit craft-ui dock direction; saved workspace order unchanged.
+- **RTL:** remove catalog preordering; explicit `TextDirection` for UI labels; `Style::right_to_left` after manual-layout audit; explicit nodalia-ui dock direction; saved workspace order unchanged.
 - **Fonts:** `monochrome_emoji_fonts` on; no broad system provider.
-- **Window frame:** `craft_window::Choice` at startup; `PAPEL_TITLEBAR=app|system|desktop`; `window_controls` uses craft-window types; runtime preference remains a `ViewportCommand::Decorations` toggle.
-- **Screenshot helper:** PR 1 waits for and directly adopts the reviewed craft-ui helper after CL-2F; no local duplicate.
+- **Window frame:** `nodalia_window::Choice` at startup; `PAPEL_TITLEBAR=app|system|desktop`; `window_controls` uses nodalia-window types; runtime preference remains a `ViewportCommand::Decorations` toggle.
+- **Screenshot helper:** PR 1 waits for and directly adopts the reviewed nodalia-ui helper after CL-2F; no local duplicate.
 - **Performance:** harness and baseline precede production; stock-0.37 control accompanies first baseline and regressions.
 
 External gates that cannot be decided from this host:
 
-- final approved immutable storytold egui/winit/craft-libs revisions, including W15P and E21b/P7b;
+- final approved immutable storytold egui/winit/nodalia-libs revisions, including W15P and E21b/P7b;
 - native Wayland PRIMARY/IME evidence on wlroots/KWin/Mutter;
 - Windows real-GPU/WARP and native GUI evidence; macOS and FreeBSD hardware evidence;
 - browser runtime and non-Latin keyboard evidence;
@@ -772,7 +772,7 @@ External gates that cannot be decided from this host:
 - Upstream status comes from the provided `upstream-discussions.json` snapshot and local refs; it is not a live GitHub query. #8763 and #8764 are an open issue/PR, not release fixes. #8748 is closed and N/A because Papel uses only `ViewportId::ROOT`.
 - No native Wayland compositor, macOS or Windows session was available; PRIMARY, IME, focus and real-GPU behavior remain unverified.
 - No performance baseline has been measured. The thresholds in §9 are predeclared relative limits; the absolute baseline must be recorded before implementation.
-- The exact publication revisions for egui, winit and craft-libs remain external prerequisites, not user choices.
+- The exact publication revisions for egui, winit and nodalia-libs remain external prerequisites, not user choices.
 - Only `docs/egui-037-migration-plan.md` was written. No production file, manifest, lockfile, vendor tree or test was changed.
 
 ## 14. Source index used for this plan
@@ -789,7 +789,7 @@ Target/reference source:
 
 - egui 0.37 `841a328b`, planning-era candidate `a4f9a17f` (current pin `6d518fc`): `Context::run_ui`/`run_logic`/`end_pass`/`current_pass_index`, `Ui::scope_id`/`unique_id`, `UiBuilder`, `PanelState`/`Panel::id`, `ScreenshotCallback`, `MouseWheelSource`, `ScrollStyle`/`ScrollArea`, `menu::SubmenuButton::arrow_atom`, `epaint_default_fonts`.
 - winit vendor 0.30.13, planning-era candidate `8b35388b` and current pin `a517b384`: `PATCHES.md`, `platform/wayland.rs::set_ime_surrounding_text`, per-seat clipboard/data-device APIs.
-- craft-libs `3832c47` (planning-era; ancestor of the current `25da131` pin), PR 199 `b68de8c`/`8614e4a`/`ec8840a`: `crates/ui`, `crates/window`, `crates/print`, `docs/egui-037-suite-rollout.md`.
+- nodalia-libs `3832c47` (planning-era; ancestor of the current `25da131` pin), PR 199 `b68de8c`/`8614e4a`/`ec8840a`: `crates/ui`, `crates/window`, `crates/print`, `docs/egui-037-suite-rollout.md`.
 - Shared evidence: `lifecycle-source-audit.md`, `ime-surrounding-gap.md`, `upstream-discussions.json`.
 
 
@@ -805,8 +805,8 @@ The complete static delta review and exact old/new object identities are retaine
 
 ## Local implementation amendment — 2026-10-24
 
-**Historical note (superseded by the 2026-10-25 qualification state).** The migration is implemented locally but remains unpublished. At the time of this amendment, `egui`/`eframe`/`egui-wgpu` 0.37.0, the reviewed winit worktree and the shared craft-libs helpers resolved through `local-integration-config.toml`; the checked-in `Cargo.toml`/`Cargo.lock` did not yet pin them. The current tree pins egui `6d518fc`, winit `a517b38` and craft-libs `25da131` (craft-ui, craft-quit and craft-print) directly, while `craft-docpath` remains at `82a24b006eefa036b43c09a67fb9a3fbd17ffe63` (see the top section). The repository quality gates passed as recorded below; publication still requires fresh human approval. No push, PR or release is authorized by this amendment.
+**Historical note (superseded by the 2026-10-25 qualification state).** The migration is implemented locally but remains unpublished. At the time of this amendment, `egui`/`eframe`/`egui-wgpu` 0.37.0, the reviewed winit worktree and the shared nodalia-libs helpers resolved through `local-integration-config.toml`; the checked-in `Cargo.toml`/`Cargo.lock` did not yet pin them. The current tree pins egui `6d518fc`, winit `a517b38` and nodalia-libs `25da131` (nodalia-ui, nodalia-quit and nodalia-print) directly, while `nodalia-docpath` remains at `82a24b006eefa036b43c09a67fb9a3fbd17ffe63` (see the top section). The repository quality gates passed as recorded below; publication still requires fresh human approval. No push, PR or release is authorized by this amendment.
 
-The font contract now includes the native-only Simplified Chinese face: the pinned craft-fonts input supplies `fonts/simplified-chinese-manifest.txt` (LXGW WenKai Lite, OFL-1.1), `crates/fonts/build.rs` embeds it on native builds only under a 16 MiB cap, and a `CRAFT_FONTS_REQUIRED` build fails rather than skipping an absent or over-cap required Chinese face. Traditional Chinese is served by an installed `Hant` face placed before the Japanese faces even when LXGW is embedded. CI, release and FreeBSD keep an immutable craft-fonts commit pin; the current candidate is recorded in the task evidence and the pin must be updated only to a published central commit.
+The font contract now includes the native-only Simplified Chinese face: the pinned nodalia-fonts input supplies `fonts/simplified-chinese-manifest.txt` (LXGW WenKai Lite, OFL-1.1), `crates/fonts/build.rs` embeds it on native builds only under a 16 MiB cap, and a `NODALIA_FONTS_REQUIRED` build fails rather than skipping an absent or over-cap required Chinese face. Traditional Chinese is served by an installed `Hant` face placed before the Japanese faces even when LXGW is embedded. CI, release and FreeBSD keep an immutable nodalia-fonts commit pin; the current candidate is recorded in the task evidence and the pin must be updated only to a published central commit.
 
 Fallback faces now use egui 0.37's `FontTweak::fallback_align = FallbackAlign::Baseline` for the existing one-baseline intent (the metric-derived `y_offset_factor` compensation is gone). Control-channel synthetic input that times out after a press keeps one bounded release batch, so a key, pointer button or modifier cannot stay held when the window resumes. Accepted-frame counting remains one count per presented frame, verified at `max_passes` above two.

@@ -11,10 +11,10 @@ workspace = true
 
 [dependencies]
 papel-ui-egui = { workspace = true }
-# The host messages (getnodalia/foundation (vendor/craft-libs)): one contract and one bridge for the web builds.
+# The host messages (getnodalia/foundation (vendor/nodalia-libs)): one contract and one bridge for the web builds.
 # The page command API (storytold/craft-libs#413): window.papel over the UI control channel.
-craft-web-api = { git = "https://github.com/getnodalia/foundation", rev = "fd5e2feff6ea25bed371a99cc732b3968d621505", version = "0.1.0" }
-craft-web-host = { git = "https://github.com/getnodalia/foundation", rev = "fd5e2feff6ea25bed371a99cc732b3968d621505", version = "0.1.0" }
+nodalia-web-api = { git = "https://github.com/getnodalia/foundation", rev = "a5ba368c1313d208fe927b5bbdf06bddf38b1b2f", version = "0.1.0" }
+nodalia-web-host = { git = "https://github.com/getnodalia/foundation", rev = "a5ba368c1313d208fe927b5bbdf06bddf38b1b2f", version = "0.1.0" }
 eframe = { workspace = true, features = ["default_fonts", "glow", "persistence", "accesskit"] }
 egui = { workspace = true, features = ["default_fonts", "monochrome_emoji_fonts"] }
 serde_json = { workspace = true }

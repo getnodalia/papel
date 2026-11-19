@@ -48,7 +48,7 @@ wayland-protocols = { version = "0.32", features = ["client"] }
 # `com.canonical.dbusmenu` for the top bar. MIT, already in the build through accesskit. Pinned
 # exactly: review the diff before bumping.
 zbus = "=5.19.0"
-craft-menu = { workspace = true }
+nodalia-menu = { workspace = true }
 serde = { workspace = true }
 
 [target.'cfg(all(unix, not(target_os = "macos")))'.dependencies]

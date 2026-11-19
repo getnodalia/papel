@@ -17,7 +17,7 @@ fn flag_box(ui: &mut egui::Ui, flags: &mut u32, bit: u32, inverted: bool, label:
 /// Shared PDF `/Q` picker for text and choice-field Options.
 fn alignment(ui: &mut egui::Ui, quadding: &mut i64) {
     ui.label(tl!("Alignment:"));
-    craft_ui::ComboBox::from_id_salt("quadding")
+    nodalia_ui::ComboBox::from_id_salt("quadding")
         .selected_text(tl!(match (*quadding).clamp(0, 2) {
             1 => "Center",
             2 => "Right",
@@ -87,7 +87,7 @@ pub(crate) fn body(ui: &mut egui::Ui, d: &mut FieldDraft, t: &crate::theme::Toke
                     ui.end_row();
                     if let Some(l) = d.look.as_mut() {
                         ui.label(tl!("Font:"));
-                        craft_ui::ComboBox::from_id_salt("field-font").selected_text(l.font.label()).show_ui(ui, |ui| {
+                        nodalia_ui::ComboBox::from_id_salt("field-font").selected_text(l.font.label()).show_ui(ui, |ui| {
                             for f in FieldFont::ALL {
                                 ui.selectable_value(&mut l.font, f, f.label());
                             }
@@ -130,14 +130,14 @@ pub(crate) fn body(ui: &mut egui::Ui, d: &mut FieldDraft, t: &crate::theme::Toke
                                 tl!("Thick")
                             }
                         };
-                        craft_ui::ComboBox::from_id_salt("field-width").selected_text(thick(l.width)).show_ui(ui, |ui| {
+                        nodalia_ui::ComboBox::from_id_salt("field-width").selected_text(thick(l.width)).show_ui(ui, |ui| {
                             for (w, label) in [(1.0, tl!("Thin")), (2.0, tl!("Medium")), (3.0, tl!("Thick"))] {
                                 ui.selectable_value(&mut l.width, w, label);
                             }
                         });
                         ui.end_row();
                         ui.label(tl!("Line Style:"));
-                        craft_ui::ComboBox::from_id_salt("field-style").selected_text(tl!(l.style.label())).show_ui(ui, |ui| {
+                        nodalia_ui::ComboBox::from_id_salt("field-style").selected_text(tl!(l.style.label())).show_ui(ui, |ui| {
                             for s in BorderStyle::ALL {
                                 ui.selectable_value(&mut l.style, s, tl!(s.label()));
                             }
@@ -162,7 +162,7 @@ pub(crate) fn body(ui: &mut egui::Ui, d: &mut FieldDraft, t: &crate::theme::Toke
                 ui.horizontal(|ui| {
                     let l = ui.label(tl!("Rotation:"));
                     // The field keeps its place and size: the rotation turns its content (#4296).
-                    craft_ui::ComboBox::from_id_salt("field-rotation")
+                    nodalia_ui::ComboBox::from_id_salt("field-rotation")
                         .selected_text(format!("{}°", d.rotation))
                         .show_ui(ui, |ui| {
                             for r in [0, 90, 180, 270] {
@@ -235,7 +235,7 @@ pub(crate) fn body(ui: &mut egui::Ui, d: &mut FieldDraft, t: &crate::theme::Toke
                     if let Some(style) = d.check_style.as_mut() {
                         ui.horizontal(|ui| {
                             let l = ui.label(tl!(if d.kind == FormFieldKind::CheckBox { "Check Box Style:" } else { "Button Style:" }));
-                            craft_ui::ComboBox::from_id_salt("check-style")
+                            nodalia_ui::ComboBox::from_id_salt("check-style")
                                 .selected_text(tl!(style.label()))
                                 .show_ui(ui, |ui| {
                                     for s in papel_engine::CheckStyle::ALL {
@@ -295,7 +295,7 @@ pub(crate) fn body(ui: &mut egui::Ui, d: &mut FieldDraft, t: &crate::theme::Toke
                     ui.horizontal(|ui| {
                         ui.label(tl!("Default:"));
                         let shown = if d.default.is_empty() { tl!("(none)").to_string() } else { d.default.clone() };
-                        craft_ui::ComboBox::from_id_salt("choice-default").selected_text(shown).show_ui(ui, |ui| {
+                        nodalia_ui::ComboBox::from_id_salt("choice-default").selected_text(shown).show_ui(ui, |ui| {
                             ui.selectable_value(&mut d.default, String::new(), tl!("(none)"));
                             for o in d.options.clone() {
                                 ui.selectable_value(&mut d.default, o.clone(), o);

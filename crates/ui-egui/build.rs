@@ -1,4 +1,4 @@
-//! Bake the contributor credits into the binary as static Rust tables, and embed the craft-i18n
+//! Bake the contributor credits into the binary as static Rust tables, and embed the nodalia-i18n
 //! interface catalogs. Nothing is read at run time.
 //!
 //! - contributors/contributors.json: commit stats per GitHub username, with a mark for whose people.toml
@@ -8,11 +8,11 @@
 //!
 //! A missing or malformed file gives empty tables (or no names) and a warning.
 //!
-//! - `CRAFT_I18N_DIR`, a craft-i18n checkout (getnodalia/foundation (vendor/craft-i18n), at the SHA in
-//!   `craft-i18n.rev`): `craft_i18n.rs` holds `CRAFT_I18N`, one (locale, shared catalog, Papel
-//!   catalog) entry per locale that has a `pdfcraft.tsv`. Unset, or not a checkout (a warning),
-//!   it is empty and the interface is English only; with `CRAFT_I18N_REQUIRED=1` (CI and releases)
-//!   that is an error instead. Recipe: craft-i18n's `docs/integration.md`.
+//! - `NODALIA_I18N_DIR`, a nodalia-i18n checkout (getnodalia/foundation (vendor/nodalia-i18n), at the SHA in
+//!   `nodalia-i18n.rev`): `nodalia_i18n.rs` holds `NODALIA_I18N`, one (locale, shared catalog, Papel
+//!   catalog) entry per locale that has a `papel.tsv`. Unset, or not a checkout (a warning),
+//!   it is empty and the interface is English only; with `NODALIA_I18N_REQUIRED=1` (CI and releases)
+//!   that is an error instead. Recipe: nodalia-i18n's `docs/integration.md`.
 
 use std::fmt::Write as _;
 
@@ -30,39 +30,39 @@ fn main() {
     if let Err(e) = std::fs::write(&out, generate(&json, &people)) {
         println!("cargo::warning=writing {}: {e}", out.display());
     }
-    let out = out.with_file_name("craft_i18n.rs");
-    if let Err(e) = std::fs::write(&out, craft_i18n()) {
+    let out = out.with_file_name("nodalia_i18n.rs");
+    if let Err(e) = std::fs::write(&out, nodalia_i18n()) {
         println!("cargo::error=writing {}: {e}", out.display());
     }
 }
 
-/// The catalog this app reads in each locale: `locales/<locale>/pdfcraft.tsv`.
-const APP_CATALOG: &str = "pdfcraft.tsv";
+/// The catalog this app reads in each locale: `locales/<locale>/papel.tsv`.
+const APP_CATALOG: &str = "papel.tsv";
 
-/// `CRAFT_I18N` from `CRAFT_I18N_DIR`: the `Embedded` list the craft-i18n crate reads.
-fn craft_i18n() -> String {
-    println!("cargo::rerun-if-env-changed=CRAFT_I18N_DIR");
-    println!("cargo::rerun-if-env-changed=CRAFT_I18N_REQUIRED");
-    let required = std::env::var("CRAFT_I18N_REQUIRED").is_ok_and(|v| v.trim() == "1");
-    let entries = match std::env::var_os("CRAFT_I18N_DIR").filter(|d| !d.is_empty()) {
+/// `NODALIA_I18N` from `NODALIA_I18N_DIR`: the `Embedded` list the nodalia-i18n crate reads.
+fn nodalia_i18n() -> String {
+    println!("cargo::rerun-if-env-changed=NODALIA_I18N_DIR");
+    println!("cargo::rerun-if-env-changed=NODALIA_I18N_REQUIRED");
+    let required = std::env::var("NODALIA_I18N_REQUIRED").is_ok_and(|v| v.trim() == "1");
+    let entries = match std::env::var_os("NODALIA_I18N_DIR").filter(|d| !d.is_empty()) {
         // Not canonicalized: on Windows that gives `\\?\C:\…`, which `include_str!` can't read.
         Some(dir) => match locales(&std::path::PathBuf::from(dir).join("locales")) {
             Ok(entries) => entries,
             Err(e) => {
                 let level = if required { "error" } else { "warning" };
-                println!("cargo::{level}=CRAFT_I18N_DIR: {e}; the interface is English only");
+                println!("cargo::{level}=NODALIA_I18N_DIR: {e}; the interface is English only");
                 Vec::new()
             }
         },
         None => {
             if required {
-                println!("cargo::error=CRAFT_I18N_REQUIRED=1 but CRAFT_I18N_DIR is unset: a release must embed the translations");
+                println!("cargo::error=NODALIA_I18N_REQUIRED=1 but NODALIA_I18N_DIR is unset: a release must embed the translations");
             }
             Vec::new()
         }
     };
     let mut o = String::from("/// (locale, shared catalog, Papel's catalog), one entry per locale; `\"\"` for a missing file.\n");
-    o.push_str("pub static CRAFT_I18N: &craft_i18n::Embedded = &[\n");
+    o.push_str("pub static NODALIA_I18N: &nodalia_i18n::Embedded = &[\n");
     for (code, shared, app) in entries {
         // `{:?}` escapes the path (Windows backslashes) as a Rust string literal.
         let shared = shared.map_or_else(|| "\"\"".to_string(), |p| format!("include_str!({p:?})"));
@@ -76,7 +76,7 @@ fn craft_i18n() -> String {
 type Locale = (String, Option<std::path::PathBuf>, std::path::PathBuf);
 
 /// Every locale under `dir` with Papel's catalog, by code. An error when `dir` isn't a
-/// craft-i18n `locales/` directory.
+/// nodalia-i18n `locales/` directory.
 fn locales(dir: &std::path::Path) -> Result<Vec<Locale>, String> {
     // Build scripts run in the crate's directory and `include_str!` resolves against the
     // generated file, so a relative path would mean two different places.
@@ -85,7 +85,7 @@ fn locales(dir: &std::path::Path) -> Result<Vec<Locale>, String> {
     }
     // Before read_dir, so a checkout that appears later reruns the script.
     println!("cargo::rerun-if-changed={}", dir.display());
-    let list = std::fs::read_dir(dir).map_err(|e| format!("{} is not a craft-i18n checkout ({e})", dir.display()))?;
+    let list = std::fs::read_dir(dir).map_err(|e| format!("{} is not a nodalia-i18n checkout ({e})", dir.display()))?;
     let mut out = Vec::new();
     for entry in list.flatten() {
         let path = entry.path();

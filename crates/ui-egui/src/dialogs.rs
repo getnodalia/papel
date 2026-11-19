@@ -634,7 +634,7 @@ fn dialog_properties(ui: &mut egui::Ui, app: &mut PapelApp, req: &mut Pending, t
                 ui.end_row();
                 let label = ui.label(tl!("Navigation tab"));
                 ui.add_enabled_ui(editable, |ui| {
-                    craft_ui::ComboBox::from_id_salt("iv-nav")
+                    nodalia_ui::ComboBox::from_id_salt("iv-nav")
                         .selected_text(tl!(format!("{:?}", v.navigation)
                             .replace("PageOnly", "Page Only")
                             .replace("Pages", "Pages Panel and Page")
@@ -666,7 +666,7 @@ fn dialog_properties(ui: &mut egui::Ui, app: &mut PapelApp, req: &mut Pending, t
                         (L::TwoUpContinuousCoverPage, tl!("Two-Up Continuous (Cover Page)")),
                     ];
                     let shown = names.iter().find(|(l, _)| *l == v.layout).map_or(tl!("Default"), |(_, n)| n);
-                    craft_ui::ComboBox::from_id_salt("iv-layout")
+                    nodalia_ui::ComboBox::from_id_salt("iv-layout")
                         .selected_text(shown)
                         .show_ui(ui, |ui| {
                             for (l, n) in names {
@@ -692,7 +692,7 @@ fn dialog_properties(ui: &mut egui::Ui, app: &mut PapelApp, req: &mut Pending, t
                             M::Percent(p) => format!("{p:.0}%"),
                             m => names.iter().find(|(x, _)| *x == m).map_or(tl!("Default").to_string(), |(_, n)| n.to_string()),
                         };
-                        craft_ui::ComboBox::from_id_salt("iv-mag")
+                        nodalia_ui::ComboBox::from_id_salt("iv-mag")
                             .selected_text(shown)
                             .show_ui(ui, |ui| {
                                 for (m, n) in names {
@@ -1176,7 +1176,7 @@ fn dialog_rotate_pages(ui: &mut egui::Ui, app: &mut PapelApp, req: &mut Pending)
     ui.add_space(8.0);
     egui::Grid::new("rotate-pages").num_columns(2).spacing([12.0, 8.0]).show(ui, |ui| {
         ui.label(tl!("Direction:"));
-        craft_ui::ComboBox::from_id_salt("rotate-dir")
+        nodalia_ui::ComboBox::from_id_salt("rotate-dir")
             .selected_text(match d.degrees {
                 270 => tl!("Counterclockwise 90 degrees"),
                 180 => tl!("180 degrees"),
@@ -1203,7 +1203,7 @@ fn dialog_rotate_pages(ui: &mut egui::Ui, app: &mut PapelApp, req: &mut Pending)
         });
         ui.end_row();
         ui.label(tl!("Rotate:"));
-        craft_ui::ComboBox::from_id_salt("rotate-parity")
+        nodalia_ui::ComboBox::from_id_salt("rotate-parity")
             .selected_text(match d.parity {
                 P::Both => tl!("Even and Odd Pages"),
                 P::Even => tl!("Even Pages Only"),
@@ -1216,7 +1216,7 @@ fn dialog_rotate_pages(ui: &mut egui::Ui, app: &mut PapelApp, req: &mut Pending)
             });
         ui.end_row();
         ui.label("");
-        craft_ui::ComboBox::from_id_salt("rotate-orient")
+        nodalia_ui::ComboBox::from_id_salt("rotate-orient")
             .selected_text(match d.orientation {
                 O::Both => tl!("Landscape and Portrait Pages"),
                 O::Landscape => tl!("Landscape Pages"),
@@ -1312,7 +1312,7 @@ fn dialog_summarize_comments(ui: &mut egui::Ui, app: &mut PapelApp, req: &mut Pe
     ui.add_space(6.0);
     ui.horizontal(|ui| {
         ui.label(tl!("Sort comments by:"));
-        craft_ui::ComboBox::from_id_salt("summary-sort").selected_text(tl!(app.summary_sort.name())).show_ui(ui, |ui| {
+        nodalia_ui::ComboBox::from_id_salt("summary-sort").selected_text(tl!(app.summary_sort.name())).show_ui(ui, |ui| {
             for s in papel_engine::SummarySort::ALL {
                 ui.selectable_value(&mut app.summary_sort, s, tl!(s.name()));
             }
@@ -1533,7 +1533,7 @@ fn dialog_number_pages(ui: &mut egui::Ui, app: &mut PapelApp, req: &mut Pending)
             (L::None, tl!("None (prefix only)")),
         ];
         let current = styles.iter().find(|(s, _)| *s == d.style).map_or("1, 2, 3", |(_, l)| *l);
-        craft_ui::ComboBox::from_id_salt("label_style").selected_text(current).show_ui(ui, |ui| {
+        nodalia_ui::ComboBox::from_id_salt("label_style").selected_text(current).show_ui(ui, |ui| {
             for (s, l) in styles {
                 ui.selectable_value(&mut d.style, s, l);
             }

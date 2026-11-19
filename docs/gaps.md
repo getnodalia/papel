@@ -131,18 +131,18 @@ update the numbers.
 
 ### 5. Chinese UI lacks a web glyph face
 
-- **Missing:** a Simplified Chinese (`Hans`) UI face in the web build and a working fallback. Native release builds embed LXGW WenKai Lite from the pinned craft-fonts native Simplified Chinese manifest.
+- **Missing:** a Simplified Chinese (`Hans`) UI face in the web build and a working fallback. Native release builds embed LXGW WenKai Lite from the pinned nodalia-fonts native Simplified Chinese manifest.
 - **Evidence:** [#826](https://github.com/storytold/pdfcraft/issues/826),
   [#688](https://github.com/storytold/pdfcraft/issues/688),
   [#728](https://github.com/storytold/pdfcraft/issues/728),
   [#758](https://github.com/storytold/pdfcraft/issues/758),
   [#689](https://github.com/storytold/pdfcraft/issues/689) (Flatpak) predate the native face; the
   web build still embeds only BIZ UDPGothic Regular plus the small Arabic, Hebrew, Thai and Devanagari faces.
-  craft-fonts has Noto Sans CJK SC, but at 16.4 MB it is too large to embed whole; a web face needs
+  nodalia-fonts has Noto Sans CJK SC, but at 16.4 MB it is too large to embed whole; a web face needs
   a cut of it (storytold/craft-libs#213).
 - **Impact:** the second-largest language group sees a broken interface in the web build although
   the catalog is 97% translated.
-- **Estimate:** 6–12 h (cut CJK faces through craft-fonts-build plus the fallback chain). **Doc:**
+- **Estimate:** 6–12 h (cut CJK faces through nodalia-fonts-build plus the fallback chain). **Doc:**
   [localization-parity.md](localization-parity.md).
 
 ### 6. Open-issue backlog of wrong results in shipped features

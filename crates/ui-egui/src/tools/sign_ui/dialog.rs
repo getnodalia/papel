@@ -168,7 +168,7 @@ fn configure(ui: &mut egui::Ui, app: &mut PapelApp, t: &Tokens) -> bool {
             ui.add(crate::widgets::line(&mut n.country).hint_text("US").char_limit(2).desired_width(60.0)).labelled_by(l.id);
             ui.end_row();
             ui.label(tl!("Key Algorithm"));
-            craft_ui::ComboBox::from_id_salt("key-alg").selected_text(KEY_ALGORITHMS[n.key].0).show_ui(ui, |ui| {
+            nodalia_ui::ComboBox::from_id_salt("key-alg").selected_text(KEY_ALGORITHMS[n.key].0).show_ui(ui, |ui| {
                 for (i, (label, _)) in KEY_ALGORITHMS.iter().enumerate() {
                     ui.selectable_value(&mut n.key, i, *label);
                 }
@@ -434,7 +434,7 @@ fn sign_as(ui: &mut egui::Ui, app: &mut PapelApp, t: &Tokens) -> bool {
                 3 => tl!("Annotations, form fill-in, and digital signatures"),
                 _ => tl!("Form fill-in and digital signatures"),
             };
-            craft_ui::ComboBox::from_id_salt("certify-p").selected_text(label(p)).width(300.0).show_ui(ui, |ui| {
+            nodalia_ui::ComboBox::from_id_salt("certify-p").selected_text(label(p)).width(300.0).show_ui(ui, |ui| {
                 for v in [1u8, 2, 3] {
                     ui.selectable_value(&mut p, v, label(v));
                 }

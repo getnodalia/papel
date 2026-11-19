@@ -1,7 +1,7 @@
-//! System print spooler supplied by craft-print. PDF composition and permission checks
+//! System print spooler supplied by nodalia-print. PDF composition and permission checks
 //! stay in Papel; these adapters retain the application's print-error surface.
 
-pub use craft_print::{
+pub use nodalia_print::{
     Duplex, HANDLED_OPTIONS, HAS_PRINTER_PREFERENCES, Job, Printer, PrinterOption, Scaling, lp_args, lpstat_command, parse_lpoptions, parse_lpstat,
     parse_lpstat_e, parse_ppd, parse_windows_printers, ppd_text, printers_parsed,
 };
@@ -60,7 +60,7 @@ pub fn printers() -> Vec<Printer> {
     }
     #[cfg(all(windows, test))]
     PRINTER_BACKEND_CALLS.with(|c| c.set(c.get().saturating_add(1)));
-    craft_print::printers()
+    nodalia_print::printers()
 }
 
 /// The system's print queues without asking any driver, so a Print dialog's list never waits on
@@ -71,7 +71,7 @@ pub fn printer_queues() -> Vec<Printer> {
     }
     #[cfg(all(windows, test))]
     PRINTER_BACKEND_CALLS.with(|c| c.set(c.get().saturating_add(1)));
-    craft_print::printer_queues()
+    nodalia_print::printer_queues()
 }
 
 /// Whether `printer`'s driver takes two-sided settings, read for that one printer; it can wait
@@ -83,7 +83,7 @@ pub fn two_sided(printer: &str) -> Option<bool> {
     }
     #[cfg(all(windows, test))]
     PRINTER_BACKEND_CALLS.with(|c| c.set(c.get().saturating_add(1)));
-    craft_print::two_sided(printer)
+    nodalia_print::two_sided(printer)
 }
 
 /// The driver's job options for a printer (CUPS: its PPD, with the queue's current defaults);
@@ -104,7 +104,7 @@ pub fn printer_options_in(printer: &str, lang: &str) -> Vec<PrinterOption> {
     #[cfg(not(all(unix, not(target_arch = "wasm32"))))]
     {
         let _ = lang;
-        craft_print::printer_options(printer)
+        nodalia_print::printer_options(printer)
     }
 }
 
@@ -236,7 +236,7 @@ pub(crate) fn printer_options_via_within(
     options
 }
 
-/// Caps that match [`craft_print::parse_ppd`]: a malformed spooler answer is not allowed to
+/// Caps that match [`nodalia_print::parse_ppd`]: a malformed spooler answer is not allowed to
 /// dominate memory or the dialog.
 #[cfg(all(unix, not(target_arch = "wasm32")))]
 const MAX_LPOPTIONS_OPTIONS: usize = 400;
@@ -247,7 +247,7 @@ const MAX_LPOPTIONS_LABEL: usize = 256;
 
 /// A PPD keyword: printable ASCII without spaces, `/`, `:`, `=` or `"`.
 #[cfg(all(unix, not(target_arch = "wasm32")))]
-// The three name helpers below mirror `is_ppd_keyword`, `name_label` and `ppd_label` in craft-print,
+// The three name helpers below mirror `is_ppd_keyword`, `name_label` and `ppd_label` in nodalia-print,
 // which are private there: keep them in step with that crate, or they will accept in one reader what
 // the other refuses.
 fn is_lpoptions_keyword(s: &str) -> bool {
@@ -395,7 +395,7 @@ pub fn submit(pdf: &[u8], job: &Job) -> Result<String, crate::PrintError> {
     #[cfg(windows)]
     let job = resolved.as_ref();
     let pdf = spooled_pdf(pdf, crate::font_names::RENAME_FOR_SPOOLER);
-    craft_print::submit(&pdf, &spooled(job)).map_err(|e| crate::PrintError::Spool(e.to_string()))
+    nodalia_print::submit(&pdf, &spooled(job)).map_err(|e| crate::PrintError::Spool(e.to_string()))
 }
 
 /// [`submit`], told `(sent, sheets)` as each sheet reaches the spooler (Windows; CUPS takes the
@@ -409,7 +409,7 @@ pub fn submit_with_progress(pdf: &[u8], job: &Job, progress: &mut dyn FnMut(usiz
     #[cfg(windows)]
     let job = resolved.as_ref();
     let pdf = spooled_pdf(pdf, crate::font_names::RENAME_FOR_SPOOLER);
-    craft_print::submit_with_progress(&pdf, &spooled(job), progress).map_err(|e| crate::PrintError::Spool(e.to_string()))
+    nodalia_print::submit_with_progress(&pdf, &spooled(job), progress).map_err(|e| crate::PrintError::Spool(e.to_string()))
 }
 
 /// The PDF as the system spooler takes it: with `rename` (Windows), its embedded TrueType and
@@ -427,7 +427,7 @@ pub(crate) fn spooled_pdf(pdf: &[u8], rename: bool) -> std::borrow::Cow<'_, [u8]
 }
 
 pub fn open_printer_preferences(printer: &str) -> Result<(), crate::PrintError> {
-    craft_print::open_printer_preferences(printer).map_err(|e| crate::PrintError::Spool(e.to_string()))
+    nodalia_print::open_printer_preferences(printer).map_err(|e| crate::PrintError::Spool(e.to_string()))
 }
 
 /// The PPD language codes (`*cupsLanguages`, the `ll` of `*ll.Translation`) to try for a UI

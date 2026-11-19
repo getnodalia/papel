@@ -69,7 +69,7 @@ pub struct Manifest {
     pub build_input: Vec<BuildInput>,
 }
 
-/// Material compiled in only when the builder opts in (e.g. `CRAFT_FONTS_DIR`): not in this
+/// Material compiled in only when the builder opts in (e.g. `NODALIA_FONTS_DIR`): not in this
 /// repository, not downloaded by it. Its own repository attributes each file.
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -493,11 +493,11 @@ mod tests {
     #[test]
     fn build_inputs_need_an_open_licence_and_https_links() {
         let input = |licence: &str, attribution: &str| BuildInput {
-            name: "craft-fonts".into(),
-            option: "CRAFT_FONTS_DIR".into(),
+            name: "nodalia-fonts".into(),
+            option: "NODALIA_FONTS_DIR".into(),
             title: "t".into(),
             author: "a".into(),
-            source: "https://github.com/getnodalia/foundation/tree/vendor/craft-fonts/main".into(),
+            source: "https://github.com/getnodalia/foundation/tree/nodalia/fonts".into(),
             licence: licence.into(),
             attribution: attribution.into(),
             kind: "font".into(),

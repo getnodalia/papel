@@ -50,7 +50,7 @@ fn main() {
                     // eframe never raises a close request on a browser reload or tab close, so `guard_quit` never
                     // prompts; ask the browser to confirm instead while a document has unsaved work or an OCR review is open (#812).
                     warn_before_unload(app.unsaved_flag.clone());
-                    // Host modes (`host` below, over `craft-web-host`): `?host=parent`, a
+                    // Host modes (`host` below, over `nodalia-web-host`): `?host=parent`, a
                     // same-origin page embedding Papel in an iframe (such as the Nextcloud
                     // app), or `data-host="page"` on the canvas, a host that runs the module in
                     // its own document.
@@ -131,7 +131,7 @@ fn app_canvas() -> Option<web_sys::HtmlCanvasElement> {
 }
 
 /// Host modes: how the page embedding Papel passes files in and takes saves back. The messages
-/// and the two transports are `craft-web-host`'s (getnodalia/foundation (vendor/craft-libs)), the same contract as the
+/// and the two transports are `nodalia-web-host`'s (getnodalia/foundation (vendor/nodalia-libs)), the same contract as the
 /// other Nodalia apps' bridges, with the `papel:` prefix. This module is Papel's part of it.
 ///
 /// - `?host=parent` is the `postMessage` bridge for a same-origin page that embeds Papel in an
@@ -151,7 +151,7 @@ fn app_canvas() -> Option<web_sys::HtmlCanvasElement> {
 mod host {
     use std::rc::Rc;
 
-    use craft_web_host::web::{FileData, Host, Message};
+    use nodalia_web_host::web::{FileData, Host, Message};
 
     /// The app id in the host messages (`papel:ready`).
     const APP: &str = "papel";

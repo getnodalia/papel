@@ -10,16 +10,16 @@ rust-version = "1.95"
 workspace = true
 
 [dependencies]
-craft-ui = { workspace = true }
+nodalia-ui = { workspace = true }
 nodalia-theme = { workspace = true }
 # The menus: native on macOS, an egui bar elsewhere, from one definition (menus.rs).
-craft-menu = { workspace = true }
-craft-keymap = { workspace = true }
-# Interface translations over the embedded craft-i18n catalogs (`build.rs`, `src/i18n.rs`).
-craft-i18n = { workspace = true }
+nodalia-menu = { workspace = true }
+nodalia-keymap = { workspace = true }
+# Interface translations over the embedded nodalia-i18n catalogs (`build.rs`, `src/i18n.rs`).
+nodalia-i18n = { workspace = true }
 # Quit from the menus asks the window to close, so the unsaved-changes check runs; on macOS a window
 # close also quits through `terminate:` (the Touch Bar crash, #1136).
-craft-quit = { workspace = true, features = ["egui"] }
+nodalia-quit = { workspace = true, features = ["egui"] }
 papel-fonts = { workspace = true }
 papel-engine = { workspace = true }
 papel-cos = { workspace = true }

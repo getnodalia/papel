@@ -79,8 +79,8 @@ The workflow sets `PAPEL_BUILD_SHA` and `PAPEL_BUILD_DATE` (`packaging/env.sh` f
 for local builds): the commit is recorded in the macOS `Info.plist` (`PapelBuildCommit`) and the
 date in the AppStream metadata. The binaries don't embed the commit yet.
 
-**Fonts:** every job checks out [craft-fonts](https://github.com/getnodalia/foundation/tree/vendor/craft-fonts/main) at the commit
-pinned in `release.yml` and builds with `CRAFT_FONTS_DIR` and `CRAFT_FONTS_REQUIRED=1`, so releases
+**Fonts:** every job checks out [nodalia-fonts](https://github.com/getnodalia/foundation/tree/nodalia/fonts) at the commit
+pinned in `release.yml` and builds with `NODALIA_FONTS_DIR` and `NODALIA_FONTS_REQUIRED=1`, so releases
 embed its Japanese fonts and fail rather than ship without them (`AGENTS.md` §1.4). Bump the pin
 deliberately.
 
@@ -180,15 +180,15 @@ neither the MSI nor the portable zip needs the Visual C++ redistributable.
   smoke test checks that both all-users shortcuts point at the installed `papel.exe` and are
   removed on uninstall, and that `INSTALLDESKTOPSHORTCUT=0` skips the desktop one.
 - The portable zip holds both executables, the README, the licences, the OFL licence of each
-  embedded craft-fonts family, and `portable.txt`. That marker beside `papel.exe` keeps the
+  embedded nodalia-fonts family, and `portable.txt`. That marker beside `papel.exe` keeps the
   settings, logs, crash recovery and new digital IDs in `PapelData\` next to the exe instead of
   `%APPDATA%` and `%LOCALAPPDATA%` (`crates/ui-egui/src/platform/portable.rs`). The MSI carries the same
-  OFL notices; `-SkipBuild` requires `CRAFT_FONTS_DIR` so they can be staged, or
+  OFL notices; `-SkipBuild` requires `NODALIA_FONTS_DIR` so they can be staged, or
   `-BuiltWithoutCraftFonts` for binaries built without that input, and `test-msi.ps1` checks that
   the compiled MSI has OFL notice rows when expected (and none for a no-font build).
   Before either package is created, `font-notices.ps1` validates every declared OFL notice in
   `fonts/manifest.txt` and the native `fonts/simplified-chinese-manifest.txt` when present
-  (required when `CRAFT_FONTS_REQUIRED` is set). Missing or empty family notices fail packaging;
+  (required when `NODALIA_FONTS_REQUIRED` is set). Missing or empty family notices fail packaging;
   one family's notice cannot cover another. The check conservatively includes declared faces
   omitted by build-time size caps. `test-font-notices.ps1` exercises these failures in CI.
   The supplied checkout must match the existing binaries when using `-SkipBuild`.

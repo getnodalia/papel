@@ -67,7 +67,7 @@ This change does not alter persistence of other print preferences.
 Headless `doc_print` defaults are unchanged.
 
 `spool` delegates discovery, driver options, preferences and submission to
-[`craft-print`](https://github.com/getnodalia/foundation/tree/vendor/craft-libs/main/crates/print).
+[`nodalia-print`](https://github.com/getnodalia/foundation/tree/nodalia/libs/crates/print).
 Papel retains page selection, imposition, annotations and print-permission checks.
 CUPS jobs stream through stdin with `fit-to-page=false`, and with `orientation-requested=4` when
 every sheet is landscape (`cups_orientation`), since CUPS would otherwise shrink a landscape
@@ -91,7 +91,7 @@ logged and falls back to leaving duplex unspecified, so the driver can still cho
 If the queue was resolved before the settings failure, the job remains pinned to that queue. CUPS still leaves the choice to the queue. The Windows backend
 selects `JobDuplexAllDocumentsContiguously`, falling back to `DocumentDuplex` when
 the driver exposes only document-level duplex, and validates the retained binding before submission
-([craft-libs #411](https://github.com/storytold/craft-libs/pull/411)).
+([nodalia-libs #411](https://github.com/storytold/craft-libs/pull/411)).
 
 Before a job reaches the Windows spooler, every embedded TrueType or OpenType program is
 renamed `PapelPrint<n>` in its `name` table and in the PDF (`/BaseFont`, `/FontName`; a
@@ -102,7 +102,7 @@ program Papel can't read and rewrite keeps its old name in the PDF too, so a vie
 can't load it either still picks its substitute by that name.
 
 The shared dependency requires Rust 1.95. Transport and native Windows regression tests
-live in craft-libs; local tests retain composition, facade, engine, automation and UI coverage.
+live in nodalia-libs; local tests retain composition, facade, engine, automation and UI coverage.
 The desktop UI discovers printers and submits jobs on workers, so neither operation blocks
 the dialog; the Windows backend starts without a console window. Physical printer output
 still needs hardware validation.
@@ -131,7 +131,7 @@ this is not per-page paper-source selection.
 
 **PDF scale** describes the source-to-sheet transform in the previewed print-ready
 PDF, not measured physical output. Fit reserves an 18 pt margin and can reduce even
-a matching page. On Windows craft-print sends the sheets as vectors with a PrintTicket
+a matching page. On Windows nodalia-print sends the sheets as vectors with a PrintTicket
 for the sheet's exact paper and no scaling (#599's approach), validated by the driver:
 a job is refused, not shrunk, when the driver lacks the paper or would change it. Verify
 the driver's paper settings and physical calibration before relying on drawing scale.

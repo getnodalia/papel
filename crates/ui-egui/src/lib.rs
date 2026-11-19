@@ -743,7 +743,7 @@ pub struct PapelApp {
     /// `registry_shortcuts`).
     deferred_commands: Vec<(&'static str, Option<DocId>)>,
     /// The native menu bar (macOS), while it is installed; the in-window bar shows otherwise.
-    pub(crate) native_menu: Option<craft_menu::NativeMenu>,
+    pub(crate) native_menu: Option<nodalia_menu::NativeMenu>,
     /// Whether the desktop's top bar shows the native menu right now (Linux's global menu, which
     /// a desktop can take and give back); `None` when the native menu is always shown (macOS).
     pub(crate) native_menu_shown: Option<std::sync::Arc<std::sync::atomic::AtomicBool>>,

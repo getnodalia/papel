@@ -19,9 +19,9 @@ add a language: [localization.md](localization.md). Summary in [ROADMAP.md](../R
   falls behind without losing a translation, and every figure here carries its date. English is
   built in.
 - **Catalogs:** the figures above were taken from the in-repo catalogs
-  (`crates/ui-egui/src/i18n/<code>.tsv`), which have since moved to craft-i18n's `locales/<code>/`.
-  The report reads the catalogs the build embeds, so measuring again needs `CRAFT_I18N_DIR` set to a
-  craft-i18n checkout at the commit in `craft-i18n.rev`; without it the report says it was
+  (`crates/ui-egui/src/i18n/<code>.tsv`), which have since moved to nodalia-i18n's `locales/<code>/`.
+  The report reads the catalogs the build embeds, so measuring again needs `NODALIA_I18N_DIR` set to a
+  nodalia-i18n checkout at the commit in `nodalia-i18n.rev`; without it the report says it was
   skipped.
 - **Before 2026-11-03** this page counted distinct `(context, English)` keys against the union of
   keys across all catalogs: 2,143 keys on 2026-10-10, 2,798 on 2026-10-25, and 2,895 on
@@ -43,16 +43,16 @@ add a language: [localization.md](localization.md). Summary in [ROADMAP.md](../R
 | Language | Code | UI strings translated (of 2,897, 2026-11-03) | Dialogs / tooltips / help | Script support | Native review | Status | Acrobat ships it | To `full` (h) |
 |---|---|---|---|---|---|---|---|---|
 | English | `en` | built in (100%) | all; README and docs | Latin | yes | **full** | yes | 0 |
-| Simplified Chinese | `zh-hans` | 2,560 (88.4%) | dialogs and tooltips through `tl!`; no help | CJK text and IME work; native craft-fonts builds embed the **LXGW WenKai Lite** Hans face, while the web build has no Hans face beyond BIZ UDPGothic, and missing-glyph reports (#826, #688, #728, #758; Flatpak #689) predate the native face | no | partial | yes | 6–12 |
+| Simplified Chinese | `zh-hans` | 2,560 (88.4%) | dialogs and tooltips through `tl!`; no help | CJK text and IME work; native nodalia-fonts builds embed the **LXGW WenKai Lite** Hans face, while the web build has no Hans face beyond BIZ UDPGothic, and missing-glyph reports (#826, #688, #728, #758; Flatpak #689) predate the native face | no | partial | yes | 6–12 |
 | Spanish | `es` | 2,851 (98.4%) | dialogs and tooltips; no help | Latin | no | partial | yes | 2–4 |
-| Hindi | `hi` | 2,825 (97.5%) | dialogs and tooltips; no help | Devanagari not tested (egui shapes Telugu conjuncts, so shaping is likely workable); the pinned craft-fonts manifest has Noto Sans Devanagari Regular; rendering remains unqualified | no | partial | no | 10–18 |
+| Hindi | `hi` | 2,825 (97.5%) | dialogs and tooltips; no help | Devanagari not tested (egui shapes Telugu conjuncts, so shaping is likely workable); the pinned nodalia-fonts manifest has Noto Sans Devanagari Regular; rendering remains unqualified | no | partial | no | 10–18 |
 | Arabic | `ar` | 2,836 (97.9%) | dialogs and tooltips; no help | Logical-order catalog; egui 0.37's epaint reorders with UAX #9, Arabic, Kurdish and Persian labels use an explicit right-to-left paragraph direction, and stock chrome is mirrored. Native/browser RTL input and IME, and complex bidirectional workflows, are not yet qualified (`localization.md` §Arabic) | no | partial | yes (Middle East edition) | 25–45 |
 | French | `fr` | 2,851 (98.4%) | dialogs and tooltips; no help | Latin | no | partial | yes | 1–2 |
 | Portuguese (Brazil) | `pt-br` | 2,851 (98.4%) | dialogs and tooltips; no help | Latin | community (#288) | partial | yes | 1–2 |
 | Indonesian | `id` | 2,825 (97.5%) | dialogs and tooltips; no help | Latin | no | partial | no | 3–5 |
-| Japanese | `ja` | 2,597 (89.6%) | dialogs and tooltips; no help | BIZ UDPGothic from craft-fonts; IME patched on macOS, Windows, X11, Wayland; vertical text renders but can't be edited | no | partial | yes | 4–8 |
+| Japanese | `ja` | 2,597 (89.6%) | dialogs and tooltips; no help | BIZ UDPGothic from nodalia-fonts; IME patched on macOS, Windows, X11, Wayland; vertical text renders but can't be edited | no | partial | yes | 4–8 |
 | German | `de` | 2,600 (89.7%) | dialogs and tooltips; no help | Latin | community, in progress (#828: terminology, clipping) | partial | yes | 2–4 |
-| Korean | `ko` | 2,825 (97.5%) | dialogs and tooltips; no help | Hangul IME patched (Microsoft and Apple Korean, `vendor/README.md` winit 3, 6, 9, 10); no Hangul UI face in craft-fonts | no | partial | yes | 6–10 |
+| Korean | `ko` | 2,825 (97.5%) | dialogs and tooltips; no help | Hangul IME patched (Microsoft and Apple Korean, `vendor/README.md` winit 3, 6, 9, 10); no Hangul UI face in nodalia-fonts | no | partial | yes | 6–10 |
 | Vietnamese | `vi` | 2,851 (98.4%) | dialogs and tooltips; no help | Latin with stacked diacritics; bundled Inter covers them (fonts test) | community | partial | no | 2–4 |
 
 **Localization dimension ≈ 68%** (scored 2026-10-13, before the counts above): the mean over the
@@ -76,7 +76,7 @@ help/docs polish: their script work is done, and each catalog lacks 46 strings o
 | Russian | `ru` | 2,515 (86.8%) | partial | yes |
 | Bulgarian | `bg` | 2,564 (88.5%) | partial | no |
 | Czech | `cs` | 2,847 (98.3%) | partial | yes |
-| Telugu | `te` | 2,513 (86.7%) | partial (the release-pinned craft-fonts has no Telugu face yet) | no |
+| Telugu | `te` | 2,513 (86.7%) | partial (the release-pinned nodalia-fonts has no Telugu face yet) | no |
 | Hungarian | `hu` | 2,599 (89.7%) | partial | yes |
 | Ukrainian | `uk` | 2,600 (89.7%) | partial | yes |
 | Italian | `it` | 2,790 (96.3%) | partial | yes |
@@ -105,7 +105,7 @@ Acrobat languages Papel lacks: Danish, Dutch, Swedish, Hebrew. Vietnamese is shi
 | Date | Change | Summary |
 |---|---|---|
 | 2026-11-03 | minor | Every catalog restated from `cargo xtask i18n-report` on `14ae839a` (of the 2,897 strings in the report's denominator), replacing the catalog-union measure, which had reached 2,895 keys and left rows "100%" that were 44 short (#5805). Hindi, Indonesian and Korean restated from 0 to their catalogs, and Thai, Lao and Central Kurdish added to the table. The ≈ 68% score is not re-scored |
-| 2026-10-25 | minor | Arabic current state corrected: catalogs stay logical, Arabic/Kurdish labels take an explicit RTL direction, and stock chrome mirrors; native/browser RTL input, IME and complex workflows remain unqualified. Native Simplified Chinese uses LXGW WenKai Lite; the web build still has no Hans face and the release-pinned craft-fonts still has no Telugu face. Scores and estimates unchanged |
+| 2026-10-25 | minor | Arabic current state corrected: catalogs stay logical, Arabic/Kurdish labels take an explicit RTL direction, and stock chrome mirrors; native/browser RTL input, IME and complex workflows remain unqualified. Native Simplified Chinese uses LXGW WenKai Lite; the web build still has no Hans face and the release-pinned nodalia-fonts still has no Telugu face. Scores and estimates unchanged |
 | 2026-10-25 | minor | Added Persian (`fa`, 2,785 entries, all but 13 of the current 2,798-key union); right-to-left like Arabic and Kurdish, with logical entries reordered by egui 0.37's epaint; AI-assisted, not yet native-reviewed |
 | 2026-10-21 | minor | Brazilian Portuguese (`pt-br`) now covers all 2,674 distinct keys in the current catalog union; no help or engine/OS error-detail localization; twelve-language mean still rounds to ≈ 68% |
 | 2026-10-20 | minor | Spanish: the 143 keys the other catalogs had and `es.tsv` was missing; `es` now covers the whole 2,674-key union, like `lt` and `vi`. Restated Lithuanian against the current union (its 2,585 was measured on 2026-10-13) and said plainly in *How this was measured* that the union moves, so counts only compare within a date |

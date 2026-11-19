@@ -1,7 +1,7 @@
 //! Window chrome: tab strip (with the integrated macOS title bar), mode bar, right rail.
 
-use craft_ui::panes::{Rail, RailItem, RailRequest};
 use egui::{Align, Color32, CornerRadius, Layout, Rect, Sense, Stroke, vec2};
+use nodalia_ui::panes::{Rail, RailItem, RailRequest};
 
 use crate::canvas::{DocView, Fit, PageLayout};
 use crate::panes::{Place, TabDrop};
@@ -526,7 +526,7 @@ fn tab(ui: &mut egui::Ui, spec: TabSpec<'_>, close: &mut Option<usize>) -> egui:
     let (rect, _) = ui.allocate_exact_size(vec2(width, height), Sense::hover());
     let a11y = if dirty { format!("{name} (edited)") } else { name.to_string() };
     let sense = if draggable { Sense::click_and_drag() } else { Sense::click() };
-    let resp = craft_ui::tabs::Tab::new(id, &a11y, active).sense(sense).focus_stroke(Stroke::new(1.0, t.accent)).show_at(ui, rect, |ui, resp| {
+    let resp = nodalia_ui::tabs::Tab::new(id, &a11y, active).sense(sense).focus_stroke(Stroke::new(1.0, t.accent)).show_at(ui, rect, |ui, resp| {
         let press = theme::Press::track(ui, resp);
         let bg = if active {
             press.fill(t.chrome, t.chrome.lerp_to_gamma(t.hover, 0.65), t.hover)

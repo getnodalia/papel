@@ -392,7 +392,7 @@ fn fill_text_border_controls(ui: &mut egui::Ui, app: &mut PapelApp, picked: Opti
     // A border around the text, in its colour; the text keeps its place.
     let border_label = |w: f64| if w > 0.0 { format!("{w} pt") } else { tl!("None").to_string() };
     let label = vertical.then(|| ui.label(tl!("Border:")));
-    let combo = craft_ui::ComboBox::from_id_salt("fill-text-border")
+    let combo = nodalia_ui::ComboBox::from_id_salt("fill-text-border")
         .selected_text(border_label(was.width))
         .width(72.0)
         .show_ui(ui, |ui| {
@@ -417,7 +417,7 @@ fn fill_text_border_controls(ui: &mut egui::Ui, app: &mut PapelApp, picked: Opti
     }
     // Its shape: an oval or a circle goes around the text, which keeps its place.
     if was.width > 0.0 {
-        craft_ui::ComboBox::from_id_salt("fill-text-border-shape")
+        nodalia_ui::ComboBox::from_id_salt("fill-text-border-shape")
             .selected_text(tl!(was.shape.name()))
             .width(96.0)
             .show_ui(ui, |ui| {

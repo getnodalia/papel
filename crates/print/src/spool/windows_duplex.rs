@@ -50,7 +50,7 @@ fn supported_default(value: Option<Duplex>, support: impl FnOnce() -> Option<boo
 /// DM_DUPLEX. Values are DMDUP_SIMPLEX, DMDUP_VERTICAL and DMDUP_HORIZONTAL, respectively.
 /// Return `None` when DM_DUPLEX is absent, or a spool error for a malformed field or an
 /// unrecognized declared value. Layout: <https://learn.microsoft.com/windows/win32/api/wingdi/ns-wingdi-devmodew>.
-fn duplex(settings: &craft_print::rgb::DevMode) -> Result<Option<Duplex>, PrintError> {
+fn duplex(settings: &nodalia_print::rgb::DevMode) -> Result<Option<Duplex>, PrintError> {
     let bytes = settings.as_bytes();
     let invalid = || PrintError::Spool("the printer driver returned an invalid two-sided default; check its printing preferences".into());
     let fields = bytes.get(72..76).and_then(|b| <[u8; 4]>::try_from(b).ok()).map(u32::from_le_bytes).ok_or_else(invalid)?;
@@ -75,14 +75,14 @@ pub(super) fn job(job: &Job) -> Cow<'_, Job> {
         let failed = |e| PrintError::Spool(format!("could not read the printer's two-sided default: {e}"));
         let printer = match selected {
             Some(name) => name.to_owned(),
-            None => craft_print::rgb::default_printer()
+            None => nodalia_print::rgb::default_printer()
                 .map_err(failed)?
                 .ok_or_else(|| PrintError::Spool("there is no default printer; choose a printer".into()))?,
         };
-        let value = craft_print::rgb::default_settings(&printer).map_err(failed).and_then(|settings| duplex(&settings));
-        // Only this printer's driver is asked (craft-print `two_sided`), not every queue's, as
+        let value = nodalia_print::rgb::default_settings(&printer).map_err(failed).and_then(|settings| duplex(&settings));
+        // Only this printer's driver is asked (nodalia-print `two_sided`), not every queue's, as
         // `printers()` would; a networked printer in power save could hold the job (#2192).
-        let value = supported_default(driver_default(value), || craft_print::two_sided(&printer));
+        let value = supported_default(driver_default(value), || nodalia_print::two_sided(&printer));
         Ok((printer, value))
     })
 }
@@ -91,12 +91,12 @@ pub(super) fn job(job: &Job) -> Cow<'_, Job> {
 mod tests {
     use super::*;
 
-    fn settings(fields: u32, value: i16) -> craft_print::rgb::DevMode {
+    fn settings(fields: u32, value: i16) -> nodalia_print::rgb::DevMode {
         let mut bytes = vec![0; 220];
         bytes[68..70].copy_from_slice(&220u16.to_le_bytes());
         bytes[72..76].copy_from_slice(&fields.to_le_bytes());
         bytes[94..96].copy_from_slice(&value.to_le_bytes());
-        craft_print::rgb::DevMode::from_bytes(bytes).unwrap()
+        nodalia_print::rgb::DevMode::from_bytes(bytes).unwrap()
     }
 
     #[test]
@@ -203,7 +203,7 @@ mod tests {
     fn installed_windows_printer_default_is_carried_explicitly() {
         let printer = std::env::var("PAPEL_PRINT_TEST_PRINTER").unwrap();
         let original = Job { printer: Some(printer.clone()), ..Job::default() };
-        let expected = supported_default(duplex(&craft_print::rgb::default_settings(&printer).unwrap()).unwrap(), || {
+        let expected = supported_default(duplex(&nodalia_print::rgb::default_settings(&printer).unwrap()).unwrap(), || {
             super::super::printers().into_iter().find(|p| p.name == printer).and_then(|p| p.two_sided)
         });
         let resolved = job(&original);

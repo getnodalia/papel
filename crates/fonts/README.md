@@ -19,10 +19,10 @@ Today it holds what generated appearances need without a font program:
   `set_undrawn_mark` (`UNDRAWN_MARK`, read back by `undrawn_mark`) so the edit is reported and
   flattening refuses. `script_missing` names what the typed-signature script font and its Inter fallback both lack.
 
-It also holds the fonts of the optional [craft-fonts](https://github.com/getnodalia/foundation/tree/vendor/craft-fonts/main)
-build input. `build.rs` embeds them as `CRAFT_FONTS` when the build sets
-`CRAFT_FONTS_DIR=<checkout>` (and fails if it can't while `CRAFT_FONTS_REQUIRED=1`, as releases
-set). Without that variable `CRAFT_FONTS` is empty and everything below copes:
+It also holds the fonts of the optional [nodalia-fonts](https://github.com/getnodalia/foundation/tree/nodalia/fonts)
+build input. `build.rs` embeds them as `NODALIA_FONTS` when the build sets
+`NODALIA_FONTS_DIR=<checkout>` (and fails if it can't while `NODALIA_FONTS_REQUIRED=1`, as releases
+set). Without that variable `NODALIA_FONTS` is empty and everything below copes:
 
 - `ui_japanese_fonts`: the `Jpan` faces for the interface, BIZ UDPGothic first.
 - `ui_chinese_fonts`: the `Hans` faces for the interface, in manifest order (without one,
@@ -36,7 +36,7 @@ set). Without that variable `CRAFT_FONTS` is empty and everything below copes:
 - `ui_hebrew_fonts` / `document_hebrew_font(bold)`: the `Hebr` faces (Noto Sans Hebrew) for
   Hebrew interface text, and the face whose outlines become the Type 3 fallback for Hebrew text
   written by Edit text (Bold when asked for and present, else Regular). `None` without a
-  craft-fonts input that has one; the editor then reports a clear error.
+  nodalia-fonts input that has one; the editor then reports a clear error.
 - `shape_hebrew` / `hebrew_has`: the Regular `Hebr` face shaped with harfrust for Hebrew Add
   Text content, one cluster per letter with its points and cantillation marks (positioned by the
   face), drawn by the same Type 3 writer as Arabic and Thai. `GlyphError::NoFont` without the face.

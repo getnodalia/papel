@@ -188,7 +188,7 @@ enum Pending {
         value: Value,
     },
     Screenshot {
-        slot: craft_ui::capture::CaptureSlot,
+        slot: nodalia_ui::capture::CaptureSlot,
         /// The one-shot callback, kept until the settled pass that issues it.
         callback: Option<egui::ScreenshotCallback>,
         region: Option<egui::Rect>,
@@ -397,7 +397,7 @@ impl Control {
                     };
                     reserved_total = new_total;
                     slot.cancel();
-                    let (new_slot, new_callback) = craft_ui::capture::CaptureSlot::new(ctx, egui::ViewportId::ROOT, MAX_IMAGE_BYTES);
+                    let (new_slot, new_callback) = nodalia_ui::capture::CaptureSlot::new(ctx, egui::ViewportId::ROOT, MAX_IMAGE_BYTES);
                     *slot = new_slot;
                     *callback = Some(new_callback);
                     *geometry = current;

@@ -265,7 +265,7 @@ fn a_badge_tip_stays_off_where_a_comment_tip_would() {
 fn arabic_caption_keeps_logical_word_order_on_page_and_in_extracted_text() {
     let _gpu = gpu();
     if papel_fonts::document_arabic_font().is_none() {
-        eprintln!("skipping Arabic status-caption rendering: build without a craft-fonts Arab face");
+        eprintln!("skipping Arabic status-caption rendering: build without a nodalia-fonts Arab face");
         return;
     }
     if crate::support::skip_without_catalogs("arabic_caption_keeps_logical_word_order_on_page_and_in_extracted_text") {

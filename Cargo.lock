@@ -1185,136 +1185,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "craft-docpath"
-version = "0.1.0"
-source = "git+https://github.com/getnodalia/foundation?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
-
-[[package]]
-name = "craft-fonts-build"
-version = "0.1.0"
-source = "git+https://github.com/getnodalia/foundation?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
-
-[[package]]
-name = "craft-i18n"
-version = "0.1.0"
-source = "git+https://github.com/getnodalia/foundation?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
-dependencies = [
- "fixed_decimal",
- "icu_decimal",
- "icu_locale_core",
- "icu_locale_fallback",
- "icu_normalizer",
- "icu_plurals",
- "icu_properties",
- "icu_provider",
- "icu_provider_adapters",
- "icu_provider_blob",
- "log",
- "objc2-foundation 0.3.2",
- "sys-locale",
- "unicode-bidi",
- "windows-registry",
- "writeable",
-]
-
-[[package]]
-name = "craft-keymap"
-version = "0.1.0"
-source = "git+https://github.com/getnodalia/foundation?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
-dependencies = [
- "egui",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "craft-menu"
-version = "0.1.0"
-source = "git+https://github.com/getnodalia/foundation?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
-dependencies = [
- "craft-keymap",
- "craft-quit",
- "egui",
- "muda",
- "objc2 0.6.5",
- "objc2-app-kit 0.3.2",
-]
-
-[[package]]
-name = "craft-print"
-version = "0.1.0"
-source = "git+https://github.com/getnodalia/foundation?rev=1146cdc4f92e6c5c4fc3d67efbf0e1cec436a10c#1146cdc4f92e6c5c4fc3d67efbf0e1cec436a10c"
-dependencies = [
- "craft-winprint-gdi",
- "log",
- "miniz_oxide 0.9.1",
- "roxmltree 0.21.2",
- "tempfile",
- "winprint",
- "winsafe",
-]
-
-[[package]]
-name = "craft-quit"
-version = "0.1.0"
-source = "git+https://github.com/getnodalia/foundation?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
-dependencies = [
- "dispatch2",
- "egui",
- "objc2 0.6.5",
- "objc2-app-kit 0.3.2",
-]
-
-[[package]]
-name = "craft-ui"
-version = "0.1.0"
-source = "git+https://github.com/getnodalia/foundation?rev=787a7a0f972fd1d7a7618fdbeca3a5267a0407ff#787a7a0f972fd1d7a7618fdbeca3a5267a0407ff"
-dependencies = [
- "craft-fonts-build",
- "craft-i18n",
- "egui",
- "epaint",
- "js-sys",
- "log",
- "objc2 0.6.5",
- "objc2-app-kit 0.3.2",
- "objc2-foundation 0.3.2",
- "serde",
- "skrifa 0.44.0",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
-]
-
-[[package]]
-name = "craft-web-api"
-version = "0.1.0"
-source = "git+https://github.com/getnodalia/foundation?rev=fd5e2feff6ea25bed371a99cc732b3968d621505#fd5e2feff6ea25bed371a99cc732b3968d621505"
-dependencies = [
- "js-sys",
- "serde_json",
- "wasm-bindgen",
- "wasm-bindgen-futures",
-]
-
-[[package]]
-name = "craft-web-host"
-version = "0.1.0"
-source = "git+https://github.com/getnodalia/foundation?rev=fd5e2feff6ea25bed371a99cc732b3968d621505#fd5e2feff6ea25bed371a99cc732b3968d621505"
-dependencies = [
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
-name = "craft-winprint-gdi"
-version = "0.1.0"
-source = "git+https://github.com/getnodalia/foundation?rev=64e7afd4d1483512385012c340ecaaaf0f3beb7f#64e7afd4d1483512385012c340ecaaaf0f3beb7f"
-dependencies = [
- "windows-sys 0.61.2",
-]
-
-[[package]]
 name = "crc32fast"
 version = "1.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3659,11 +3529,113 @@ dependencies = [
 ]
 
 [[package]]
+name = "nodalia-docpath"
+version = "0.1.0"
+source = "git+https://github.com/getnodalia/foundation?rev=d7130bd0ce460e49116c86a8b11a9824801be4bb#d7130bd0ce460e49116c86a8b11a9824801be4bb"
+
+[[package]]
+name = "nodalia-fonts-build"
+version = "0.1.0"
+source = "git+https://github.com/getnodalia/foundation?rev=d7130bd0ce460e49116c86a8b11a9824801be4bb#d7130bd0ce460e49116c86a8b11a9824801be4bb"
+
+[[package]]
+name = "nodalia-i18n"
+version = "0.1.0"
+source = "git+https://github.com/getnodalia/foundation?rev=d7130bd0ce460e49116c86a8b11a9824801be4bb#d7130bd0ce460e49116c86a8b11a9824801be4bb"
+dependencies = [
+ "fixed_decimal",
+ "icu_decimal",
+ "icu_locale_core",
+ "icu_locale_fallback",
+ "icu_normalizer",
+ "icu_plurals",
+ "icu_properties",
+ "icu_provider",
+ "icu_provider_adapters",
+ "icu_provider_blob",
+ "log",
+ "objc2-foundation 0.3.2",
+ "sys-locale",
+ "unicode-bidi",
+ "windows-registry",
+ "writeable",
+]
+
+[[package]]
+name = "nodalia-keymap"
+version = "0.1.0"
+source = "git+https://github.com/getnodalia/foundation?rev=d7130bd0ce460e49116c86a8b11a9824801be4bb#d7130bd0ce460e49116c86a8b11a9824801be4bb"
+dependencies = [
+ "egui",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "nodalia-menu"
+version = "0.1.0"
+source = "git+https://github.com/getnodalia/foundation?rev=d7130bd0ce460e49116c86a8b11a9824801be4bb#d7130bd0ce460e49116c86a8b11a9824801be4bb"
+dependencies = [
+ "egui",
+ "muda",
+ "nodalia-keymap",
+ "nodalia-quit",
+ "objc2 0.6.5",
+ "objc2-app-kit 0.3.2",
+]
+
+[[package]]
+name = "nodalia-print"
+version = "0.1.0"
+source = "git+https://github.com/getnodalia/foundation?rev=c8c76d140340266aa304607a10850f11fa9ee986#c8c76d140340266aa304607a10850f11fa9ee986"
+dependencies = [
+ "log",
+ "miniz_oxide 0.9.1",
+ "nodalia-winprint-gdi",
+ "roxmltree 0.21.2",
+ "tempfile",
+ "winprint",
+ "winsafe",
+]
+
+[[package]]
+name = "nodalia-quit"
+version = "0.1.0"
+source = "git+https://github.com/getnodalia/foundation?rev=d7130bd0ce460e49116c86a8b11a9824801be4bb#d7130bd0ce460e49116c86a8b11a9824801be4bb"
+dependencies = [
+ "dispatch2",
+ "egui",
+ "objc2 0.6.5",
+ "objc2-app-kit 0.3.2",
+]
+
+[[package]]
 name = "nodalia-theme"
 version = "0.1.0-alpha.1"
 source = "git+https://github.com/getnodalia/nodalia-design?rev=44bfd0a37e6bd2837c473b4e5607b70e8d169e61#44bfd0a37e6bd2837c473b4e5607b70e8d169e61"
 dependencies = [
  "egui",
+]
+
+[[package]]
+name = "nodalia-ui"
+version = "0.1.0"
+source = "git+https://github.com/getnodalia/foundation?rev=d7130bd0ce460e49116c86a8b11a9824801be4bb#d7130bd0ce460e49116c86a8b11a9824801be4bb"
+dependencies = [
+ "egui",
+ "epaint",
+ "js-sys",
+ "log",
+ "nodalia-fonts-build",
+ "nodalia-i18n",
+ "objc2 0.6.5",
+ "objc2-app-kit 0.3.2",
+ "objc2-foundation 0.3.2",
+ "serde",
+ "skrifa 0.44.0",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
 ]
 
 [[package]]
@@ -3675,6 +3647,34 @@ dependencies = [
  "serde_json",
  "sha2 0.10.9",
  "ureq",
+]
+
+[[package]]
+name = "nodalia-web-api"
+version = "0.1.0"
+source = "git+https://github.com/getnodalia/foundation?rev=a5ba368c1313d208fe927b5bbdf06bddf38b1b2f#a5ba368c1313d208fe927b5bbdf06bddf38b1b2f"
+dependencies = [
+ "js-sys",
+ "serde_json",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+]
+
+[[package]]
+name = "nodalia-web-host"
+version = "0.1.0"
+source = "git+https://github.com/getnodalia/foundation?rev=a5ba368c1313d208fe927b5bbdf06bddf38b1b2f#a5ba368c1313d208fe927b5bbdf06bddf38b1b2f"
+dependencies = [
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "nodalia-winprint-gdi"
+version = "0.1.0"
+source = "git+https://github.com/getnodalia/foundation?rev=5a9c69b611f181d50655758b6eb1fb49fb3737e8#5a9c69b611f181d50655758b6eb1fb49fb3737e8"
+dependencies = [
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -4198,11 +4198,11 @@ name = "papel"
 version = "0.1.2"
 dependencies = [
  "chrono",
- "craft-menu",
  "eframe",
  "egui",
  "fmv-macos-events",
  "log",
+ "nodalia-menu",
  "papel-engine",
  "papel-platform",
  "papel-ui-egui",
@@ -4381,11 +4381,11 @@ name = "papel-engine"
 version = "0.1.2"
 dependencies = [
  "chrono",
- "craft-docpath",
  "getrandom 0.4.3",
  "icu_properties",
  "idna",
  "image",
+ "nodalia-docpath",
  "papel-a11y",
  "papel-annot",
  "papel-audit",
@@ -4595,8 +4595,8 @@ dependencies = [
 name = "papel-print"
 version = "0.1.2"
 dependencies = [
- "craft-print",
  "log",
+ "nodalia-print",
  "papel-content",
  "papel-cos",
  "papel-model",
@@ -4705,11 +4705,6 @@ dependencies = [
  "block2 0.6.2",
  "bytemuck",
  "chrono",
- "craft-i18n",
- "craft-keymap",
- "craft-menu",
- "craft-quit",
- "craft-ui",
  "eframe",
  "egui",
  "egui_extras",
@@ -4720,7 +4715,12 @@ dependencies = [
  "image",
  "js-sys",
  "log",
+ "nodalia-i18n",
+ "nodalia-keymap",
+ "nodalia-menu",
+ "nodalia-quit",
  "nodalia-theme",
+ "nodalia-ui",
  "nodalia-update",
  "objc2 0.6.5",
  "objc2-app-kit 0.3.2",
@@ -4759,11 +4759,11 @@ dependencies = [
 name = "papel-web"
 version = "0.1.2"
 dependencies = [
- "craft-web-api",
- "craft-web-host",
  "eframe",
  "egui",
  "js-sys",
+ "nodalia-web-api",
+ "nodalia-web-host",
  "papel-ui-egui",
  "serde_json",
  "wasm-bindgen-futures",
@@ -8290,7 +8290,7 @@ dependencies = [
 [[package]]
 name = "winprint"
 version = "0.2.1"
-source = "git+https://github.com/getnodalia/foundation?rev=3c978dfcf3d460577fabd87aeea7a84ffdcfb396#3c978dfcf3d460577fabd87aeea7a84ffdcfb396"
+source = "git+https://github.com/getnodalia/foundation?rev=8587a9aa8bc4d77545afcd0c06c0eb6aa550f28f#8587a9aa8bc4d77545afcd0c06c0eb6aa550f28f"
 dependencies = [
  "flate2",
  "fmt-derive",
