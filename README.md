@@ -39,8 +39,16 @@ with no account and no cloud. It runs on Linux, macOS and Windows.
 </p>
 
 > [!IMPORTANT]
-> **Papel is at an early stage.** There are no published builds yet, and the Nodalia interface is
-> not wired in.
+> **Papel is at an early stage.** Version 0.2.0 is out for Linux, macOS and Windows:
+> [download it from the releases page](https://github.com/getnodalia/papel/releases/latest).
+
+## What it does
+
+- Reads, annotates, fills, signs, edits and organises PDF documents, offline and with no account.
+- A template gallery on Home with thirteen one-page templates (invoice, quote, receipt, letter,
+  meeting minutes, forms, timesheet, résumé, planner, certificate and more). Each is a normal PDF
+  with real form fields, in English or Spanish and on Letter or A4 paper.
+- Every action is a command, so it can be driven from the command line or by agents through MCP.
 
 ## Build and run
 
@@ -58,9 +66,9 @@ cargo run --release -p papel
 |---|---|
 | Package and binary names | Done: the desktop binary is called `papel` |
 | App icon | Done: portrait of Aldus Manutius |
-| Nodalia interface | Not started |
-| Shared interface resources | Planned: the Nodalia apps will share interface components and styles |
-| Installable packages | None published |
+| Nodalia interface | Done: rounded islands, Papel's accent and the suite's window controls on Linux |
+| Shared interface resources | Done: the interface comes from the shared Nodalia Design Language |
+| Installable packages | AppImage, .deb, .rpm and .tar.gz; a DMG; a Windows installer and portable zip |
 
 ## App icon
 
