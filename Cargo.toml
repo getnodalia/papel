@@ -5,7 +5,7 @@ exclude = ["vendor"]
 default-members = ["crates/*", "apps/papel", "apps/papel-cli", "xtask"]
 
 [workspace.package]
-version = "0.1.2"
+version = "0.2.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
@@ -32,41 +32,41 @@ nodalia-update = { git = "https://github.com/getnodalia/nodalia-design", rev = "
 # The Nodalia Design Language: palette, icons, window controls and the office apps' shared parts.
 nodalia-theme = { git = "https://github.com/getnodalia/nodalia-design", rev = "44bfd0a37e6bd2837c473b4e5607b70e8d169e61", version = "0.1.0-alpha.1", features = ["egui", "creator"] }
 # internal
-papel-geom = { path = "crates/geom", version = "0.1.0" }
-papel-filters = { path = "crates/filters", version = "0.1.0" }
-papel-cos = { path = "crates/cos", version = "0.1.0" }
-papel-crypt = { path = "crates/crypt", version = "0.1.0" }
-papel-organize = { path = "crates/organize", version = "0.1.0" }
-papel-measure = { path = "crates/measure", version = "0.1.0" }
-papel-annot = { path = "crates/annot", version = "0.1.0" }
-papel-audit = { path = "crates/audit", version = "0.1.0" }
-papel-fonts = { path = "crates/fonts", version = "0.1.0" }
-papel-model = { path = "crates/model", version = "0.1.0" }
-papel-content = { path = "crates/content", version = "0.1.0" }
-papel-redact = { path = "crates/redact", version = "0.1.0" }
-papel-print = { path = "crates/print", version = "0.1.0" }
-papel-xfdf = { path = "crates/xfdf", version = "0.1.0" }
-papel-sign = { path = "crates/sign", version = "0.1.0" }
-papel-optimize = { path = "crates/optimize", version = "0.1.0" }
-papel-a11y = { path = "crates/a11y", version = "0.1.0" }
-papel-oracle = { path = "crates/oracle", version = "0.1.0" }
-papel-testkit = { path = "crates/testkit", version = "0.1.0" }
-papel-ocr = { path = "crates/ocr", version = "0.1.0" }
-papel-js = { path = "crates/js", version = "0.1.0" }
-papel-compare = { path = "crates/compare", version = "0.1.0" }
-papel-preflight = { path = "crates/preflight", version = "0.1.0" }
-papel-export = { path = "crates/export", version = "0.1.0" }
-papel-edit = { path = "crates/edit", version = "0.1.0" }
-papel-create = { path = "crates/create", version = "0.1.0" }
-papel-forms = { path = "crates/forms", version = "0.1.0" }
-papel-xfa = { path = "crates/xfa", version = "0.1.0" }
-papel-render = { path = "crates/render", version = "0.1.0" }
-papel-engine = { path = "crates/engine", version = "0.1.0" }
-papel-platform = { path = "crates/platform", version = "0.1.0" }
-papel-ui-egui = { path = "crates/ui-egui", version = "0.1.0" }
-papel-automation = { path = "crates/automation", version = "0.1.0", default-features = false }
-papel-prc = { path = "crates/prc", version = "0.1.0" }
-papel-prc-render = { path = "crates/prc-render", version = "0.1.0" }
+papel-geom = { path = "crates/geom", version = "0.2.0" }
+papel-filters = { path = "crates/filters", version = "0.2.0" }
+papel-cos = { path = "crates/cos", version = "0.2.0" }
+papel-crypt = { path = "crates/crypt", version = "0.2.0" }
+papel-organize = { path = "crates/organize", version = "0.2.0" }
+papel-measure = { path = "crates/measure", version = "0.2.0" }
+papel-annot = { path = "crates/annot", version = "0.2.0" }
+papel-audit = { path = "crates/audit", version = "0.2.0" }
+papel-fonts = { path = "crates/fonts", version = "0.2.0" }
+papel-model = { path = "crates/model", version = "0.2.0" }
+papel-content = { path = "crates/content", version = "0.2.0" }
+papel-redact = { path = "crates/redact", version = "0.2.0" }
+papel-print = { path = "crates/print", version = "0.2.0" }
+papel-xfdf = { path = "crates/xfdf", version = "0.2.0" }
+papel-sign = { path = "crates/sign", version = "0.2.0" }
+papel-optimize = { path = "crates/optimize", version = "0.2.0" }
+papel-a11y = { path = "crates/a11y", version = "0.2.0" }
+papel-oracle = { path = "crates/oracle", version = "0.2.0" }
+papel-testkit = { path = "crates/testkit", version = "0.2.0" }
+papel-ocr = { path = "crates/ocr", version = "0.2.0" }
+papel-js = { path = "crates/js", version = "0.2.0" }
+papel-compare = { path = "crates/compare", version = "0.2.0" }
+papel-preflight = { path = "crates/preflight", version = "0.2.0" }
+papel-export = { path = "crates/export", version = "0.2.0" }
+papel-edit = { path = "crates/edit", version = "0.2.0" }
+papel-create = { path = "crates/create", version = "0.2.0" }
+papel-forms = { path = "crates/forms", version = "0.2.0" }
+papel-xfa = { path = "crates/xfa", version = "0.2.0" }
+papel-render = { path = "crates/render", version = "0.2.0" }
+papel-engine = { path = "crates/engine", version = "0.2.0" }
+papel-platform = { path = "crates/platform", version = "0.2.0" }
+papel-ui-egui = { path = "crates/ui-egui", version = "0.2.0" }
+papel-automation = { path = "crates/automation", version = "0.2.0", default-features = false }
+papel-prc = { path = "crates/prc", version = "0.2.0" }
+papel-prc-render = { path = "crates/prc-render", version = "0.2.0" }
 
 # pdf
 hayro = "0.7.1"

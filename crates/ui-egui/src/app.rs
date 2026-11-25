@@ -177,6 +177,7 @@ impl PapelApp {
             recent_check: Default::default(),
             pinned_tools: Vec::new(),
             pin_tool_search: String::new(),
+            template_previews: std::collections::HashMap::new(),
             toast: None,
             toast_script: None,
             script_messages: std::collections::VecDeque::new(),

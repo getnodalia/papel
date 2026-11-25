@@ -132,6 +132,6 @@ modules:
       # The interface translations at the commit in nodalia-i18n.rev (a test keeps the two equal).
       - type: git
         url: https://github.com/getnodalia/foundation
-        commit: 4df0177d9ad0772ecd34649956c6e81f467f240c
+        commit: cfab38ac1db75ce36daa317c7633a52326438b96
         dest: nodalia-i18n
       - cargo-sources.json

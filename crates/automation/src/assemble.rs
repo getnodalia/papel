@@ -45,6 +45,18 @@ impl Automation {
                 })?;
                 (format!("{title}.pdf"), bytes)
             }
+            "template" => {
+                use papel_engine::templates::{self, Lang};
+                let id = a.str("template")?;
+                let lang = Lang::parse(a.opt_str("language")?.unwrap_or("en"));
+                let page = (a.opt_num("width")?.unwrap_or(612.0), a.opt_num("height")?.unwrap_or(792.0));
+                let bytes = self.session.create_from_template(id, lang, page).map_err(|e| match e {
+                    papel_engine::EditError::Invalid(m) => ToolError::InvalidArgs(m),
+                    e => failed(e),
+                })?;
+                let name = templates::list(lang).iter().find(|t| t.id == id).map_or("Untitled", |t| t.name);
+                (format!("{name}.pdf"), bytes)
+            }
             other => return Err(ToolError::InvalidArgs(format!("unknown source {other:?}"))),
         };
         let name = a.opt_str("name")?.map(str::to_owned).unwrap_or(name);

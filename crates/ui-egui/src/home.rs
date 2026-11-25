@@ -8,6 +8,7 @@ use crate::theme::{self, Tokens};
 use crate::{PapelApp, icons, panels::human_size, widgets};
 
 pub mod folders_ui;
+pub mod templates_ui;
 
 const RECOMMENDED: [&str; 5] = ["organize", "comment", "form", "edit", "protect"];
 
@@ -120,6 +121,9 @@ pub fn show(app: &mut PapelApp, ui: &mut egui::Ui) {
                         }
                     });
                 });
+
+            ui.add_space(26.0);
+            templates_ui::section(app, ui);
 
             ui.add_space(26.0);
             let mut unpin_tool = None;
@@ -256,7 +260,7 @@ mod tests {
         let mut app = PapelApp::new();
         app.pinned_tools = vec!["edit".into()];
         let mut fonts = false;
-        egui_kittest::Harness::builder().with_size(vec2(1500.0, 1200.0)).build_ui_state(
+        egui_kittest::Harness::builder().with_size(vec2(1500.0, 2600.0)).build_ui_state(
             move |ui, app| {
                 if !fonts {
                     ui.ctx().set_fonts(theme::font_definitions());

@@ -169,6 +169,17 @@ impl PapelApp {
         }
     }
 
+    /// Create ▸ Templates: a new document from a built-in template, in the interface language on
+    /// the system region's paper. The gallery on Home calls this with the template the user chose.
+    pub fn create_from_template(&mut self, id: &str) {
+        let lang = crate::home::templates_ui::language();
+        let name = papel_engine::templates::list(lang).iter().find(|t| t.id == id).map_or("Untitled", |t| t.name).to_string();
+        let created = self.session.create_from_template(id, lang, self.blank_paper.points()).map_err(|e| e.to_string());
+        if let Err(e) = self.open_created_bytes(&format!("{name}.pdf"), created) {
+            self.notify_fmt("Couldn't create a PDF: {e}", &[("e", &e.to_string())]);
+        }
+    }
+
     /// Create ▸ Images: several images, one page each, in one new document.
     pub(crate) fn create_from_images_dialog(&mut self) {
         #[cfg(not(target_arch = "wasm32"))]

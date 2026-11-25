@@ -7111,6 +7111,18 @@ evidence = ["crates/ui-egui/tests/it/create.rs::opening_images_and_text_converts
 notes = "The page is the system region's paper (#5644): US Letter in the US, Canada, Mexico, the Philippines and the other CLDR Letter regions, A4 elsewhere; Windows' own Region paper size (iPaperSize) first, then the system locale (macOS) or LC_ALL/LC_PAPER/LANG; Letter when the region is unknown (web). The doc_create tool keeps Letter unless given width and height. Missing: a page size or count chooser like Acrobat's New Document dialog."
 
 [[feature]]
+id = "create.template"
+title = "Create a PDF from a template"
+area = "J"
+tier = "P2"
+milestone = "M10"
+status = "shipped"
+commands = ["create.template"]
+tools = ["doc_create"]
+evidence = ["crates/engine/src/templates/tests.rs::every_template_builds_in_both_languages_on_both_papers", "crates/engine/src/templates/tests.rs::no_text_is_lost_to_the_font_encoding", "crates/ui-egui/tests/it/create.rs::the_template_command_goes_to_home_and_every_template_has_a_tile", "crates/ui-egui/tests/it/create.rs::a_template_from_home_opens_as_a_new_fillable_document", "crates/automation/tests/it/automation.rs::creating_from_a_template_gives_a_fillable_page_in_the_language_asked"]
+notes = "Thirteen designed one-page templates (invoice, quote, receipt, letter, meeting minutes, registration form, timesheet, expense report, résumé, weekly planner, checklist, study notes, certificate), each with real form fields laid over the page, in English and Spanish (other interface languages read English), on the system region's paper; the certificate is landscape. They are shown on Home as a wrapping grid of page previews. Drawn in code with the standard fonts, so no artwork or font is embedded. Missing: a preview before creating, more than one page, templates in the other interface languages, saving your own document as a template."
+
+[[feature]]
 id = "create.from-html"
 title = "Create PDF from an HTML file"
 area = "J"

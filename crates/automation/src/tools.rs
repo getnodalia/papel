@@ -1608,11 +1608,13 @@ pub fn tools() -> Vec<ToolDef> {
         t(
             "doc_create",
             "Create a PDF",
-            "Create a new, unsaved document and return it like doc_open: `blank` (pages, width, height in points; default 1 US Letter page), `images` (paths of PNG, JPEG, TIFF (every page), GIF or BMP files, one page each at the image's resolution) or `text` (a .txt path, or `text` directly; set in Helvetica, or in the bundled Inter face when it has Latin, Greek or Cyrillic letters outside Western European (WinAnsi); other characters are refused). Save it with doc_save and a path.",
+            "Create a new, unsaved document and return it like doc_open: `blank` (pages, width, height in points; default 1 US Letter page), `images` (paths of PNG, JPEG, TIFF (every page), GIF or BMP files, one page each at the image's resolution), `text` (a .txt path, or `text` directly; set in Helvetica, or in the bundled Inter face when it has Latin, Greek or Cyrillic letters outside Western European (WinAnsi); other characters are refused) or `template` (one of invoice, quote, receipt, letter, minutes, registration, timesheet, expenses, resume, planner, checklist, notes, certificate: a designed one-page document with real form fields to fill in, in `language` en or es, on a page of width and height points, US Letter by default; the certificate is landscape). Save it with doc_save and a path.",
         )
         .with(schema(
             json!({
-                "from": { "type": "string", "enum": ["blank", "images", "text"] },
+                "from": { "type": "string", "enum": ["blank", "images", "text", "template"] },
+                "template": { "type": "string", "enum": ["invoice", "quote", "receipt", "letter", "minutes", "registration", "timesheet", "expenses", "resume", "planner", "checklist", "notes", "certificate"], "description": "For template: which one." },
+                "language": { "type": "string", "enum": ["en", "es"], "description": "For template: the language it is written in (default en)." },
                 "paths": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
                 "dpi": { "type": "number", "minimum": 1, "maximum": 1200, "description": "For images: override the embedded resolution without resampling. 72 gives one point per pixel; omit to use each image's resolution (72 when absent)." },
                 "text": { "type": "string" },
