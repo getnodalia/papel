@@ -39,7 +39,7 @@ with no account and no cloud. It runs on Linux, macOS and Windows.
 </p>
 
 > [!IMPORTANT]
-> **Papel is at an early stage.** Version 0.2.1 is out for Linux, macOS and Windows:
+> **Papel is at an early stage.** Version 0.2.2 is out for Linux, macOS and Windows:
 > [download it from the releases page](https://github.com/getnodalia/papel/releases/latest).
 
 ## What it does
