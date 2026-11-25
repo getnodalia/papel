@@ -28,7 +28,7 @@ permissions:
 env:
   # Same commits as ci.yml and the release-*.yml workflows; nodalia-i18n's is nodalia-i18n.rev.
   FONTS_REF: d4f57e6b31d7c7526b539f7aaaa07312c9908bb8
-  I18N_REF: cfab38ac1db75ce36daa317c7633a52326438b96
+  I18N_REF: c4dd74886dfce280960c5b568de00d747b11a81a
 
 jobs:
   package:
