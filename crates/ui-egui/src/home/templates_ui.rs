@@ -1,6 +1,7 @@
 //! Home's templates: a wrapping grid of page previews, grouped, that start a new document.
-//! The words around them come with the templates (English and Spanish; other languages read
-//! English), so the gallery and its pages always speak the same language.
+//! The words around the tiles come from the interface catalogs (context `template`, English as the
+//! key); where a catalog has none they are the templates' own English or Spanish, so the gallery
+//! never shows a gap. The pages themselves are written in English or Spanish.
 
 use egui::{Align2, CornerRadius, Rect, Sense, Stroke, TextureOptions, vec2};
 use papel_engine::templates::{self, Lang, TemplateInfo, Words};
@@ -26,6 +27,13 @@ pub(crate) fn tile_grid(width: f32) -> (usize, f32) {
 /// templates in it.
 pub(crate) fn language() -> Lang {
     Lang::parse(crate::i18n::current().code())
+}
+
+/// What the gallery shows for `english`: the catalog's translation under the `template` context,
+/// else `bundled` (the templates' own wording in `language()`).
+fn shown(english: &str, bundled: &str) -> String {
+    let translated = tl_ctx!("template", english);
+    if translated != english { translated.to_owned() } else { bundled.to_owned() }
 }
 
 fn key(id: &str, lang: Lang, page: (f64, f64)) -> String {
@@ -58,12 +66,12 @@ fn preview(app: &mut PapelApp, ctx: &egui::Context, id: &str, lang: Lang, budget
 }
 
 /// One tile: the page, its name, and one line about it. Returns true when it was clicked.
-fn tile(ui: &mut egui::Ui, t: &Tokens, info: &TemplateInfo, texture: Option<&egui::TextureHandle>, width: f32, landscape: bool) -> bool {
+fn tile(ui: &mut egui::Ui, t: &Tokens, name: &str, summary: &str, texture: Option<&egui::TextureHandle>, width: f32, landscape: bool) -> bool {
     // Every tile has the same height, so a row stays level; a landscape page sits in the middle of its mat.
     let thumb_h = width * 1.2;
     let text_h = 66.0;
     let (rect, resp) = ui.allocate_exact_size(vec2(width, thumb_h + text_h + 16.0), Sense::click());
-    resp.widget_info(|| egui::WidgetInfo::labeled(egui::Role::Button, true, info.name));
+    resp.widget_info(|| egui::WidgetInfo::labeled(egui::Role::Button, true, name));
     let press = theme::Press::track(ui, &resp);
     super::card_lift(ui, t, rect, press);
     ui.painter().rect(rect, CornerRadius::same(10), press.fill(t.card, t.hover, t.pressed), Stroke::new(1.0, t.divider), egui::StrokeKind::Inside);
@@ -83,8 +91,8 @@ fn tile(ui: &mut egui::Ui, t: &Tokens, info: &TemplateInfo, texture: Option<&egu
     }
 
     let title = body.min + vec2(12.0, thumb_h + 22.0);
-    widgets::row_text(ui, title, info.name, theme::semibold(13.0), t.text, width - 24.0);
-    let mut job = egui::text::LayoutJob::simple(info.summary.to_owned(), theme::regular(11.0), t.text_muted, width - 24.0);
+    widgets::row_text(ui, title, name, theme::semibold(13.0), t.text, width - 24.0);
+    let mut job = egui::text::LayoutJob::simple(summary.to_owned(), theme::regular(11.0), t.text_muted, width - 24.0);
     job.wrap.max_rows = 2;
     let galley = ui.fonts_mut(|f| f.layout_job(job));
     ui.painter().galley(body.min + vec2(12.0, thumb_h + 34.0), galley, t.text_muted);
@@ -95,12 +103,13 @@ fn tile(ui: &mut egui::Ui, t: &Tokens, info: &TemplateInfo, texture: Option<&egu
 pub(crate) fn section(app: &mut PapelApp, ui: &mut egui::Ui) {
     let t = Tokens::get(ui.ctx());
     let lang = language();
-    let words: Words = templates::words(lang);
-    ui.label(egui::RichText::new(words.heading).font(theme::semibold(17.0)));
+    let (english, bundled): (Words, Words) = (templates::words(Lang::En), templates::words(lang));
+    ui.label(egui::RichText::new(shown(english.heading, bundled.heading)).font(theme::semibold(17.0)));
     ui.add_space(2.0);
-    ui.label(egui::RichText::new(words.intro).color(t.text_muted).font(theme::regular(12.5)));
+    ui.label(egui::RichText::new(shown(english.intro, bundled.intro)).color(t.text_muted).font(theme::regular(12.5)));
 
     let list = templates::list(lang);
+    let source = templates::list(Lang::En);
     let ctx = ui.ctx().clone();
     let mut budget = PREVIEWS_PER_FRAME;
     let mut pending = false;
@@ -112,7 +121,7 @@ pub(crate) fn section(app: &mut PapelApp, ui: &mut egui::Ui) {
             continue;
         }
         ui.add_space(14.0);
-        ui.label(egui::RichText::new(category.label(lang)).color(t.text_muted).font(theme::medium(12.0)));
+        ui.label(egui::RichText::new(shown(category.label(Lang::En), category.label(lang))).color(t.text_muted).font(theme::medium(12.0)));
         ui.add_space(6.0);
         for row in group.chunks(per_row) {
             ui.horizontal(|ui| {
@@ -120,7 +129,10 @@ pub(crate) fn section(app: &mut PapelApp, ui: &mut egui::Ui) {
                 for info in row {
                     let texture = preview(app, &ctx, info.id, lang, &mut budget);
                     pending |= texture.is_none();
-                    if tile(ui, &t, info, texture.as_ref(), width, info.id == "certificate") {
+                    let en = source.iter().find(|i| i.id == info.id);
+                    let name = shown(en.map_or(info.name, |i| i.name), info.name);
+                    let summary = shown(en.map_or(info.summary, |i| i.summary), info.summary);
+                    if tile(ui, &t, &name, &summary, texture.as_ref(), width, info.id == "certificate") {
                         chosen = Some(info.id);
                     }
                 }
