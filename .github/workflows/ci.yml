@@ -67,6 +67,17 @@ jobs:
               print("Git dependencies outside github.com/getnodalia:", *bad, sep="\n")
               sys.exit(1)
           PY
+      - name: No crate is named after the Craft apps
+        run: |
+          python3 - <<'PY'
+          import sys, tomllib
+          with open("Cargo.lock", "rb") as fh:
+              lock = tomllib.load(fh)
+          bad = sorted({p["name"] for p in lock.get("package", []) if p["name"].startswith(("craft-", "craft_"))})
+          if bad:
+              print("Crates named after the Craft apps (rename them to nodalia-* or the app's own name):", *bad, sep="\n")
+              sys.exit(1)
+          PY
 
   gate:
     if: github.event.action != 'labeled' || github.event.label.name == 'full-ci'
