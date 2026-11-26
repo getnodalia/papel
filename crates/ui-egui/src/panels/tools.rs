@@ -1,7 +1,7 @@
 use super::edit::{actions_menu, edit_panel, stamp_palette};
 use super::{
-    Align2, Availability, Color32, CornerRadius, LeftPanel, PapelApp, Rect, Sense, Stroke, TOOL_GROUPS, Tokens, ToolGroup, catalog, icons, theme,
-    vec2, widgets,
+    Align2, Availability, Color32, CornerRadius, LeftPanel, PapelApp, Rect, Sense, TOOL_GROUPS, Tokens, ToolGroup, catalog, icons, theme, vec2,
+    widgets,
 };
 
 const COLLAPSED_TOOLS: usize = 14;
@@ -17,19 +17,17 @@ pub fn left_panel(app: &mut PapelApp, ui: &mut egui::Ui) {
     if app.left == LeftPanel::Tool("organize") && app.active.and_then(|i| app.views.get(i)).is_some_and(|v| !v.organize) {
         app.left = crate::organize_panel::workspace_panel(app.mode);
     }
-    egui::Frame::NONE.fill(t.panel).inner_margin(egui::Margin { left: 14, right: 14, top: 12, bottom: 10 }).stroke(Stroke::new(1.0, t.divider)).show(
-        ui,
-        |ui| match app.left {
-            // Organize pages has its own panel whenever the grid shows (with a document open).
-            _ if app.active.is_some() && crate::organize_panel::showing(app) => crate::organize_panel::panel(app, ui, &t),
-            LeftPanel::AllTools => all_tools(app, ui, &t),
-            LeftPanel::Tool(id) => match catalog::group(id) {
-                Some(g) => tool_detail(app, ui, &t, g),
-                None => app.left = LeftPanel::AllTools,
-            },
-            LeftPanel::CalculationOrder => crate::calc_order_ui::panel(app, ui, &t),
+    // The pane host draws the island (its fill and rounded corners); this frame only pads.
+    egui::Frame::NONE.inner_margin(egui::Margin { left: 14, right: 14, top: 12, bottom: 10 }).show(ui, |ui| match app.left {
+        // Organize pages has its own panel whenever the grid shows (with a document open).
+        _ if app.active.is_some() && crate::organize_panel::showing(app) => crate::organize_panel::panel(app, ui, &t),
+        LeftPanel::AllTools => all_tools(app, ui, &t),
+        LeftPanel::Tool(id) => match catalog::group(id) {
+            Some(g) => tool_detail(app, ui, &t, g),
+            None => app.left = LeftPanel::AllTools,
         },
-    );
+        LeftPanel::CalculationOrder => crate::calc_order_ui::panel(app, ui, &t),
+    });
 }
 
 /// A panel's title row: a leading button (`lead`: its icon and tooltip) when given, the title
