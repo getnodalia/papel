@@ -126,5 +126,5 @@ modules:
         path: stage
       - type: git
         url: https://github.com/getnodalia/foundation
-        commit: c4dd74886dfce280960c5b568de00d747b11a81a
+        commit: 5e8ddb40e54b0e172cdd4919e201e811391988d7
         dest: nodalia-i18n
