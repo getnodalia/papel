@@ -32,7 +32,7 @@ printing are counted in their feature areas). **Platforms ≈ 70% ready, 15–30
 |---|---|---|---|---|
 | macOS | yes | yes | signed and notarized DMG | — |
 | Windows (x64, x86, ARM64) | yes (x64, ARM64) | yes | signed installers | — |
-| Linux | no | yes | AppImage, deb, rpm, Flatpak, tarball | Chinese faces in Flatpak (#689) |
+| Linux | no | yes | AppImage, deb, rpm, tarball | |
 | FreeBSD | no | yes | package | — |
 | Web | Acrobat online (cloud) | yes (WASM, offline in the browser) | static site | OCR as fast as native (Web Workers with SIMD read a page about 17× slower), crash recovery, PKCS #12 signing, hosted deployment |
 

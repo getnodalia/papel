@@ -66,7 +66,7 @@ Papel reads its translations from [nodalia-i18n](https://github.com/getnodalia/f
 
 - Strings in the code stay in English and serve as lookup keys. At draw time, `tl!("Save")` returns the text in the current language, and falls back to English when there is no entry.
 - Each language has two catalogs in nodalia-i18n: `locales/<code>/common.tsv` (rows every app shares) and `locales/<code>/papel.tsv` (Papel's own rows, which win over shared ones). One entry per line: `context<TAB>English<TAB>translation`. An empty context marks a plain string. `@id` keys an entry by command id (for example `file.saveAs`); Papel reads `@id` rows only from `papel.tsv`. `@plural` holds plural forms, chosen by CLDR rules. Any other context disambiguates an English word with several meanings (`tl_ctx!` in UI code). nodalia-i18n's `docs/integration.md` documents the format and escapes.
-- The build embeds the catalogs from `NODALIA_I18N_DIR`, a nodalia-i18n checkout at the commit in `nodalia-i18n.rev` (CI and the flatpak manifests check it out there). Unset, the build is English only; `NODALIA_I18N_REQUIRED=1` (release builds) makes that an error. Tests that need the catalogs say they are skipped.
+- The build embeds the catalogs from `NODALIA_I18N_DIR`, a nodalia-i18n checkout at the commit in `nodalia-i18n.rev` (CI checks it out there). Unset, the build is English only; `NODALIA_I18N_REQUIRED=1` (release builds) makes that an error. Tests that need the catalogs say they are skipped.
 - Placeholders (`{name}`) must appear in both columns. A trailing `…` must be kept. `i18n::fmt` fills placeholders in one pass, so a value such as a file name containing `{n}` is inserted as written.
 - A missing entry never fails a build or a test: that string shows in English. `cargo xtask i18n-report`, a step of `cargo xtask ci`, prints for each language how many strings it has no translation for and the first few. It counts every command, All tools label, literal passed to `tl!` or `i18n::t` in the UI source, engine wording (below) and key of the embedded Papel catalogs.
 - nodalia-i18n validates rows strictly (unknown escapes, unknown `@` contexts, placeholder or ellipsis mismatches, wrong plural form counts, duplicates). At run time a bad row is skipped (and logged) and that string shows in English; `bundled_catalogs_are_consistent` prints them.
@@ -89,7 +89,7 @@ Error details that come from the operating system, and faults rather than mistak
 
 1. In nodalia-i18n, add `locales/xx/papel.tsv` with its `@id language.name` row, and translate entries.
 2. Add one row to `LANGUAGES` in `crates/ui-egui/src/i18n.rs` (code and whether it is right-to-left), one to `english_name`, and one to `DATE_LANGUAGES` in `crates/engine/src/dates.rs`.
-3. Bump `nodalia-i18n.rev` (and the `commit:` of the nodalia-i18n source in both flatpak manifests) to a nodalia-i18n commit with the catalog.
+3. Bump `nodalia-i18n.rev` to a nodalia-i18n commit with the catalog.
 
 The Preferences dropdown, the system-language match and the translation gaps report then pick it up.
 

@@ -51,7 +51,7 @@ Once the draft is published, the workflow refuses to touch that version again, s
 with `cargo xtask version set` before building, so the binaries report it too. The signing jobs
 (macOS, Windows) and the draft-release job use the `release` environment, so pick the `release`
 branch in the dialog for a full run. On any other branch the same dispatch is a **dry run**: the
-Linux, Flatpak, FreeBSD and web jobs build and check everything, the signing jobs are refused by the
+Linux, FreeBSD and web jobs build and check everything, the signing jobs are refused by the
 environment's branch rule, and the draft-release job (which needs them) is skipped, so nothing is
 published (`gh workflow run release.yml --ref <branch>`).
 
@@ -66,8 +66,6 @@ published (`gh workflow run release.yml --ref <branch>`).
 | Linux x86_64 | `papel-<v>-linux-x86_64.{AppImage,AppImage.zsync,deb,rpm,tar.gz}`, `papel-cli-<v>-linux-x86_64.tar.gz` | `ubuntu-22.04` |
 | Linux aarch64 | `papel-<v>-linux-aarch64.{AppImage,AppImage.zsync,deb,rpm,tar.gz}`, `papel-cli-<v>-linux-aarch64.tar.gz` | `ubuntu-22.04-arm` |
 | Linux riscv64 | `papel-<v>-linux-riscv64.tar.gz`, `papel-cli-<v>-linux-riscv64.tar.gz` (glibc 2.39+) | `ubuntu-24.04` (cross-compiled; CLI smoke-tested under QEMU) |
-| Flatpak x86_64 | `papel-<v>-linux-x86_64.flatpak` | `ubuntu-24.04` (repackages the Linux tarball) |
-| Flatpak aarch64 | `papel-<v>-linux-aarch64.flatpak` | `ubuntu-24.04-arm` (repackages the Linux tarball) |
 | FreeBSD 14 x86_64 | `papel-<v>-freebsd-x86_64.tar.gz` | FreeBSD VM on `ubuntu-latest` |
 | Web | `papel-web-<v>.zip` (a static site; see [`packaging/web/README.md`](../packaging/web/README.md)) | `ubuntu-latest` |
 
@@ -96,7 +94,7 @@ Discovery never combines model formats or files from different directories.
 Directory precedence stays the same: `$PAPEL_MODELS`, the release-package locations beside the executable, then the source tree's `assets/models/`.
 The first directory with a complete supported pair wins, even if an earlier legacy pair precedes a later ONNX pair.
 
-The release-package locations are `models\` beside `papel.exe` (MSI, portable zip), `Papel.app/Contents/Resources/models` (macOS), and `share/papel/models` beside `bin/` (deb, rpm, tar.gz, AppImage, Flatpak, FreeBSD).
+The release-package locations are `models\` beside `papel.exe` (MSI, portable zip), `Papel.app/Contents/Resources/models` (macOS), and `share/papel/models` beside `bin/` (deb, rpm, tar.gz, AppImage, FreeBSD).
 The web build does not include these models, and OCR remains limited to the Latin alphabet without accents.
 
 ### macOS
@@ -221,17 +219,7 @@ downloading only the changed blocks. `latest` is the newest published, non-pre-r
 `package.sh` writes the `.zsync` when `zsyncmake` (the `zsync` package) is installed and warns
 otherwise; the release job checks both.
 
-**Flatpak:** the `flatpak` job turns each arch's tarball into a single-file bundle with
-`packaging/linux/flatpak-bundle.sh` and `flatpak/dev.danielmiguelt.Papel.bundle.yml` (no Rust build;
-the same binaries), then installs it and runs `papel-cli --version` in the sandbox.
-`flatpak/dev.danielmiguelt.Papel.yml` is the from-source manifest for a later Flathub submission;
-packaging-lint keeps the runtime and sandbox permissions (`finish-args`) of the two identical.
-Printing is not available in the Flatpak yet: it runs `lp`, which the freedesktop runtime lacks
-(the job logs a note); it needs the print portal. Users install the bundle with `flatpak install --user papel-<v>-linux-<arch>.flatpak`; the
-freedesktop runtime comes from Flathub.
-
-Locally (on Linux, with nfpm): `packaging/linux/package.sh` or `--formats "deb tar"`; then
-`packaging/linux/flatpak-bundle.sh` for the Flatpak.
+Locally (on Linux, with nfpm): `packaging/linux/package.sh` or `--formats "deb tar"`.
 
 ### FreeBSD
 
