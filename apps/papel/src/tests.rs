@@ -727,27 +727,14 @@ fn the_desktop_entry_names_the_window_class() {
     assert_eq!(class, Some(super::APP_ID));
 }
 
-/// Both flatpak manifests build with the nodalia-i18n commit `nodalia-i18n.rev` pins: CI and
-/// releases read the file, and the manifests have to name the commit themselves. The pin may
-/// have a trailing newline or CRLF (a Windows checkout), so it is trimmed, as every reader does.
+/// CI and releases read the nodalia-i18n commit from `nodalia-i18n.rev`: it holds one full SHA. The pin
+/// may have a trailing newline or CRLF (a Windows checkout), so it is trimmed, as every reader does.
 #[test]
-fn the_flatpak_manifests_pin_the_craft_i18n_rev() {
+fn the_i18n_rev_is_one_full_sha() {
     let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
     let rev = std::fs::read_to_string(root.join("nodalia-i18n.rev")).unwrap();
     let rev = rev.trim();
     assert!(rev.len() == 40 && rev.bytes().all(|b| b.is_ascii_hexdigit()), "nodalia-i18n.rev holds one full SHA: {rev:?}");
-    for manifest in ["dev.danielmiguelt.Papel.yml", "dev.danielmiguelt.Papel.bundle.yml"] {
-        let text = std::fs::read_to_string(root.join("packaging/linux/flatpak").join(manifest)).unwrap();
-        let source =
-            text.split("url: https://github.com/getnodalia/foundation").nth(1).unwrap_or_else(|| panic!("{manifest}: a nodalia-i18n git source"));
-        let source = source.split("- type:").next().unwrap_or(source);
-        let commit = source
-            .lines()
-            .find_map(|l| l.trim().strip_prefix("commit:"))
-            .unwrap_or_else(|| panic!("{manifest}: the nodalia-i18n source pins a commit"));
-        assert_eq!(commit.trim().trim_matches(['\'', '"']), rev, "{manifest}");
-        assert!(text.contains("NODALIA_I18N_DIR: /run/build/papel/nodalia-i18n"), "{manifest}: the build names the catalogs");
-    }
 }
 
 /// Every release workflow builds with the translations (Papel 0.1.0 shipped Linux and Windows

@@ -1,7 +1,7 @@
 # Nodalia migration: Papel
 
 Category: secondary app.
-Status: renamed to Papel throughout, as of 2026-11-15. Evidence: the pull request that adds `scripts/rebrand.py`.
+Status: renamed to Papel throughout; Flatpak and the weekly upstream sync removed, as of 2026-11-26.
 
 ## Current state
 
@@ -18,15 +18,13 @@ interface follows Foundation's [NDL standard](https://github.com/getnodalia/foun
 
 | Dependency | Where | Replacement | Blocked on |
 |---|---|---|---|
-| `storytold/pdfcraft` | `.github/workflows/upstream-sync.yml` | none: the intended weekly upstream sync, renamed by `scripts/rebrand.py` | — |
 | `storytold/winprint.rs` | `Cargo.toml` `[patch]` | getnodalia/foundation's vendor branches already serve it; the `[patch]` names the source it overrides | — |
 
 ## Technical debt
 
 - Every name is Papel's, internal ones included (crates `papel-*`, binaries `papel` and
-  `papel-cli`, app id `dev.danielmiguelt.Papel`, `PAPEL_*` environment variables). Upstream's tree
-  arrives renamed by `scripts/rebrand.py` (`docs/upstream.md`). The shared translation catalog keeps
-  its name, `pdfcraft.tsv`.
+  `papel-cli`, app id `dev.danielmiguelt.Papel`, `PAPEL_*` environment variables). There is no
+  upstream sync and no rename tooling.
 
 ## Reusable Nodalia components
 
