@@ -1,4 +1,4 @@
-//! `window.papel`: the page command API (`nodalia-web-api`, storytold/craft-libs#413) over the app's
+//! `window.papel`: the page command API (`nodalia-web-api`, #413) over the app's
 //! UI control channel (`papel_ui_egui::control`), opt-in with `?control`.
 //!
 //! The crate owns the JavaScript side (`request`, `execute`, `commands`, `docInspect`, `uiInspect`,

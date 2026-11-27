@@ -1791,7 +1791,7 @@ mod tests {
         assert_eq!(pdf.pages().len(), 1);
     }
 
-    // Papel patch tests (ported from craft-libs): xref stream entries are bounded by the
+    // Papel patch tests (ported from nodalia-libs): xref stream entries are bounded by the
     // decoded data, and the type field is read at its full width.
     #[test]
     fn xref_stream_entries_need_backing_bytes() {

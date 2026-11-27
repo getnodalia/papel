@@ -827,7 +827,7 @@ fn read_encoding(object: &Object<'_>, cmap_resolver: &CMapResolverFn) -> Option<
     }
 }
 
-/// Papel patch test (ported from craft-libs): a /W2 run whose first CID is past `MAX_CID`
+/// Papel patch test (ported from nodalia-libs): a /W2 run whose first CID is past `MAX_CID`
 /// is skipped and the rest of the table kept.
 #[cfg(test)]
 mod tests {

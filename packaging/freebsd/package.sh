@@ -30,7 +30,7 @@ release_arch() {
   esac
 }
 # The release workflow cross-compiles aarch64 in an x86_64 VM with CARGO_BUILD_TARGET set to
-# aarch64-unknown-freebsd (craft-common-actions#39): name the archive after the target.
+# aarch64-unknown-freebsd: name the archive after the target.
 # host-tuple means the build host's triple, as rustc names it.
 if [[ "${CARGO_BUILD_TARGET:-}" == host-tuple ]]; then
   CARGO_BUILD_TARGET="$(rustc -vV | sed -n 's/^host: //p')"

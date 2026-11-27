@@ -13,7 +13,7 @@ use crate::{Dialog, Mode, PapelApp, PropsTab, RightPanel, icons, widgets, window
 /// lights itself, centred in the standard 28 pt title-bar band at the top of the window, and moving
 /// them takes AppKit calls the workspace forbids (`unsafe`). So on macOS the strip is that band:
 /// the lights sit vertically centred in it, and the controls beside them shrink to fit, as in
-/// Letra (storytold/wordcraft#255).
+/// Letra (#255).
 pub const MAC_TITLE_BAR: f32 = 28.0;
 /// The traffic lights as AppKit lays them out: button diameter, centre-to-centre pitch and the
 /// first button's left edge (8–10 pt depending on the macOS version; the larger value keeps the

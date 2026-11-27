@@ -91,7 +91,7 @@ logged and falls back to leaving duplex unspecified, so the driver can still cho
 If the queue was resolved before the settings failure, the job remains pinned to that queue. CUPS still leaves the choice to the queue. The Windows backend
 selects `JobDuplexAllDocumentsContiguously`, falling back to `DocumentDuplex` when
 the driver exposes only document-level duplex, and validates the retained binding before submission
-([nodalia-libs #411](https://github.com/storytold/craft-libs/pull/411)).
+(nodalia-libs #411).
 
 Before a job reaches the Windows spooler, every embedded TrueType or OpenType program is
 renamed `PapelPrint<n>` in its `name` table and in the PDF (`/BaseFont`, `/FontName`; a
