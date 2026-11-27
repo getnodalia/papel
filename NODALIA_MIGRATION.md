@@ -11,14 +11,13 @@ workflows pinned by commit. SonarCloud was removed; CodeQL and Scorecard remain.
 
 ## Desired state
 
-No workflow, dependency or document depends on storytold; Papel has its own release workflow; the
+No workflow, dependency or document depends on a repository outside Nodalia; Papel has its own release workflow; the
 interface follows Foundation's [NDL standard](https://github.com/getnodalia/foundation/blob/main/standards/ndl.md).
 
 ## Inherited dependencies still pending
 
-| Dependency | Where | Replacement | Blocked on |
-|---|---|---|---|
-| `storytold/winprint.rs` | `Cargo.toml` `[patch]` | getnodalia/foundation's vendor branches already serve it; the `[patch]` names the source it overrides | — |
+None.
+
 
 ## Technical debt
 

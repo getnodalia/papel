@@ -744,7 +744,7 @@ pub(crate) fn path_as_rect(path: &BezPath) -> Option<Rect> {
     Some(path.fast_bounding_box())
 }
 
-/// Papel patch tests (ported from craft-libs): the graphics-state stack is bounded by count
+/// Papel patch tests (ported from nodalia-libs): the graphics-state stack is bounded by count
 /// and by bytes, and every `q` still pairs with its `Q`.
 #[cfg(test)]
 mod saved_state_tests {

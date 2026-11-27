@@ -5845,7 +5845,7 @@ fn jbig2_placements_at_the_end_of_an_i32_draw_nothing() {
     assert_eq!(ink(hex(LOWER_LINE), 16, 12), 0, "a lower range line past an i32");
 }
 
-/// Item 1 of storytold/pdfcraft#623: a page's content used to be cut at `MAX_DECODED_STREAM`,
+/// Item 1 of #623: a page's content used to be cut at `MAX_DECODED_STREAM`,
 /// so everything after the cut was lost (the text and the title block of the A1 sample). Content
 /// that expands by a few times over is read to its end, however large it is.
 #[test]
