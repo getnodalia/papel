@@ -101,7 +101,7 @@ If you find an asset that breaks these rules, stop and remove it from the reposi
 - Behaviour comes only from public specifications (ISO 32000-2, the Arlington model), public documentation and black-box observation.
 - Never copy GPL/AGPL code. Copyleft tools run only as external oracle processes.
 - Observe Acrobat only with synthetic fixtures. Never capture personal data, account information or recent files.
-- Shared real-file test oracles (Photoshop-authored PSDs, etc.) live in [`storytold/photocraft-corpus`](https://github.com/storytold/photocraft-corpus). Never commit large binary fixtures to this repo; fetch them pinned by commit and sha256-verified, as Lienzo does with `cargo xtask corpus`.
+- Shared real-file test oracles live in [`getnodalia/nodalia-corpus`](https://github.com/getnodalia/nodalia-corpus), each with its provenance and licence. Never commit large binary fixtures to this repo; fetch them pinned by commit and sha256-verified, as Lienzo does with `cargo xtask corpus`.
 
 ## 3. Agent control (automation and MCP)
 
